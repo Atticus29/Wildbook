@@ -220,8 +220,8 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
         // out.println(TwitterUtil.toJSONString(test));
         MediaAssetMetadata entMd = ent.updateMetadata();
         MediaAssetFactory.save(ent, myShepherd);
-        // JSONObject test = TwitterUtil.toJSONObject(entMd);
-        // out.println(TwitterUtil.toJSONString(test));
+        JSONObject test = TwitterUtil.toJSONObject(entMd);
+        out.println(TwitterUtil.toJSONString(test));
 				// MediaAssetFactory.save(ent, myShepherd);
 				String taskId = IBEISIA.IAIntake(ent, myShepherd, request);
         out.println(tweet.getId() + ": created entity asset " + ent + "; detection taskId " + taskId);
