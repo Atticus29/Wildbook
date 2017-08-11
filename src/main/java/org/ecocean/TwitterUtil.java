@@ -215,7 +215,7 @@ public class TwitterUtil {
           ej.put("maId", ent.getId());
           ej.put("taskId", taskId);
           ej.put("creationDate", new LocalDateTime());
-          String tweeterScreenName = tj.getJSONObject("tweet").getJSONObject("user").getString("screen_name");
+          String tweeterScreenName = tj.getJSONObject("tweet").getJSONObject("user").getString("screenName");
           ej.put("tweeterScreenName", tweeterScreenName);
           jent.put(ej);
           // myShepherd.getPM().makePersistent(ej); //maybe?
