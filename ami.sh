@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cp /home/ubuntu/Wildbook_javaTweetBot/twitter.properties /home/ubuntu/Wildbook_javaTweetBot/src/main/resources/bundles/twitter.properties
-cp /var/lib/tomcat/webapps/wildbook/tweetFind.jsp /home/ubuntu/Wildbook_javaTweetBot/src/main/webapp/
+#cp /var/lib/tomcat/webapps/wildbook/tweetFind.jsp /home/ubuntu/Wildbook_javaTweetBot/src/main/webapp/
 
 #rm -rf /var/lib/tomcat/webapps/wildbook.war
 
