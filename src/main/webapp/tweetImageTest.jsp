@@ -43,25 +43,66 @@ String simpleTweetText = "@wildmetweetbot! I saw a whale!";
 String dateTweetText = "@wildmetweetbot, I saw a whale on June 3, 2017!";
 String oneImageTweetText = "@wildmetweetbot, I took a picture of a whale!";
 String multImageTweetText = "@wildmetweetbot, I took some pictures of whales!";
+String locationTweetText = "@wildmetweetbot Saw this cool humpback whale in the galapagos, Ecuador!";
+String nonEnglishLocationTweetText = "@wildmetweetbot! Ayer vi una ballena increible en los galapagos en mexico.";
+String textTweetGpsText = "@wildmetweetbot saw a whale at 45.5938,-122.737 in ningaloo. #bestvacationever";
+String futureTweetText = "@wildmetweetbot Saw a whale on July 2, 2017. I'm going to see one tomorrow too!";
+String pastTweetText = "@wildmetweetbot Saw a whale on July 2, 2017. I saw one yesterday, too!";
+
 File imageFile1 = new File(dataDir + "/images/testWhale1.jpg");
 File imageFile2 = new File(dataDir + "/images/testWhale2.jpg");
 
 // Test simple tweet
 try {
-  TwitterUtil.createTweet(simpleTweetText, twitterInst);
+  TwitterUtil.createTweet(simpleTweetText + new Date().toString(), twitterInst);
 } catch(TwitterException e){
   e.printStackTrace();
   out.println("Unable to send simple tweet.");
 } 
-// Test tweet with date?
+// Test tweet with date
 try {
-  TwitterUtil.createTweet(dateTweetText, twitterInst);
+  TwitterUtil.createTweet(dateTweetText + new Date().toString(), twitterInst);
 } catch(TwitterException e){
   e.printStackTrace();
   out.println("Unable to send date tweet.");
 }
+// Test tweet with location
+try {
+  TwitterUtil.createTweet(locationTweetText + new Date().toString(), twitterInst);
+} catch(TwitterException e){
+  e.printStackTrace();
+  out.prinln("Unable to send location tweet.");
+}
+// Test tweet with non English text
+try {
+  TwitterUtil.createTweet(nonEnglishLocationTweetText + new Date().toString(), twitterInst);
+} catch(TwitterException e){
+  e.printStackTrace();
+  out.prinln("Unable to send non-English location tweet.");
+}
+// Test tweet with GPS text
+try {
+  TwitterUtil.createTweet(textTweetGpsText + new Date().toString(), twitterInst);
+} catch(TwitterException e){
+  e.printStackTrace();
+  out.prinln("Unable to send GPS location tweet.");
+}
+// Test tweet with future text
+try {
+  TwitterUtil.createTweet(futureTweetText + new Date().toString(), twitterInst);
+} catch(TwitterException e){
+  e.printStackTrace();
+  out.prinln("Unable to send future tweet.");
+}
+// Test tweet with past text
+try {
+  TwitterUtil.createTweet(pastTweetText + new Date().toString(), twitterInst);
+} catch(TwitterException e){
+  e.printStackTrace();
+  out.prinln("Unable to send past tweet.");
+}
 // Test tweet with one image
-StatusUpdate status = new StatusUpdate(oneImageTweetText);
+StatusUpdate status = new StatusUpdate(oneImageTweetText + new Date().toString());
 status.setMedia(imageFile1);
 try {
   twitterInst.updateStatus(status);
@@ -80,14 +121,13 @@ try {
   out.println("Uploaded Media: " + media.getMediaId());
   mediaIds[1] = media.getMediaId();
   // Set media ids to status
-  StatusUpdate multiStatus = new StatusUpdate(multImageTweetText);
+  StatusUpdate multiStatus = new StatusUpdate(multImageTweetText + new Date().toString());
   multiStatus.setMediaIds(mediaIds);
   twitterInst.updateStatus(multiStatus);
 } catch(TwitterException e){
   e.printStackTrace();
   out.println("Unable to send multi-image tweet.");
 }
-
 
 // ###              End tweet tests                 ###
 
