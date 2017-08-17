@@ -81,7 +81,7 @@ try {
 }
 // Test tweet with one image
 StatusUpdate status = new StatusUpdate(oneImageTweetText);
-status.uploadMedia(imageFile1);
+status.setMedia(imageFile1);
 try {
   twitterInst.updateStatus(status);
 } catch(TwitterException e){
