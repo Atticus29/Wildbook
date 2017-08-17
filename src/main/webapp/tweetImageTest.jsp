@@ -37,25 +37,6 @@ Long timeStamp = 890302524275662848L;
 // Twitter Instance
 Twitter twitterInst = TwitterUtil.init(request);
 
-// ### Retrieve timestamp for the last twitter check ###
-
-try{
-	// the timestamp is written with a new line at the end, so we need to strip that out before converting
-  String timeStampAsText = Util.readFromFile(dataDir + twitterTestTimeStampFile);
-  timeStampAsText = timeStampAsText.replace("\n", "");
-  timeStamp = Long.parseLong(timeStampAsText, 10);
-} catch(FileNotFoundException e){
-	e.printStackTrace();
-} catch(IOException e){
-	e.printStackTrace();
-} catch(NumberFormatException e){
-	e.printStackTrace();
-}
-out.println("Timestamp: " + timeStamp);
-
-// ###           End timestamp retrieval            ###
-
- 
 // ### Test different tweets against the Twitterbot ###
 
 String simpleTweetText = "@wildmetweetbot! I saw a whale!";
