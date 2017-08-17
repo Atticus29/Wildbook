@@ -22,7 +22,8 @@ org.ecocean.media.*,
 org.ecocean.ParseDateLocation.*,
 java.util.concurrent.ThreadLocalRandom,
 org.joda.time.DateTime,
-org.joda.time.Interval
+org.joda.time.Interval,
+java.io.File
               "
 %>
 
@@ -59,12 +60,28 @@ out.println("Timestamp: " + timeStamp);
 
 // Test simple tweet
 String simpleTweetText = "@wildmetweetbot! I saw a whale!";
-
+try {
+  TwitterUtil.createTweet(simpleTweetText, twitterInst);
+} catch(TwitterException e){
+  e.printStackTrace();
+} 
 // Test tweet with date?
 String dateTweetText = "@wildmetweetbot, I saw a whale on June 3, 2017!";
-
+try {
+  TwitterUtil.createTweet(dateTweetText, twitterInst);
+} catch(TwitterException e){
+  e.printStackTrace();
+}
 // Test tweet with one image
 String oneImageTweetText = "@wildmetweetbot, I took a picture of a whale!";
+File imageFile = new File(dataDir + "/images/testWhale1.jpg");
+StatusUpdate status = new StatusUpdate(oneImageTweetText);
+status.uploadMedia(imageFile);
+try {
+  twitterInst.updateStatus(status);
+} catch(TwitterException e){
+  e.printStackTrace();
+}
 // Test tweet with multiple images
 String multImageTweetText = "@wildmetweetbot, I took some pictures of whales!";
 
