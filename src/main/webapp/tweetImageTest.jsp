@@ -45,6 +45,7 @@ String oneImageTweetText = "@wildmetweetbot, I took a picture of a whale!";
 String multImageTweetText = "@wildmetweetbot, I took some pictures of whales!";
 File imageFile1 = new File(dataDir + "/images/testWhale1.jpg");
 File imageFile2 = new File(dataDir + "/images/testWhale2.jpg");
+File imageFile3 = new File(dataDir + "/images/notAWhale.jpg");
 
 // Test simple tweet
 try {
@@ -52,7 +53,7 @@ try {
 } catch(TwitterException e){
   e.printStackTrace();
   out.println("Unable to send simple tweet.");
-} 
+}
 // Test tweet with date?
 try {
   TwitterUtil.createTweet(dateTweetText, twitterInst);
