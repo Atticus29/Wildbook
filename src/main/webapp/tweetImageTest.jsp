@@ -58,32 +58,55 @@ out.println("Timestamp: " + timeStamp);
  
 // ### Test different tweets against the Twitterbot ###
 
-// Test simple tweet
 String simpleTweetText = "@wildmetweetbot! I saw a whale!";
+String dateTweetText = "@wildmetweetbot, I saw a whale on June 3, 2017!";
+String oneImageTweetText = "@wildmetweetbot, I took a picture of a whale!";
+String multImageTweetText = "@wildmetweetbot, I took some pictures of whales!";
+File imageFile1 = new File(dataDir + "/images/testWhale1.jpg");
+File imageFile2 = new File(dataDir + "/images/testWhale2.jpg");
+
+// Test simple tweet
 try {
   TwitterUtil.createTweet(simpleTweetText, twitterInst);
 } catch(TwitterException e){
   e.printStackTrace();
+  out.println("Unable to send simple tweet.");
 } 
 // Test tweet with date?
-String dateTweetText = "@wildmetweetbot, I saw a whale on June 3, 2017!";
 try {
   TwitterUtil.createTweet(dateTweetText, twitterInst);
 } catch(TwitterException e){
   e.printStackTrace();
+  out.println("Unable to send date tweet.");
 }
 // Test tweet with one image
-String oneImageTweetText = "@wildmetweetbot, I took a picture of a whale!";
-File imageFile = new File(dataDir + "/images/testWhale1.jpg");
 StatusUpdate status = new StatusUpdate(oneImageTweetText);
-status.uploadMedia(imageFile);
+status.uploadMedia(imageFile1);
 try {
   twitterInst.updateStatus(status);
 } catch(TwitterException e){
   e.printStackTrace();
+  out.println("Unable to send single image tweet.");
 }
 // Test tweet with multiple images
-String multImageTweetText = "@wildmetweetbot, I took some pictures of whales!";
+long mediaIds[] = new long[2];
+try {
+  // Upload media and get ids
+  UploadedMedia media = twitterInst.uploadMedia(imageFile1);
+  out.println("Uploaded Media: " + media.getMediaId());
+  mediaIds[0] = media.getMediaId();
+  media = twitterInst.uploadMedia(imageFile2);
+  out.println("Uploaded Media: " + media.getMediaId());
+  mediaIds[1] = media.getMediaId();
+  // Set media ids to status
+  StatusUpdate multiStatus = new StatusUpdate(multImageTweetText);
+  multiStatus.setMediaIds(mediaIds);
+  twitterInst.updateStatus(multiStatus);
+} catch(TwitterException e){
+  e.printStackTrace();
+  out.println("Unable to send multi-image tweet.");
+}
+
 
 // ###              End tweet tests                 ###
 
