@@ -286,4 +286,20 @@ public class TwitterUtil {
     }
     return new JSONArray(list);
   }
+
+  public static Long getSinceIdFromTwitterTimeStampFile(String path){
+    try{
+    	// the timestamp is written with a new line at the end, so we need to strip that out before converting
+      String timeStampAsText = Util.readFromFile(dataDir + twitterTimeStampFile);
+      timeStampAsText = timeStampAsText.replace("\n", "");
+      sinceId = Long.parseLong(timeStampAsText, 10);
+    } catch(FileNotFoundException e){
+    	e.printStackTrace();
+    } catch(IOException e){
+    	e.printStackTrace();
+    } catch(NumberFormatException e){
+    	e.printStackTrace();
+    }
+
+  }
 }
