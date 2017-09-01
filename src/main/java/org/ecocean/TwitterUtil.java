@@ -199,7 +199,7 @@ public class TwitterUtil {
     }
   }
 
-  public static JSONObject saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis(List<MediaAsset> mas, Long tweetID, Shepherd myShepherd, JSONObject tj, HttpServletRequest request){
+  public static JSONArray saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis(List<MediaAsset> mas, Long tweetID, Shepherd myShepherd, JSONObject tj, HttpServletRequest request, JSONArray tarr, JSONArray iaPendingResults){
     if ((mas == null) || (mas.size() < 1)) {
     } else {
       JSONArray jent = new JSONArray();
@@ -227,7 +227,10 @@ public class TwitterUtil {
       }
       tj.put("entities", jent);
     }
-    return tj;
+    tarr.put(tj);
+
+    iaPendingResults.put(ej);
+    return iaPendingResults;
   }
 
 
