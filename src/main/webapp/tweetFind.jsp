@@ -90,6 +90,7 @@ try {
 // Check if JSON data exists
 if(iaPendingResults != null){
 
+	out.println("iaPendingResults wasn't null");
 	// out.println(iaPendingResults);
 	for(int i = 0; i < iaPendingResults.length(); i++){
 		JSONObject resultStatus = null;
