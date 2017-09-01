@@ -42,7 +42,10 @@ Twitter twitterInst = TwitterUtil.init(request);
 String simpleTweetText = "@wildmetweetbot! I saw a whale!";
 String dateTweetText = "@wildmetweetbot, I saw a whale on June 3, 2017!";
 String oneImageTweetText = "@wildmetweetbot, I took a picture of a whale!";
+String oneImageNotWhaleTweetText = "@wildmetweetbot, I took a picture of a whale! This is a whale, right?";
 String multImageTweetText = "@wildmetweetbot, I took some pictures of whales!";
+String multImageNotWhaleTweetText = "@wildmetweetbot, I took some pictures of whales! These are whales, aren't they?";
+String multImageOneNotWhaleTweetText = "@wildmetweetbot, I took some pictures of whales! These are both whales, aren't they?";
 String locationTweetText = "@wildmetweetbot Saw this cool humpback whale in the galapagos, Ecuador!";
 String nonEnglishLocationTweetText = "@wildmetweetbot! Ayer vi una ballena increible en los galapagos en mexico.";
 String textTweetGpsText = "@wildmetweetbot saw a whale at 45.5938,-122.737 in ningaloo. #bestvacationever";
@@ -52,6 +55,7 @@ String pastTweetText = "@wildmetweetbot Saw a whale on July 2, 2017. I saw one y
 File imageFile1 = new File(dataDir + "/images/testWhale1.jpg");
 File imageFile2 = new File(dataDir + "/images/testWhale2.jpg");
 File imageFile3 = new File(dataDir + "/images/notAWhale.jpg");
+File imageFile4 = new File(dataDir + "/images/notAWhale2.jpg");
 
 // Test simple tweet
 try {
@@ -72,37 +76,37 @@ try {
   TwitterUtil.createTweet(locationTweetText + new Date().toString(), twitterInst);
 } catch(TwitterException e){
   e.printStackTrace();
-  out.prinln("Unable to send location tweet.");
+  out.println("Unable to send location tweet.");
 }
 // Test tweet with non English text
 try {
   TwitterUtil.createTweet(nonEnglishLocationTweetText + new Date().toString(), twitterInst);
 } catch(TwitterException e){
   e.printStackTrace();
-  out.prinln("Unable to send non-English location tweet.");
+  out.println("Unable to send non-English location tweet.");
 }
 // Test tweet with GPS text
 try {
   TwitterUtil.createTweet(textTweetGpsText + new Date().toString(), twitterInst);
 } catch(TwitterException e){
   e.printStackTrace();
-  out.prinln("Unable to send GPS location tweet.");
+  out.println("Unable to send GPS location tweet.");
 }
 // Test tweet with future text
 try {
   TwitterUtil.createTweet(futureTweetText + new Date().toString(), twitterInst);
 } catch(TwitterException e){
   e.printStackTrace();
-  out.prinln("Unable to send future tweet.");
+  out.println("Unable to send future tweet.");
 }
 // Test tweet with past text
 try {
   TwitterUtil.createTweet(pastTweetText + new Date().toString(), twitterInst);
 } catch(TwitterException e){
   e.printStackTrace();
-  out.prinln("Unable to send past tweet.");
+  out.println("Unable to send past tweet.");
 }
-// Test tweet with one image
+// Test tweet with one whale image
 StatusUpdate status = new StatusUpdate(oneImageTweetText + new Date().toString());
 status.setMedia(imageFile1);
 try {
@@ -111,7 +115,18 @@ try {
   e.printStackTrace();
   out.println("Unable to send single image tweet.");
 }
-// Test tweet with multiple images
+
+// Test tweet with one whale image
+status = new StatusUpdate(oneImageNotWhaleTweetText + new Date().toString());
+status.setMedia(imageFile3);
+try {
+  twitterInst.updateStatus(status);
+} catch(TwitterException e){
+  e.printStackTrace();
+  out.println("Unable to send single image tweet.");
+}
+
+// Test tweet with multiple whale images
 long mediaIds[] = new long[2];
 try {
   // Upload media and get ids
@@ -123,6 +138,44 @@ try {
   mediaIds[1] = media.getMediaId();
   // Set media ids to status
   StatusUpdate multiStatus = new StatusUpdate(multImageTweetText + new Date().toString());
+  multiStatus.setMediaIds(mediaIds);
+  twitterInst.updateStatus(multiStatus);
+} catch(TwitterException e){
+  e.printStackTrace();
+  out.println("Unable to send multi-image tweet.");
+}
+
+// Test tweet with multiple non-whale images
+mediaIds = new long[2];
+try {
+  // Upload media and get ids
+  UploadedMedia media = twitterInst.uploadMedia(imageFile3);
+  out.println("Uploaded Media: " + media.getMediaId());
+  mediaIds[0] = media.getMediaId();
+  media = twitterInst.uploadMedia(imageFile4);
+  out.println("Uploaded Media: " + media.getMediaId());
+  mediaIds[1] = media.getMediaId();
+  // Set media ids to status
+  StatusUpdate multiStatus = new StatusUpdate(multImageNotWhaleTweetText + new Date().toString());
+  multiStatus.setMediaIds(mediaIds);
+  twitterInst.updateStatus(multiStatus);
+} catch(TwitterException e){
+  e.printStackTrace();
+  out.println("Unable to send multi-image tweet.");
+}
+
+// Test tweet with one non-whale image and one whale image
+mediaIds = new long[2];
+try {
+  // Upload media and get ids
+  UploadedMedia media = twitterInst.uploadMedia(imageFile2);
+  out.println("Uploaded Media: " + media.getMediaId());
+  mediaIds[0] = media.getMediaId();
+  media = twitterInst.uploadMedia(imageFile4);
+  out.println("Uploaded Media: " + media.getMediaId());
+  mediaIds[1] = media.getMediaId();
+  // Set media ids to status
+  StatusUpdate multiStatus = new StatusUpdate(multImageOneNotWhaleTweetText + new Date().toString());
   multiStatus.setMediaIds(mediaIds);
   twitterInst.updateStatus(multiStatus);
 } catch(TwitterException e){
