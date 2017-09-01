@@ -1167,7 +1167,24 @@ System.out.println("CALLBACK GOT: (taskID " + taskID + ") " + resp);
 System.out.println("**** type ---------------> [" + type + "]");
         if ("detect".equals(type)) {
             rtn.put("success", true);
-            rtn.put("processResult", processCallbackDetect(taskID, logs, resp, myShepherd, request));
+            try{
+              String screenName = TwitterUtil.findScreenNameInIaPendingLogFromTaskId(taskId);
+              System.out.println("Retrieved screen name: " + screenName);
+            } catch(Exception e){
+              e.printStackTrace();
+            }
+            try{
+              String imageId = TwitterUtil.findImageIdInIaPendingLogFromTaskId(taskId);//TODO still have to generate this method
+            } catch(Exception e){
+              e.printStackTrace();
+            }
+            try{
+              //TODO generate twitterInst
+              rtn.put("processResult", processCallbackDetect(taskID, logs, resp, myShepherd, request, screenName, imageId, twitterInst));
+            } catch(Exception e){
+              rtn.put("processResult", processCallbackDetect(taskID, logs, resp, myShepherd, request));
+            }
+
 
         } else if ("identify".equals(type)) {
             rtn.put("success", true);
@@ -1253,7 +1270,8 @@ System.out.println("+++++++++++ >>>> skipEncounters ???? " + skipEncounters);
 
                             needsReview = true;
                             System.out.println("Detection didn't find a whale fluke");
-                            // TwitterUtil.sendDetectionAndIdentificationTweet(screenName, imageId, twitterInst, whaleId, false, false, ""); //TODO find a way to get screenName, imageId, etc. over here
+
+                            // TwitterUtil.sendDetectionAndIdentificationTweet(screenName, imageId, twitterInst, null, false, false, ""); //TODO find a way to get screenName, imageId, etc. over here
                             continue;
                         }
                         //these are annotations we can make automatically from ia detection.  we also do the same upon review return

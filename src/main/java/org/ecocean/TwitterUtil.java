@@ -311,4 +311,52 @@ public class TwitterUtil {
       throw new Exception ("sinceId in getSinceIdFromTwitterTimeStampFile is null");
     }
   }
+
+  public static String findImageIdInIaPendingLogFromTaskId(String taskId) throws Exception{
+    String returnVal = null;
+    String rootDir = request.getSession().getServletContext().getRealPath("/");
+    String dataDir = ServletUtilities.dataDir("context0", rootDir);
+    String iaPendingResultsFile = "/pendingAssetsIA.json";
+    try {
+    	String iaPendingResultsAsString = Util.readFromFile(dataDir + iaPendingResultsFile);
+    	iaPendingResults = new JSONArray(iaPendingResultsAsString);
+      for(int i =0; i<iaPendingResults.length(); i++){
+        JSONObject entry = getJSONObject(i);
+
+      }
+    } catch(Exception e){
+    	e.printStackTrace();
+    }
+
+    if (returnVal != null){
+      return returnVal;
+    } else{
+      throw new Exception ("imageId in findImageIdInIaPendingLogFromTaskId was null");
+    }
+  }
+
+  public static String findScreenNameInIaPendingLogFromTaskId(String taskId) throws Exception{
+    String returnVal = null;
+    String rootDir = request.getSession().getServletContext().getRealPath("/");
+    String dataDir = ServletUtilities.dataDir("context0", rootDir);
+    String iaPendingResultsFile = "/pendingAssetsIA.json";
+    try {
+    	String iaPendingResultsAsString = Util.readFromFile(dataDir + iaPendingResultsFile);
+    	iaPendingResults = new JSONArray(iaPendingResultsAsString);
+      for(int i =0; i<iaPendingResults.length(); i++){
+        JSONObject entry = getJSONObject(i);
+        if (entry.getString("taskId").equals(taskId)){
+          returnVal = entry.getString("tweeterScreenName");
+          break;
+        }
+      }
+    } catch(Exception e){
+    	e.printStackTrace();
+    }
+    if (returnVal != null){
+      return returnVal;
+    } else{
+      throw new Exception ("imageId in findImageIdInIaPendingLogFromTaskId was null");
+    }
+  }
 }
