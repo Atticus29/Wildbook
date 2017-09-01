@@ -234,6 +234,7 @@ try {
 rtn.put("success", true);
 rtn.put("data", tarr);
 out.println(rtn);
+System.out.println(rtn);
 
 myShepherd.closeDBTransaction();
 
