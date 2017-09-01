@@ -18,6 +18,8 @@ import com.google.gson.Gson;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.io.IOException;
+import java.io.FileNotFoundException;
 
 /*
 import java.net.URL;
@@ -218,6 +220,7 @@ public class TwitterUtil {
           String tweeterScreenName = tj.getJSONObject("tweet").getJSONObject("user").getString("screenName");
           ej.put("tweeterScreenName", tweeterScreenName);
           jent.put(ej);
+          iaPendingResults.put(ej);
           // myShepherd.getPM().makePersistent(ej); //maybe?
           myShepherd.commitDBTransaction();
         } catch(Exception e){
@@ -228,8 +231,6 @@ public class TwitterUtil {
       tj.put("entities", jent);
     }
     tarr.put(tj);
-
-    iaPendingResults.put(ej);
     return iaPendingResults;
   }
 
@@ -290,10 +291,11 @@ public class TwitterUtil {
     return new JSONArray(list);
   }
 
-  public static Long getSinceIdFromTwitterTimeStampFile(String path){
+  public static Long getSinceIdFromTwitterTimeStampFile(String path) throws Exception{
+    Long sinceId = null;
     try{
     	// the timestamp is written with a new line at the end, so we need to strip that out before converting
-      String timeStampAsText = Util.readFromFile(dataDir + twitterTimeStampFile);
+      String timeStampAsText = Util.readFromFile(path); //dataDir + twitterTimeStampFile
       timeStampAsText = timeStampAsText.replace("\n", "");
       sinceId = Long.parseLong(timeStampAsText, 10);
     } catch(FileNotFoundException e){
@@ -303,6 +305,10 @@ public class TwitterUtil {
     } catch(NumberFormatException e){
     	e.printStackTrace();
     }
-
+    if(sinceId != null){
+        return sinceId;
+    } else{
+      throw new Exception ("sinceId in getSinceIdFromTwitterTimeStampFile is null");
+    }
   }
 }
