@@ -57,55 +57,57 @@ File imageFile2 = new File(dataDir + "/images/testWhale2.jpg");
 File imageFile3 = new File(dataDir + "/images/notAWhale.jpg");
 File imageFile4 = new File(dataDir + "/images/notAWhale2.jpg");
 
-// Test simple tweet
-try {
-  TwitterUtil.createTweet(simpleTweetText + new Date().toString(), twitterInst);
-} catch(TwitterException e){
-  e.printStackTrace();
-  out.println("Unable to send simple tweet.");
-}
-// Test tweet with date
-try {
-  TwitterUtil.createTweet(dateTweetText + new Date().toString(), twitterInst);
-} catch(TwitterException e){
-  e.printStackTrace();
-  out.println("Unable to send date tweet.");
-}
-// Test tweet with location
-try {
-  TwitterUtil.createTweet(locationTweetText + new Date().toString(), twitterInst);
-} catch(TwitterException e){
-  e.printStackTrace();
-  out.println("Unable to send location tweet.");
-}
-// Test tweet with non English text
-try {
-  TwitterUtil.createTweet(nonEnglishLocationTweetText + new Date().toString(), twitterInst);
-} catch(TwitterException e){
-  e.printStackTrace();
-  out.println("Unable to send non-English location tweet.");
-}
-// Test tweet with GPS text
-try {
-  TwitterUtil.createTweet(textTweetGpsText + new Date().toString(), twitterInst);
-} catch(TwitterException e){
-  e.printStackTrace();
-  out.println("Unable to send GPS location tweet.");
-}
-// Test tweet with future text
-try {
-  TwitterUtil.createTweet(futureTweetText + new Date().toString(), twitterInst);
-} catch(TwitterException e){
-  e.printStackTrace();
-  out.println("Unable to send future tweet.");
-}
-// Test tweet with past text
-try {
-  TwitterUtil.createTweet(pastTweetText + new Date().toString(), twitterInst);
-} catch(TwitterException e){
-  e.printStackTrace();
-  out.println("Unable to send past tweet.");
-}
+// // Test simple tweet
+// try {
+//   TwitterUtil.createTweet(simpleTweetText + new Date().toString(), twitterInst);
+// } catch(TwitterException e){
+//   e.printStackTrace();
+//   out.println("Unable to send simple tweet.");
+// }
+// // Test tweet with date
+// try {
+//   TwitterUtil.createTweet(dateTweetText + new Date().toString(), twitterInst);
+// } catch(TwitterException e){
+//   e.printStackTrace();
+//   out.println("Unable to send date tweet.");
+// }
+// // Test tweet with location
+// try {
+//   TwitterUtil.createTweet(locationTweetText + new Date().toString(), twitterInst);
+// } catch(TwitterException e){
+//   e.printStackTrace();
+//   out.println("Unable to send location tweet.");
+// }
+// // Test tweet with non English text
+// try {
+//   TwitterUtil.createTweet(nonEnglishLocationTweetText + new Date().toString(), twitterInst);
+// } catch(TwitterException e){
+//   e.printStackTrace();
+//   out.println("Unable to send non-English location tweet.");
+// }
+// // Test tweet with GPS text
+// try {
+//   TwitterUtil.createTweet(textTweetGpsText + new Date().toString(), twitterInst);
+// } catch(TwitterException e){
+//   e.printStackTrace();
+//   out.println("Unable to send GPS location tweet.");
+// }
+// // Test tweet with future text
+// try {
+//   TwitterUtil.createTweet(futureTweetText + new Date().toString(), twitterInst);
+// } catch(TwitterException e){
+//   e.printStackTrace();
+//   out.println("Unable to send future tweet.");
+// }
+// // Test tweet with past text
+// try {
+//   TwitterUtil.createTweet(pastTweetText + new Date().toString(), twitterInst);
+// } catch(TwitterException e){
+//   e.printStackTrace();
+//   out.println("Unable to send past tweet.");
+// }
+
+
 // Test tweet with one whale image
 StatusUpdate status = new StatusUpdate(oneImageTweetText + new Date().toString());
 status.setMedia(imageFile1);
