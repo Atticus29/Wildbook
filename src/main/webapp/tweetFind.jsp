@@ -59,9 +59,20 @@ if(tas == null){
 }
 
 // Retrieve timestamp for the last twitter check
-sinceId = TwitterUtil.getSinceIdFromTwitterTimeStampFile(dataDir + twitterTimeStampFile);
+try{
+	// the timestamp is written with a new line at the end, so we need to strip that out before converting
+  String timeStampAsText = Util.readFromFile(dataDir + twitterTimeStampFile);
+  timeStampAsText = timeStampAsText.replace("\n", "");
+  sinceId = Long.parseLong(timeStampAsText, 10);
+} catch(FileNotFoundException e){
+	e.printStackTrace();
+} catch(IOException e){
+	e.printStackTrace();
+} catch(NumberFormatException e){
+	e.printStackTrace();
+}
 rtn.put("sinceId", sinceId);
-// out.println("sinceId is " + sinceId);
+out.println("sinceId is " + sinceId);
 QueryResult qr = TwitterUtil.findTweets("@wildmetweetbot", sinceId);
 JSONArray tarr = new JSONArray();
 // out.println(qr.getTweets().size());
@@ -69,7 +80,6 @@ JSONArray tarr = new JSONArray();
 // Retrieve current results that are being processed by IA
 try {
 	String iaPendingResultsAsString = Util.readFromFile(dataDir + iaPendingResultsFile);
-  out.println(iaPendingResultsAsString);
 	iaPendingResults = new JSONArray(iaPendingResultsAsString);
 } catch(Exception e){
 	e.printStackTrace();
@@ -77,54 +87,14 @@ try {
 
 // Check if JSON data exists
 if(iaPendingResults != null){
-
-	out.println("iaPendingResults wasn't null");
-	// out.println(iaPendingResults);
-	for(int i = 0; i < iaPendingResults.length(); i++){
-		JSONObject resultStatus = null;
-		JSONObject pendingResult = null;
-		try {
-			pendingResult = iaPendingResults.getJSONObject(i);
-			resultStatus = IBEISIA.getTaskResults(pendingResult.getString("taskId"), context);
-		} catch(Exception e){
-			e.printStackTrace();
-			out.println("Unable to get result status from IBEISIA for pending result");
-		}
-		if(resultStatus != null){
-			// If job is complete, remove from iaPendingResults
-			out.println("Result status: " + resultStatus);
-
-			if(resultStatus.getBoolean("success")){
-				out.println("IA complete for object " + pendingResult.getString("taskId") + "! Removing from pending");
-				iaPendingResults = TwitterUtil.removePendingEntry(iaPendingResults, i);
-			} else {
-				out.println("IA failed for object " + pendingResult.getString("taskId") + ".");
-			}
-		} else {
-      out.println("Pending result " + pendingResult.getString("taskId") + " has not been processed yet.");
-			System.out.println("Pending result " + pendingResult.getString("taskId") + " has not been processed yet.");
-
-			// Check if 24 hrs have passed since the result process was started and notify sender if it's timed out
-			DateTime resultCreation = new DateTime(pendingResult.getString("creationDate"));
-			DateTime timeNow = new DateTime();
-			Interval interval = new Interval(resultCreation, timeNow);
-
-			if(interval.toDuration().getStandardHours() >= 24){
-				out.println("Object " + pendingResult.getString("taskId") + " has timed out in IA. Notifying sender.");
-        try{
-          TwitterUtil.sendTimeoutTweet(pendingResult.getString("tweeterScreenName"), twitterInst, pendingResult.getString("maId"));
-        } catch(Exception e){
-          System.out.println("sendTimeoutTweet failed");
-          e.printStackTrace();
-        }
-			}
-		}
-	}
-
+	// TODO: check if IA has finished processing the pending results
+  out.println("iaPendingResults:");
+	out.println(iaPendingResults);
 } else {
 	out.println("No pending results");
 	iaPendingResults = new JSONArray();
 }
+
 // END PENDING IA RETRIEVAL
 
 //##################Begin loop through the each of the tweets since the last timestamp##################
@@ -232,7 +202,7 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
 
   // dates = addPhotoDatesToPreviouslyParsedDates(dates, mas); //TODO write this/ think about when we want this to happen. We will ultimately add the dates and locations to encounter objects, so perhaps this should only occur downstream of successful detection? Another question is how to tack all of the previously-captured date candidates (or just the best one from ParseDateLocation.parseDate()?) onto each photo while keeping the photo-specific captured date strings attached to only their parent photo...
 
-  tj = TwitterUtil.saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis(mas, tweetID, myShepherd, tj, request);
+  iaPendingResults = TwitterUtil.saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis(mas, tweetID, myShepherd, tj, request, tarr, iaPendingResults);
   //TODO iaPendingResults.put(ej); needs to go in this method, but how to extrac iaPendingResults after???
 	tarr.put(tj);
 }
@@ -263,7 +233,7 @@ try {
 
 rtn.put("success", true);
 rtn.put("data", tarr);
-// out.println(rtn);
+out.println(rtn);
 
 myShepherd.closeDBTransaction();
 
