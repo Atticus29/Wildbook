@@ -88,6 +88,7 @@ try {
 // Check if JSON data exists
 if(iaPendingResults != null){
 	// TODO: check if IA has finished processing the pending results
+  out.println("iaPendingResults:");
 	out.println(iaPendingResults);
 } else {
 	out.println("No pending results");
@@ -232,7 +233,7 @@ try {
 
 rtn.put("success", true);
 rtn.put("data", tarr);
-// out.println(rtn);
+out.println(rtn);
 
 myShepherd.closeDBTransaction();
 
