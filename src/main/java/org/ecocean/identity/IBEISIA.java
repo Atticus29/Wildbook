@@ -1117,7 +1117,7 @@ System.out.println("* createAnnotationFromIAResult() CREATED " + ann + " on Enco
         if (iaResult == null) return null;
 
         //this is hard-coded for whaleshark.org branch .... need to generalize this!!  TODO
-        if (!iaResult.optString("class", "_FAIL_").equals("whale_shark")) {
+        if (!iaResult.optString("class", "_FAIL_").equals("whale_fluke")) {
             System.out.println("WARNING: bailing on IA results due to invalid species detected -- " + iaResult.toString());
             return null;
         }
@@ -1268,10 +1268,10 @@ System.out.println("+++++++++++ >>>> skipEncounters ???? " + skipEncounters);
                         newAnns.put(ann.getId());
                         try {
                             //TODO how to know *if* we should start identification
-                            if(jann.optDouble("confidence", -1.0) >= getDetectionCutoffValue() && jann.optString("species", "unkown").equals("whale_fluke")){
+                            // if(jann.optDouble("confidence", -1.0) >= getDetectionCutoffValue() && jann.optString("species", "unkown").equals("whale_fluke")){ //These criteria have actually already been satisfied above -Mark F.
                               System.out.println("Detection found a whale fluke; sending to identification");
                               ident.put(ann.getId(), IAIntake(ann, myShepherd, request));
-                            }
+                            // }
                         } catch (Exception ex) {
                             System.out.println("WARNING: IAIntake threw exception " + ex);
                         }
