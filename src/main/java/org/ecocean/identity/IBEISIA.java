@@ -17,6 +17,7 @@ import org.ecocean.MarkedIndividual;
 import org.ecocean.ContextConfiguration;
 import org.ecocean.servlet.ServletUtilities;
 import org.ecocean.CommonConfiguration;
+import org.ecocean.TwitterUtil;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ import java.security.InvalidKeyException;
 import org.joda.time.DateTime;
 import org.apache.commons.lang3.StringUtils;
 import javax.servlet.http.HttpServletRequest;
+import twitter4j.*;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -1152,6 +1154,8 @@ System.out.println("convertAnnotation() generated ft = " + ft + "; params = " + 
 
     public static JSONObject processCallback(String taskID, JSONObject resp, HttpServletRequest request) {
 System.out.println("CALLBACK GOT: (taskID " + taskID + ") " + resp);
+        String screenName = null;
+        String imageId = null;
         JSONObject rtn = new JSONObject("{\"success\": false}");
         rtn.put("taskId", taskID);
         if (taskID == null) return rtn;
@@ -1168,18 +1172,19 @@ System.out.println("**** type ---------------> [" + type + "]");
         if ("detect".equals(type)) {
             rtn.put("success", true);
             try{
-              String screenName = TwitterUtil.findScreenNameInIaPendingLogFromTaskId(taskId);
+              screenName = TwitterUtil.findScreenNameInIaPendingLogFromTaskId(taskID, request);
               System.out.println("Retrieved screen name: " + screenName);
             } catch(Exception e){
               e.printStackTrace();
             }
             try{
-              String imageId = TwitterUtil.findImageIdInIaPendingLogFromTaskId(taskId);//TODO still have to generate this method
+              imageId = TwitterUtil.findImageIdInIaPendingLogFromTaskId(taskID, request);//TODO still have to generate this method
             } catch(Exception e){
               e.printStackTrace();
             }
             try{
               //TODO generate twitterInst
+              Twitter twitterInst = TwitterUtil.init(request);
               rtn.put("processResult", processCallbackDetect(taskID, logs, resp, myShepherd, request, screenName, imageId, twitterInst));
             } catch(Exception e){
               rtn.put("processResult", processCallbackDetect(taskID, logs, resp, myShepherd, request));

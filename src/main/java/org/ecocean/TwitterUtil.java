@@ -312,16 +312,16 @@ public class TwitterUtil {
     }
   }
 
-  public static String findImageIdInIaPendingLogFromTaskId(String taskId) throws Exception{
+  public static String findImageIdInIaPendingLogFromTaskId(String taskId, HttpServletRequest request) throws Exception{
     String returnVal = null;
     String rootDir = request.getSession().getServletContext().getRealPath("/");
     String dataDir = ServletUtilities.dataDir("context0", rootDir);
     String iaPendingResultsFile = "/pendingAssetsIA.json";
     try {
     	String iaPendingResultsAsString = Util.readFromFile(dataDir + iaPendingResultsFile);
-    	iaPendingResults = new JSONArray(iaPendingResultsAsString);
+    	JSONArray iaPendingResults = new JSONArray(iaPendingResultsAsString);
       for(int i =0; i<iaPendingResults.length(); i++){
-        JSONObject entry = getJSONObject(i);
+        JSONObject entry = iaPendingResults.getJSONObject(i);
 
       }
     } catch(Exception e){
@@ -335,16 +335,16 @@ public class TwitterUtil {
     }
   }
 
-  public static String findScreenNameInIaPendingLogFromTaskId(String taskId) throws Exception{
+  public static String findScreenNameInIaPendingLogFromTaskId(String taskId, HttpServletRequest request) throws Exception{
     String returnVal = null;
     String rootDir = request.getSession().getServletContext().getRealPath("/");
     String dataDir = ServletUtilities.dataDir("context0", rootDir);
     String iaPendingResultsFile = "/pendingAssetsIA.json";
     try {
     	String iaPendingResultsAsString = Util.readFromFile(dataDir + iaPendingResultsFile);
-    	iaPendingResults = new JSONArray(iaPendingResultsAsString);
+    	JSONArray iaPendingResults = new JSONArray(iaPendingResultsAsString);
       for(int i =0; i<iaPendingResults.length(); i++){
-        JSONObject entry = getJSONObject(i);
+        JSONObject entry = iaPendingResults.getJSONObject(i);
         if (entry.getString("taskId").equals(taskId)){
           returnVal = entry.getString("tweeterScreenName");
           break;
