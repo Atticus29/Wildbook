@@ -181,6 +181,30 @@ public class TwitterUtil {
     }
   }
 
+  public static ArrayList<String> getPhotoIds(org.json.JSONArray emedia, String tweeterScreenName, Twitter twitterInst) throws Exception{
+    ArrayList<String> photoIds = new ArrayList<>();
+    int photoCount = 0;
+    org.json.JSONObject jent = null;
+    // Long mediaEntityId = null;
+    for(int j=0; j<emedia.length(); j++){
+      try{
+        jent = emedia.getJSONObject(j);
+        System.out.println("emedia element:");
+        System.out.println(jent.toString());
+        photoIds.add(jent.getString("id"));
+      } catch(Exception e){
+        System.out.println("Error with JSONObject capture getPhotoIds method");
+        e.printStackTrace();
+      }
+      if (photoIds !=null & photoIds.size()>0){
+        return photoIds;
+      } else{
+        throw new Exception ("photoIds was null or contained no elements");
+      }
+
+    }
+  }
+
   public static JSONObject makeParentTweetMediaAssetAndSave(Shepherd myShepherd, TwitterAssetStore tas, Status tweet, JSONObject tj){
     myShepherd.beginDBTransaction();
     try{
@@ -201,11 +225,12 @@ public class TwitterUtil {
     }
   }
 
-  public static JSONArray saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis(List<MediaAsset> mas, Long tweetID, Shepherd myShepherd, JSONObject tj, HttpServletRequest request, JSONArray tarr, JSONArray iaPendingResults){
+  public static JSONArray saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis(List<MediaAsset> mas, Long tweetID, Shepherd myShepherd, JSONObject tj, HttpServletRequest request, JSONArray tarr, JSONArray iaPendingResults, ArrayList<String> photoIds){
     if ((mas == null) || (mas.size() < 1)) {
     } else {
       JSONArray jent = new JSONArray();
-      for (MediaAsset ent : mas) {
+      for(int i=0; i<mas.size(); i++){
+        MediaAsset ent = mas.get(i);
         myShepherd.beginDBTransaction();
         try {
           JSONObject ej = new JSONObject();
@@ -219,6 +244,17 @@ public class TwitterUtil {
           ej.put("creationDate", new LocalDateTime());
           String tweeterScreenName = tj.getJSONObject("tweet").getJSONObject("user").getString("screenName");
           ej.put("tweeterScreenName", tweeterScreenName);
+          if(photoIds.size() != mas.size()){
+            System.out.println("Yikes! photoIds is not the same size as mas");
+          } else{
+            ej.put("photoId", photoIds.get(i));
+          }
+
+
+          //jent = emedia.getJSONObject(j);
+          // mediaType = jent.getString("type");
+          // mediaEntityId = Long.parseLong(jent.getString("id"));
+
           jent.put(ej);
           iaPendingResults.put(ej);
           // myShepherd.getPM().makePersistent(ej); //maybe?
