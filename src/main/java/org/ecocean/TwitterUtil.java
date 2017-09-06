@@ -325,6 +325,18 @@ public class TwitterUtil {
     return new JSONArray(list);
   }
 
+  public static void removeEntryFromPendingIaByImageId(String imageId){
+    ArrayList<JSONObject> list = new ArrayList<>();
+    for(int i = 0; i < pendingResults.length(); i++){
+      if(i == index){
+        continue;
+      } else {
+        list.add(pendingResults.getJSONObject(i));
+      }
+    }
+    return new JSONArray(list);
+  }
+
   public static Long getSinceIdFromTwitterTimeStampFile(String path) throws Exception{
     Long sinceId = null;
     try{
@@ -352,8 +364,14 @@ public class TwitterUtil {
     try{
       rootDir = request.getSession().getServletContext().getRealPath("/");
     } catch(Exception e){
-      rootDir = "/var/lib/tomcat7/webapps/wildbook/";
-      e.printStackTrace();
+      try{
+        rootDir = "/var/lib/tomcat7/webapps/wildbook/";
+        e.printStackTrace();
+      } catch(Exception f){
+        System.out.println("Can't find rootdir in findImageIdInIaPendingLogFromTaskId in TwitterUtil.java");
+        f.printStackTrace();
+      }
+
     }
     String dataDir = ServletUtilities.dataDir("context0", rootDir);
     String iaPendingResultsFile = "/pendingAssetsIA.json";
@@ -385,8 +403,13 @@ public class TwitterUtil {
     try{
       rootDir = request.getSession().getServletContext().getRealPath("/");
     } catch(Exception e){
-      rootDir = "/var/lib/tomcat7/webapps/wildbook/";
-      e.printStackTrace();
+      try{
+        rootDir = "/var/lib/tomcat7/webapps/wildbook/";
+        e.printStackTrace();
+      } catch(Exception f){
+        System.out.println("Can't find rootdir in findScreenNameInIaPendingLogFromTaskId in TwitterUtil.java");
+        f.printStackTrace();
+      }
     }
     String dataDir = ServletUtilities.dataDir("context0", rootDir);
     String iaPendingResultsFile = "/pendingAssetsIA.json";
