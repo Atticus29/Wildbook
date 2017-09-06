@@ -85,15 +85,15 @@ out.println("Don't forget to conduct additional tests on an emulator with gps co
 // Testing tweetMethods
 String randomNumStr = Integer.toString(ThreadLocalRandom.current().nextInt(1, 10000 + 1));
 String randomNum2Str = Integer.toString(ThreadLocalRandom.current().nextInt(1, 10000 + 1));
-TwitterUtil.sendDetectionAndIdentificationTweet("markaaronfisher", randomNumStr, twitterInst, randomNum2Str, true, true, "http://www.google.com");
+TwitterUtil.sendDetectionAndIdentificationTweet("markaaronfisher", randomNumStr, twitterInst, randomNum2Str, true, true, "http://www.google.com", request);
 
 randomNumStr = Integer.toString(ThreadLocalRandom.current().nextInt(1, 10000 + 1));
 randomNum2Str = Integer.toString(ThreadLocalRandom.current().nextInt(1, 10000 + 1));
-TwitterUtil.sendDetectionAndIdentificationTweet("markaaronfisher", randomNumStr, twitterInst, randomNum2Str, true, false, "");
+TwitterUtil.sendDetectionAndIdentificationTweet("markaaronfisher", randomNumStr, twitterInst, randomNum2Str, true, false, "", request);
 
 randomNumStr = Integer.toString(ThreadLocalRandom.current().nextInt(1, 10000 + 1));
 randomNum2Str = Integer.toString(ThreadLocalRandom.current().nextInt(1, 10000 + 1));
-TwitterUtil.sendDetectionAndIdentificationTweet("markaaronfisher", randomNumStr, twitterInst, randomNum2Str, false, false, "");
+TwitterUtil.sendDetectionAndIdentificationTweet("markaaronfisher", randomNumStr, twitterInst, randomNum2Str, false, false, "", request);
 // End Testing tweetMethods
 
 // Timestamp test

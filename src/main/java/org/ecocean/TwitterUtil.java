@@ -269,12 +269,11 @@ public class TwitterUtil {
   }
 
 
-  public static void sendDetectionAndIdentificationTweet(String screenName, String imageId, Twitter twitterInst, String whaleId, boolean detected, boolean identified, String info){
+  public static void sendDetectionAndIdentificationTweet(String screenName, String imageId, Twitter twitterInst, String whaleId, boolean detected, boolean identified, String info, HttpServletRequest request){
     String tweet = null, tweet2 = null;
     if(detected && identified){
       tweet = "Hi, @" + screenName + "! We detected a whale in " + imageId + " and identified it as " + whaleId + "!";
       tweet2 = "@" + screenName + ", here's some info on " + whaleId + ": " + info; //TODO flesh out either by pulling info from db now that whaleId is available, or by passing some info as an additional argument in this method
-
     } else if(detected && !identified){
       tweet =  "Hi, @" + screenName + "! We detected a whale in " + imageId + " but we were not able to identify it.";
       tweet2 = "@" + screenName + ", if you'd like to make a manual submission for " + imageId + ", please go to http://www.flukebook.org/submit.jsp";
@@ -286,6 +285,12 @@ public class TwitterUtil {
     try {
       String status1 = createTweet(tweet, twitterInst);
       String status2 = createTweet(tweet2, twitterInst);
+      try{
+        removeEntryFromPendingIaByImageId(imageId, request);
+      } catch(Exception f){
+        System.out.println("removeEntryFromPendingIaByImageId failed inside sendDetectionAndIdentificationTweet method");
+        f.printStackTrace();
+      }
     } catch(TwitterException e){
       e.printStackTrace();
     }
@@ -325,16 +330,45 @@ public class TwitterUtil {
     return new JSONArray(list);
   }
 
-  public static void removeEntryFromPendingIaByImageId(String imageId){
+  public static void removeEntryFromPendingIaByImageId(String imageId, HttpServletRequest request) throws Exception{ //TODO this is ugly and could be made DRYer -Mark F.
     ArrayList<JSONObject> list = new ArrayList<>();
-    for(int i = 0; i < pendingResults.length(); i++){
-      if(i == index){
-        continue;
-      } else {
-        list.add(pendingResults.getJSONObject(i));
+    String iaPendingResultsFile = "/pendingAssetsIA.json";
+    JSONArray iaPendingResults = null;
+    String rootDir = null;
+    try{
+      rootDir = request.getSession().getServletContext().getRealPath("/");
+    } catch(Exception e){
+      try{
+        rootDir = "/var/lib/tomcat7/webapps/wildbook/";
+        e.printStackTrace();
+      } catch(Exception f){
+        System.out.println("Can't find rootdir in removeEntryFromPendingIaByImageId in TwitterUtil.java");
+        f.printStackTrace();
       }
     }
-    return new JSONArray(list);
+    String dataDir = ServletUtilities.dataDir("context0", rootDir);
+    try {
+    	String iaPendingResultsAsString = Util.readFromFile(dataDir + iaPendingResultsFile);
+    	iaPendingResults = new JSONArray(iaPendingResultsAsString);
+    } catch(Exception e){
+      System.out.println("Failed to open iaPendingResults from file in TwitterUtil.java removeEntryFromPendingIaByImageId");
+    	e.printStackTrace();
+    }
+    for(int i = 0; i < iaPendingResults.length(); i++){
+      JSONObject entry = new JSONObject(iaPendingResults.get(i));
+      if(entry.getString("photoId") == imageId){
+        continue;
+      } else {
+        list.add(iaPendingResults.getJSONObject(i));
+      }
+    }
+    JSONArray results = new JSONArray(list);
+    try{
+      Util.writeToFile(results.toString(), dataDir + iaPendingResultsFile);
+    } catch(Exception e){
+      System.out.println("Failed to re-write iaPendingResultsFile in removeEntryFromPendingIaByImageId in TwitterUtil.java");
+      e.printStackTrace();
+    }
   }
 
   public static Long getSinceIdFromTwitterTimeStampFile(String path) throws Exception{
@@ -371,7 +405,6 @@ public class TwitterUtil {
         System.out.println("Can't find rootdir in findImageIdInIaPendingLogFromTaskId in TwitterUtil.java");
         f.printStackTrace();
       }
-
     }
     String dataDir = ServletUtilities.dataDir("context0", rootDir);
     String iaPendingResultsFile = "/pendingAssetsIA.json";

@@ -1276,7 +1276,7 @@ System.out.println("+++++++++++ >>>> skipEncounters ???? " + skipEncounters);
                             needsReview = true;
                             System.out.println("Detection didn't find a whale fluke");
 
-                            TwitterUtil.sendDetectionAndIdentificationTweet(screenName, imageId, twitterInst, null, false, false, "");
+                            TwitterUtil.sendDetectionAndIdentificationTweet(screenName, imageId, twitterInst, null, false, false, "", request);
                             continue;
                         }
                         //these are annotations we can make automatically from ia detection.  we also do the same upon review return
