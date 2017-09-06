@@ -349,13 +349,16 @@ public class TwitterUtil {
     String dataDir = ServletUtilities.dataDir("context0", rootDir);
     try {
     	String iaPendingResultsAsString = Util.readFromFile(dataDir + iaPendingResultsFile);
+      System.out.println(iaPendingResultsAsString);
     	iaPendingResults = new JSONArray(iaPendingResultsAsString);
     } catch(Exception e){
       System.out.println("Failed to open iaPendingResults from file in TwitterUtil.java removeEntryFromPendingIaByImageId");
     	e.printStackTrace();
     }
     for(int i = 0; i < iaPendingResults.length(); i++){
-      JSONObject entry = new JSONObject(iaPendingResults.get(i));
+      JSONObject entry = iaPendingResults.getJSONObject(i);
+      System.out.println("entry in removeEntryFromPendingIaByImageId:");
+      // System.out.println(entry.toString());
       if(entry.getString("photoId") == imageId){
         continue;
       } else {
