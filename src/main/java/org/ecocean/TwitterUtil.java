@@ -337,6 +337,7 @@ public class TwitterUtil {
 
   public static String findScreenNameInIaPendingLogFromTaskId(String taskId, HttpServletRequest request) throws Exception{
     String returnVal = null;
+    System.out.println("Is request null? " + Boolean.toString(request == null));
     String rootDir = request.getSession().getServletContext().getRealPath("/");
     String dataDir = ServletUtilities.dataDir("context0", rootDir);
     String iaPendingResultsFile = "/pendingAssetsIA.json";
