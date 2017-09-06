@@ -196,13 +196,11 @@ public class TwitterUtil {
         System.out.println("Error with JSONObject capture getPhotoIds method");
         e.printStackTrace();
       }
-      if (photoIds !=null & photoIds.size()>0){
-        return photoIds;
-      } else{
-        throw new Exception ("photoIds was null or contained no elements");
-      }
-
     }
+    if (photoIds ==null & photoIds.size()<1){
+      throw new Exception ("photoIds was null or contained no elements");
+    }
+    return photoIds;
   }
 
   public static JSONObject makeParentTweetMediaAssetAndSave(Shepherd myShepherd, TwitterAssetStore tas, Status tweet, JSONObject tj){
@@ -350,7 +348,13 @@ public class TwitterUtil {
 
   public static String findImageIdInIaPendingLogFromTaskId(String taskId, HttpServletRequest request) throws Exception{
     String returnVal = null;
-    String rootDir = request.getSession().getServletContext().getRealPath("/");
+    String rootDir = null;
+    try{
+      rootDir = request.getSession().getServletContext().getRealPath("/");
+    } catch(Exception e){
+      rootDir = "/var/lib/tomcat7/webapps/wildbook/";
+      e.printStackTrace();
+    }
     String dataDir = ServletUtilities.dataDir("context0", rootDir);
     String iaPendingResultsFile = "/pendingAssetsIA.json";
     try {
@@ -358,7 +362,10 @@ public class TwitterUtil {
     	JSONArray iaPendingResults = new JSONArray(iaPendingResultsAsString);
       for(int i =0; i<iaPendingResults.length(); i++){
         JSONObject entry = iaPendingResults.getJSONObject(i);
-
+        if (entry.getString("taskId").equals(taskId)){
+          returnVal = entry.getString("photoId");
+          break;
+        }
       }
     } catch(Exception e){
     	e.printStackTrace();
