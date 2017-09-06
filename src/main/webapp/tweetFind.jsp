@@ -31,6 +31,7 @@ Long tweetID = null;
 String tweetText = null;
 Long mostRecentTweetID = null;
 String rootDir = request.getSession().getServletContext().getRealPath("/");
+out.println("rootDir is " + rootDir);
 String dataDir = ServletUtilities.dataDir("context0", rootDir);
 String context = ServletUtilities.getContext(request);
 Long sinceId = 890302524275662848L;
