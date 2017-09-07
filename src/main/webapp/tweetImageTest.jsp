@@ -109,46 +109,46 @@ File imageFile4 = new File(dataDir + "/images/notAWhale2.jpg");
 
 
 // Test tweet with one whale image
-StatusUpdate status = new StatusUpdate(oneImageTweetText + new Date().toString());
-status.setMedia(imageFile1);
-try {
-  twitterInst.updateStatus(status);
-} catch(TwitterException e){
-  e.printStackTrace();
-  out.println("Unable to send single image tweet.");
-}
-
-// Test tweet with one whale image
-status = new StatusUpdate(oneImageNotWhaleTweetText + new Date().toString());
-status.setMedia(imageFile3);
-try {
-  twitterInst.updateStatus(status);
-} catch(TwitterException e){
-  e.printStackTrace();
-  out.println("Unable to send single image tweet.");
-}
-
-// Test tweet with multiple whale images
-long mediaIds[] = new long[2];
-try {
-  // Upload media and get ids
-  UploadedMedia media = twitterInst.uploadMedia(imageFile1);
-  out.println("Uploaded Media: " + media.getMediaId());
-  mediaIds[0] = media.getMediaId();
-  media = twitterInst.uploadMedia(imageFile2);
-  out.println("Uploaded Media: " + media.getMediaId());
-  mediaIds[1] = media.getMediaId();
-  // Set media ids to status
-  StatusUpdate multiStatus = new StatusUpdate(multImageTweetText + new Date().toString());
-  multiStatus.setMediaIds(mediaIds);
-  twitterInst.updateStatus(multiStatus);
-} catch(TwitterException e){
-  e.printStackTrace();
-  out.println("Unable to send multi-image tweet.");
-}
+// StatusUpdate status = new StatusUpdate(oneImageTweetText + new Date().toString());
+// status.setMedia(imageFile1);
+// try {
+//   twitterInst.updateStatus(status);
+// } catch(TwitterException e){
+//   e.printStackTrace();
+//   out.println("Unable to send single image tweet.");
+// }
+//
+// // Test tweet with one whale image
+// status = new StatusUpdate(oneImageNotWhaleTweetText + new Date().toString());
+// status.setMedia(imageFile3);
+// try {
+//   twitterInst.updateStatus(status);
+// } catch(TwitterException e){
+//   e.printStackTrace();
+//   out.println("Unable to send single image tweet.");
+// }
+//
+// // Test tweet with multiple whale images
+// long mediaIds[] = new long[2];
+// try {
+//   // Upload media and get ids
+//   UploadedMedia media = twitterInst.uploadMedia(imageFile1);
+//   out.println("Uploaded Media: " + media.getMediaId());
+//   mediaIds[0] = media.getMediaId();
+//   media = twitterInst.uploadMedia(imageFile2);
+//   out.println("Uploaded Media: " + media.getMediaId());
+//   mediaIds[1] = media.getMediaId();
+//   // Set media ids to status
+//   StatusUpdate multiStatus = new StatusUpdate(multImageTweetText + new Date().toString());
+//   multiStatus.setMediaIds(mediaIds);
+//   twitterInst.updateStatus(multiStatus);
+// } catch(TwitterException e){
+//   e.printStackTrace();
+//   out.println("Unable to send multi-image tweet.");
+// }
 
 // Test tweet with multiple non-whale images
-mediaIds = new long[2];
+long mediaIds[] = new long[2];
 try {
   // Upload media and get ids
   UploadedMedia media = twitterInst.uploadMedia(imageFile3);
@@ -167,23 +167,23 @@ try {
 }
 
 // Test tweet with one non-whale image and one whale image
-mediaIds = new long[2];
-try {
-  // Upload media and get ids
-  UploadedMedia media = twitterInst.uploadMedia(imageFile2);
-  out.println("Uploaded Media: " + media.getMediaId());
-  mediaIds[0] = media.getMediaId();
-  media = twitterInst.uploadMedia(imageFile4);
-  out.println("Uploaded Media: " + media.getMediaId());
-  mediaIds[1] = media.getMediaId();
-  // Set media ids to status
-  StatusUpdate multiStatus = new StatusUpdate(multImageOneNotWhaleTweetText + new Date().toString());
-  multiStatus.setMediaIds(mediaIds);
-  twitterInst.updateStatus(multiStatus);
-} catch(TwitterException e){
-  e.printStackTrace();
-  out.println("Unable to send multi-image tweet.");
-}
+// mediaIds = new long[2];
+// try {
+//   // Upload media and get ids
+//   UploadedMedia media = twitterInst.uploadMedia(imageFile2);
+//   out.println("Uploaded Media: " + media.getMediaId());
+//   mediaIds[0] = media.getMediaId();
+//   media = twitterInst.uploadMedia(imageFile4);
+//   out.println("Uploaded Media: " + media.getMediaId());
+//   mediaIds[1] = media.getMediaId();
+//   // Set media ids to status
+//   StatusUpdate multiStatus = new StatusUpdate(multImageOneNotWhaleTweetText + new Date().toString());
+//   multiStatus.setMediaIds(mediaIds);
+//   twitterInst.updateStatus(multiStatus);
+// } catch(TwitterException e){
+//   e.printStackTrace();
+//   out.println("Unable to send multi-image tweet.");
+// }
 
 // ###              End tweet tests                 ###
 
