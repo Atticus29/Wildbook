@@ -1275,6 +1275,7 @@ System.out.println("+++++++++++ >>>> skipEncounters ???? " + skipEncounters);
 
                             needsReview = true;
                             System.out.println("Detection didn't find a whale fluke");
+                            System.out.println("ImageId in processCallbackDetect is: " + imageId);
 
                             TwitterUtil.sendDetectionAndIdentificationTweet(screenName, imageId, twitterInst, null, false, false, "", request);
                             continue;

@@ -358,8 +358,9 @@ public class TwitterUtil {
     for(int i = 0; i < iaPendingResults.length(); i++){
       JSONObject entry = iaPendingResults.getJSONObject(i);
       System.out.println("entry in removeEntryFromPendingIaByImageId:");
-      // System.out.println(entry.toString());
+      System.out.println(entry.toString());
       if(entry.getString("photoId") == imageId){
+        System.out.println("photoId of entry matches imageId at: " + imageId);
         continue;
       } else {
         list.add(iaPendingResults.getJSONObject(i));
@@ -368,6 +369,7 @@ public class TwitterUtil {
     JSONArray results = new JSONArray(list);
     try{
       Util.writeToFile(results.toString(), dataDir + iaPendingResultsFile);
+      System.out.println("successfully wrote pendingResultsFile content to file");
     } catch(Exception e){
       System.out.println("Failed to re-write iaPendingResultsFile in removeEntryFromPendingIaByImageId in TwitterUtil.java");
       e.printStackTrace();
