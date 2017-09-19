@@ -1155,7 +1155,7 @@ System.out.println("convertAnnotation() generated ft = " + ft + "; params = " + 
     public static JSONObject processCallback(String taskID, JSONObject resp, HttpServletRequest request) {
 System.out.println("CALLBACK GOT: (taskID " + taskID + ") " + resp);
         String screenName = null;
-        String imageId = null;
+        String imageUrl = null;
         JSONObject rtn = new JSONObject("{\"success\": false}");
         rtn.put("taskId", taskID);
         if (taskID == null) return rtn;
@@ -1178,14 +1178,14 @@ System.out.println("**** type ---------------> [" + type + "]");
               e.printStackTrace();
             }
             try{
-              imageId = TwitterUtil.findImageIdInIaPendingLogFromTaskId(taskID, request);//TODO still have to generate this method
+              imageUrl = TwitterUtil.findImageUrlInIaPendingLogFromTaskId(taskID, request);//TODO still have to generate this method
             } catch(Exception e){
               e.printStackTrace();
             }
             try{
               //TODO generate twitterInst
               Twitter twitterInst = TwitterUtil.init(request);
-              rtn.put("processResult", processCallbackDetect(taskID, logs, resp, myShepherd, request, screenName, imageId, twitterInst));
+              rtn.put("processResult", processCallbackDetect(taskID, logs, resp, myShepherd, request, screenName, imageUrl, twitterInst));
             } catch(Exception e){
               rtn.put("processResult", processCallbackDetect(taskID, logs, resp, myShepherd, request));
             }
@@ -1210,7 +1210,7 @@ System.out.println("**** type ---------------> [" + type + "]");
       return processCallbackDetect(taskID, logs, resp, myShepherd, request, null, null, null);
     }
 
-    private static JSONObject processCallbackDetect(String taskID, ArrayList<IdentityServiceLog> logs, JSONObject resp, Shepherd myShepherd, HttpServletRequest request, String screenName, String imageId, Twitter twitterInst) {
+    private static JSONObject processCallbackDetect(String taskID, ArrayList<IdentityServiceLog> logs, JSONObject resp, Shepherd myShepherd, HttpServletRequest request, String screenName, String imageUrl, Twitter twitterInst) {
         System.out.println("Entered processCallbackDetect");
         JSONObject rtn = new JSONObject("{\"success\": false}");
         String[] ids = IdentityServiceLog.findObjectIDs(logs);
@@ -1275,9 +1275,9 @@ System.out.println("+++++++++++ >>>> skipEncounters ???? " + skipEncounters);
 
                             needsReview = true;
                             System.out.println("Detection didn't find a whale fluke");
-                            System.out.println("ImageId in processCallbackDetect is: " + imageId);
+                            System.out.println("ImageUrl in processCallbackDetect is: " + imageUrl);
 
-                            TwitterUtil.sendDetectionAndIdentificationTweet(screenName, imageId, twitterInst, null, false, false, "", request);
+                            TwitterUtil.sendDetectionAndIdentificationTweet(screenName, imageUrl, twitterInst, null, false, false, "", request);
                             continue;
                         }
                         //these are annotations we can make automatically from ia detection.  we also do the same upon review return

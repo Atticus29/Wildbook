@@ -294,17 +294,17 @@ public class TwitterUtil {
   }
 
 
-  public static void sendDetectionAndIdentificationTweet(String screenName, String imageId, Twitter twitterInst, String whaleId, boolean detected, boolean identified, String info, HttpServletRequest request){
+  public static void sendDetectionAndIdentificationTweet(String screenName, String imageUrl, Twitter twitterInst, String whaleId, boolean detected, boolean identified, String info, HttpServletRequest request){
     String tweet = null, tweet2 = null;
     if(detected && identified){
-      tweet = "Hi, @" + screenName + "! We detected a whale in " + imageId + " and identified it as " + whaleId + "!";
+      tweet = "Hi, @" + screenName + "! We detected a whale in " + imageUrl + " and identified it as " + whaleId + "!";
       tweet2 = "@" + screenName + ", here's some info on " + whaleId + ": " + info; //TODO flesh out either by pulling info from db now that whaleId is available, or by passing some info as an additional argument in this method
     } else if(detected && !identified){
-      tweet =  "Hi, @" + screenName + "! We detected a whale in " + imageId + " but we were not able to identify it.";
-      tweet2 = "@" + screenName + ", if you'd like to make a manual submission for " + imageId + ", please go to http://www.flukebook.org/submit.jsp";
+      tweet =  "Hi, @" + screenName + "! We detected a whale in " + imageUrl + " but we were not able to identify it.";
+      tweet2 = "@" + screenName + ", if you'd like to make a manual submission for " + imageUrl + ", please go to http://www.flukebook.org/submit.jsp";
     } else {
-      tweet =  "Hi, @" + screenName + "! We were not able to identify a whale in " + imageId + ".";
-      tweet2 = "@" + screenName + ", if you'd like to make a manual submission for " + imageId + ", please go to http://www.flukebook.org/submit.jsp";
+      tweet =  "Hi, @" + screenName + "! We were not able to identify a whale in " + imageUrl + ".";
+      tweet2 = "@" + screenName + ", if you'd like to make a manual submission for " + imageUrl + ", please go to http://www.flukebook.org/submit.jsp";
     }
 
     try {
@@ -492,4 +492,41 @@ public class TwitterUtil {
       throw new Exception ("imageId in findImageIdInIaPendingLogFromTaskId was null");
     }
   }
+
+  public static String findImageUrlInIaPendingLogFromTaskId(String taskId, HttpServletRequest request) throws Exception{
+    String returnVal = null;
+    String rootDir = null;
+    try{
+      rootDir = request.getSession().getServletContext().getRealPath("/");
+    } catch(Exception e){
+      try{
+        rootDir = "/var/lib/tomcat7/webapps/wildbook/";
+        e.printStackTrace();
+      } catch(Exception f){
+        System.out.println("Can't find rootdir in findImageUrlInIaPendingLogFromTaskId in TwitterUtil.java");
+        f.printStackTrace();
+      }
+    }
+    String dataDir = ServletUtilities.dataDir("context0", rootDir);
+    String iaPendingResultsFile = "/pendingAssetsIA.json";
+    try {
+    	String iaPendingResultsAsString = Util.readFromFile(dataDir + iaPendingResultsFile);
+    	JSONArray iaPendingResults = new JSONArray(iaPendingResultsAsString);
+      for(int i =0; i<iaPendingResults.length(); i++){
+        JSONObject entry = iaPendingResults.getJSONObject(i);
+        if (entry.getString("taskId").equals(taskId)){
+          returnVal = entry.getString("photoUrl");
+          break;
+        }
+      }
+    } catch(Exception e){
+    	e.printStackTrace();
+    }
+    if (returnVal != null){
+      return returnVal;
+    } else{
+      throw new Exception ("imageId in findImageUrlInIaPendingLogFromTaskId was null");
+    }
+  }
+
 }
