@@ -500,6 +500,7 @@ public class TwitterUtil {
       return findGenericStringItemInIaPendingLogFromTaskId("photoUrl", taskId, request);
     } catch(Exception e){
       e.printStackTrace();
+      throw new Exception ("findImageUrlInIaPendingLogFromTaskId in TwitterUtil.java failed");
     }
   }
 
