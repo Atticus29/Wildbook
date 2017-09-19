@@ -197,6 +197,11 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
   ArrayList<String> photoIds = TwitterUtil.getPhotoIds(emedia, tweeterScreenName, twitterInst);
 
   tj = TwitterUtil.makeParentTweetMediaAssetAndSave(myShepherd, tas, tweet, tj);
+
+  System.out.println("twitter obj:");
+  System.out.println(tj.toString());
+
+
   //retrieve ma now that it has been saved
   ma = tas.find(p, myShepherd);
 

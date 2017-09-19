@@ -357,10 +357,7 @@ public class TwitterUtil {
     }
     for(int i = 0; i < iaPendingResults.length(); i++){
       JSONObject entry = iaPendingResults.getJSONObject(i);
-      System.out.println("entry in removeEntryFromPendingIaByImageId:");
-      System.out.println(entry.toString());
       if(entry.getString("photoId").equals(imageId)){
-        System.out.println("photoId of entry matches imageId at: " + imageId);
         continue;
       } else {
         list.add(iaPendingResults.getJSONObject(i));
