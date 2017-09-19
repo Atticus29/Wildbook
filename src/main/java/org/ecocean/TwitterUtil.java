@@ -295,6 +295,7 @@ public class TwitterUtil {
 
 
   public static void sendDetectionAndIdentificationTweet(String screenName, String imageUrl, Twitter twitterInst, String whaleId, boolean detected, boolean identified, String info, HttpServletRequest request){
+    System.out.println("Entered sendDetectionAndIdentificationTweet");
     String tweet = null, tweet2 = null;
     if(detected && identified){
       tweet = "Hi, @" + screenName + "! We detected a whale in " + imageUrl + " and identified it as " + whaleId + "!";
@@ -311,7 +312,9 @@ public class TwitterUtil {
       String status1 = createTweet(tweet, twitterInst);
       String status2 = createTweet(tweet2, twitterInst);
       try{
+        System.out.println("Entered try for removeEntryFromPendingIaByImageUrl");
         removeEntryFromPendingIaByImageUrl(imageUrl, request);
+        System.out.println("Got past try for removeEntryFromPendingIaByImageUrl");
       } catch(Exception f){
         System.out.println("removeEntryFromPendingIaByImageId failed inside sendDetectionAndIdentificationTweet method");
         f.printStackTrace();
@@ -474,8 +477,8 @@ public class TwitterUtil {
       rootDir = request.getSession().getServletContext().getRealPath("/");
     } catch(Exception e){
       try{
-        rootDir = "/var/lib/tomcat7/webapps/wildbook/";
-        e.printStackTrace();
+        rootDir = "/var/lib/tomcat7/webapps/wildbook/"; //TODO this is terrible, but I couldn't think of a better way. -Mark
+        // e.printStackTrace();
       } catch(Exception f){
         System.out.println("Can't find rootdir in findGenericStringItemInIaPendingLogFromTaskId in TwitterUtil.java");
         f.printStackTrace();
