@@ -401,6 +401,7 @@ public class TwitterUtil {
     for(int i = 0; i < iaPendingResults.length(); i++){
       JSONObject entry = iaPendingResults.getJSONObject(i);
       if(entry.getString(targetLabel).equals(id)){
+        System.out.println(targetLabel + " of " + id + " was detected in iaPendingResultsFile; removing now!");
         continue;
       } else {
         list.add(iaPendingResults.getJSONObject(i));
