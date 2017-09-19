@@ -311,7 +311,7 @@ public class TwitterUtil {
       String status1 = createTweet(tweet, twitterInst);
       String status2 = createTweet(tweet2, twitterInst);
       try{
-        removeEntryFromPendingIaByImageId(imageId, request);
+        removeEntryFromPendingIaByImageUrl(imageUrl, request);
       } catch(Exception f){
         System.out.println("removeEntryFromPendingIaByImageId failed inside sendDetectionAndIdentificationTweet method");
         f.printStackTrace();
@@ -355,7 +355,25 @@ public class TwitterUtil {
     return new JSONArray(list);
   }
 
-  public static void removeEntryFromPendingIaByImageId(String imageId, HttpServletRequest request) throws Exception{ //TODO this is ugly and could be made DRYer -Mark F.
+  public static void removeEntryFromPendingIaByImageUrl(String imageUrl, HttpServletRequest request) throws Exception{
+    try{
+      removeEntryFromPendingIaByGenericString("photoUrl", imageUrl, request);
+    } catch(Exception e){
+      e.printStackTrace();
+      throw new Exception ("removeEntryFromPendingIaByImageUrl in TwitterUtil.java failed");
+    }
+  }
+
+  public static void removeEntryFromPendingIaByImageId(String imageId, HttpServletRequest request) throws Exception{
+    try{
+      removeEntryFromPendingIaByGenericString("photoId", imageUrl, request);
+    } catch(Exception e){
+      e.printStackTrace();
+      throw new Exception ("removeEntryFromPendingIaByImageId in TwitterUtil.java failed");
+    }
+  }
+
+  public static void removeEntryFromPendingIaByGenericString(String targetLabel, String id, HttpServletRequest request) throws Exception{ //TODO this is ugly and could be made DRYer -Mark F.
     ArrayList<JSONObject> list = new ArrayList<>();
     String iaPendingResultsFile = "/pendingAssetsIA.json";
     JSONArray iaPendingResults = null;
@@ -367,22 +385,22 @@ public class TwitterUtil {
         rootDir = "/var/lib/tomcat7/webapps/wildbook/";
         e.printStackTrace();
       } catch(Exception f){
-        System.out.println("Can't find rootdir in removeEntryFromPendingIaByImageId in TwitterUtil.java");
+        System.out.println("Can't find rootdir in removeEntryFromPendingIaByGenericString in TwitterUtil.java");
         f.printStackTrace();
       }
     }
     String dataDir = ServletUtilities.dataDir("context0", rootDir);
     try {
-    	String iaPendingResultsAsString = Util.readFromFile(dataDir + iaPendingResultsFile);
+      String iaPendingResultsAsString = Util.readFromFile(dataDir + iaPendingResultsFile);
       System.out.println(iaPendingResultsAsString);
-    	iaPendingResults = new JSONArray(iaPendingResultsAsString);
+      iaPendingResults = new JSONArray(iaPendingResultsAsString);
     } catch(Exception e){
-      System.out.println("Failed to open iaPendingResults from file in TwitterUtil.java removeEntryFromPendingIaByImageId");
-    	e.printStackTrace();
+      System.out.println("Failed to open iaPendingResults from file in TwitterUtil.java removeEntryFromPendingIaByGenericString");
+      e.printStackTrace();
     }
     for(int i = 0; i < iaPendingResults.length(); i++){
       JSONObject entry = iaPendingResults.getJSONObject(i);
-      if(entry.getString("photoId").equals(imageId)){
+      if(entry.getString(targetLabel).equals(id)){
         continue;
       } else {
         list.add(iaPendingResults.getJSONObject(i));
@@ -393,7 +411,7 @@ public class TwitterUtil {
       Util.writeToFile(results.toString(), dataDir + iaPendingResultsFile);
       System.out.println("successfully wrote pendingResultsFile content to file");
     } catch(Exception e){
-      System.out.println("Failed to re-write iaPendingResultsFile in removeEntryFromPendingIaByImageId in TwitterUtil.java");
+      System.out.println("Failed to re-write iaPendingResultsFile in removeEntryFromPendingIaByGenericString in TwitterUtil.java");
       e.printStackTrace();
     }
   }
@@ -421,79 +439,25 @@ public class TwitterUtil {
 
   public static String findImageIdInIaPendingLogFromTaskId(String taskId, HttpServletRequest request) throws Exception{
     String returnVal = null;
-    String rootDir = null;
     try{
-      rootDir = request.getSession().getServletContext().getRealPath("/");
+      return findGenericStringItemInIaPendingLogFromTaskId("photoId", taskId, request);
     } catch(Exception e){
-      try{
-        rootDir = "/var/lib/tomcat7/webapps/wildbook/";
-        e.printStackTrace();
-      } catch(Exception f){
-        System.out.println("Can't find rootdir in findImageIdInIaPendingLogFromTaskId in TwitterUtil.java");
-        f.printStackTrace();
-      }
-    }
-    String dataDir = ServletUtilities.dataDir("context0", rootDir);
-    String iaPendingResultsFile = "/pendingAssetsIA.json";
-    try {
-    	String iaPendingResultsAsString = Util.readFromFile(dataDir + iaPendingResultsFile);
-    	JSONArray iaPendingResults = new JSONArray(iaPendingResultsAsString);
-      for(int i =0; i<iaPendingResults.length(); i++){
-        JSONObject entry = iaPendingResults.getJSONObject(i);
-        if (entry.getString("taskId").equals(taskId)){
-          returnVal = entry.getString("photoId");
-          break;
-        }
-      }
-    } catch(Exception e){
-    	e.printStackTrace();
-    }
-
-    if (returnVal != null){
-      return returnVal;
-    } else{
-      throw new Exception ("imageId in findImageIdInIaPendingLogFromTaskId was null");
+      e.printStackTrace();
+      throw new Exception ("findImageIdInIaPendingLogFromTaskId in TwitterUtil.java failed");
     }
   }
 
   public static String findScreenNameInIaPendingLogFromTaskId(String taskId, HttpServletRequest request) throws Exception{
     String returnVal = null;
-    System.out.println("Is request null? " + Boolean.toString(request == null));
-    String rootDir = null;
     try{
-      rootDir = request.getSession().getServletContext().getRealPath("/");
+      return findGenericStringItemInIaPendingLogFromTaskId("tweeterScreenName", taskId, request);
     } catch(Exception e){
-      try{
-        rootDir = "/var/lib/tomcat7/webapps/wildbook/";
-        e.printStackTrace();
-      } catch(Exception f){
-        System.out.println("Can't find rootdir in findScreenNameInIaPendingLogFromTaskId in TwitterUtil.java");
-        f.printStackTrace();
-      }
-    }
-    String dataDir = ServletUtilities.dataDir("context0", rootDir);
-    String iaPendingResultsFile = "/pendingAssetsIA.json";
-    try {
-    	String iaPendingResultsAsString = Util.readFromFile(dataDir + iaPendingResultsFile);
-    	JSONArray iaPendingResults = new JSONArray(iaPendingResultsAsString);
-      for(int i =0; i<iaPendingResults.length(); i++){
-        JSONObject entry = iaPendingResults.getJSONObject(i);
-        if (entry.getString("taskId").equals(taskId)){
-          returnVal = entry.getString("tweeterScreenName");
-          break;
-        }
-      }
-    } catch(Exception e){
-    	e.printStackTrace();
-    }
-    if (returnVal != null){
-      return returnVal;
-    } else{
-      throw new Exception ("imageId in findImageIdInIaPendingLogFromTaskId was null");
+      e.printStackTrace();
+      throw new Exception ("findScreenNameInIaPendingLogFromTaskId in TwitterUtil.java failed");
     }
   }
 
-  public static String findImageUrlInIaPendingLogFromTaskId(String taskId, HttpServletRequest request) throws Exception{
+  public static String findGenericStringItemInIaPendingLogFromTaskId(String target, String taskId, HttpServletRequest request) throws Exception{
     String returnVal = null;
     String rootDir = null;
     try{
@@ -503,7 +467,7 @@ public class TwitterUtil {
         rootDir = "/var/lib/tomcat7/webapps/wildbook/";
         e.printStackTrace();
       } catch(Exception f){
-        System.out.println("Can't find rootdir in findImageUrlInIaPendingLogFromTaskId in TwitterUtil.java");
+        System.out.println("Can't find rootdir in findGenericStringItemInIaPendingLogFromTaskId in TwitterUtil.java");
         f.printStackTrace();
       }
     }
@@ -515,17 +479,27 @@ public class TwitterUtil {
       for(int i =0; i<iaPendingResults.length(); i++){
         JSONObject entry = iaPendingResults.getJSONObject(i);
         if (entry.getString("taskId").equals(taskId)){
-          returnVal = entry.getString("photoUrl");
+          returnVal = entry.getString(target);
           break;
         }
       }
     } catch(Exception e){
     	e.printStackTrace();
     }
+
     if (returnVal != null){
       return returnVal;
     } else{
-      throw new Exception ("imageId in findImageUrlInIaPendingLogFromTaskId was null");
+      throw new Exception ("imageId in findGenericStringItemInIaPendingLogFromTaskId was null");
+    }
+  }
+
+  public static String findImageUrlInIaPendingLogFromTaskId(String taskId, HttpServletRequest request) throws Exception{
+    String returnVal = null;
+    try{
+      return findGenericStringItemInIaPendingLogFromTaskId("photoUrl", taskId, request);
+    } catch(Exception e){
+      e.printStackTrace();
     }
   }
 
