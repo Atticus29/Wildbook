@@ -374,6 +374,7 @@ public class TwitterUtil {
   }
 
   public static void removeEntryFromPendingIaByGenericString(String targetLabel, String id, HttpServletRequest request) throws Exception{ //TODO this is ugly and could be made DRYer -Mark F.
+    System.out.println("Entered removeEntryFromPendingIaByGenericString");
     ArrayList<JSONObject> list = new ArrayList<>();
     String iaPendingResultsFile = "/pendingAssetsIA.json";
     JSONArray iaPendingResults = null;
@@ -399,8 +400,16 @@ public class TwitterUtil {
       e.printStackTrace();
     }
     for(int i = 0; i < iaPendingResults.length(); i++){
+      System.out.println("got into entry for loop of removeEntryFromPendingIaByGenericString");
       JSONObject entry = iaPendingResults.getJSONObject(i);
+      try{
+        System.out.println(targetLabel + "is: ");
+        System.out.println(entry.getString(targetLabel));
+      } catch(Exception e){
+        e.printStackTrace();
+      }
       if(entry.getString(targetLabel).equals(id)){
+
         System.out.println(targetLabel + " of " + id + " was detected in iaPendingResultsFile; removing now!");
         continue;
       } else {
