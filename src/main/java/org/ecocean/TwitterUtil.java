@@ -366,7 +366,7 @@ public class TwitterUtil {
 
   public static void removeEntryFromPendingIaByImageId(String imageId, HttpServletRequest request) throws Exception{
     try{
-      removeEntryFromPendingIaByGenericString("photoId", imageUrl, request);
+      removeEntryFromPendingIaByGenericString("photoId", imageId, request);
     } catch(Exception e){
       e.printStackTrace();
       throw new Exception ("removeEntryFromPendingIaByImageId in TwitterUtil.java failed");
