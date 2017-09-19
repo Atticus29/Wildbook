@@ -386,8 +386,8 @@ public class TwitterUtil {
       rootDir = request.getSession().getServletContext().getRealPath("/");
     } catch(Exception e){
       try{
-        rootDir = "/var/lib/tomcat7/webapps/wildbook/";
-        e.printStackTrace();
+        rootDir = "/var/lib/tomcat7/webapps/wildbook/"; //TODO again, a terrible way to do this -Mark F.
+        // e.printStackTrace();
       } catch(Exception f){
         System.out.println("Can't find rootdir in removeEntryFromPendingIaByGenericString in TwitterUtil.java");
         f.printStackTrace();
@@ -405,9 +405,11 @@ public class TwitterUtil {
     for(int i = 0; i < iaPendingResults.length(); i++){
       System.out.println("got into entry for loop of removeEntryFromPendingIaByGenericString");
       JSONObject entry = iaPendingResults.getJSONObject(i);
-      try{
-        System.out.println(targetLabel + "is: ");
+      try{ //TODO you can remove this whole try catch statement after October, 2017 -Mark F
+        System.out.println(targetLabel + " is: ");
         System.out.println(entry.getString(targetLabel));
+        System.out.println ("id is: ");
+        System.out.println(id);
       } catch(Exception e){
         e.printStackTrace();
       }
