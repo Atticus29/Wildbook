@@ -301,10 +301,10 @@ public class TwitterUtil {
       tweet2 = "@" + screenName + ", here's some info on " + whaleId + ": " + info; //TODO flesh out either by pulling info from db now that whaleId is available, or by passing some info as an additional argument in this method
     } else if(detected && !identified){
       tweet =  "Hi, @" + screenName + "! We detected a whale in " + imageUrl + " but we were not able to identify it.";
-      tweet2 = "@" + screenName + ", if you'd like to make a manual submission for " + imageUrl + ", please go to http://www.flukebook.org/submit.jsp";
+      tweet2 = "@" + screenName + ", if you'd like to make a manual submission, please go to http://www.flukebook.org/submit.jsp";
     } else {
       tweet =  "Hi, @" + screenName + "! We were not able to identify a whale in " + imageUrl + ".";
-      tweet2 = "@" + screenName + ", if you'd like to make a manual submission for " + imageUrl + ", please go to http://www.flukebook.org/submit.jsp";
+      tweet2 = "@" + screenName + ", if you'd like to make a manual submission, please go to http://www.flukebook.org/submit.jsp";
     }
 
     try {
