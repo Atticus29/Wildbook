@@ -422,7 +422,6 @@ public class TwitterUtil {
         e.printStackTrace();
       }
       if(entry.getString(targetLabel).equals(id)){
-
         System.out.println(targetLabel + " of " + id + " was detected in iaPendingResultsFile; removing now!");
         continue;
       } else {
@@ -430,6 +429,7 @@ public class TwitterUtil {
       }
     }
     JSONArray results = new JSONArray(list);
+    System.out.println("iaPendingResultsFile will read: " + results.toString());
     try{
       Util.writeToFile(results.toString(), dataDir + iaPendingResultsFile);
       System.out.println("successfully wrote pendingResultsFile content to file");
