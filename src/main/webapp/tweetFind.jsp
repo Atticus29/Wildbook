@@ -13,6 +13,8 @@ java.io.File,
 java.util.Date,
 org.json.JSONObject,
 org.json.JSONArray,
+org.joda.time.DateTime,
+org.joda.time.Interval,
 org.ecocean.identity.IBEISIA,
 twitter4j.QueryResult,
 twitter4j.Status,
@@ -93,9 +95,10 @@ if(iaPendingResults != null){
 	out.println(iaPendingResults);
 
   //TODO: check if there are any entries that are older than 24 hours, tweet user, and remove
+
   JSONObject pendingResult = null;
   for(int i = 0; i<iaPendingResults.length(); i++){
-    pendingResult = testJSONArray.getJSONObject(i);
+    pendingResult = iaPendingResults.getJSONObject(i);
     DateTime resultCreation = new DateTime(pendingResult.getString("creationDate"));
     DateTime timeNow = new DateTime();
     Interval interval = new Interval(resultCreation, timeNow);
