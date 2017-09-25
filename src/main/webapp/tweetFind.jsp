@@ -91,11 +91,27 @@ if(iaPendingResults != null){
 	// TODO: check if IA has finished processing the pending results
   out.println("iaPendingResults:");
 	out.println(iaPendingResults);
+
+  //TODO: check if there are any entries that are older than 24 hours, tweet user, and remove
+  JSONObject pendingResult = null;
+  for(int i = 0; i<iaPendingResults.length(); i++){
+    pendingResult = testJSONArray.getJSONObject(i);
+    DateTime resultCreation = new DateTime(pendingResult.getString("creationDate"));
+    DateTime timeNow = new DateTime();
+    Interval interval = new Interval(resultCreation, timeNow);
+    out.println("Interval: " + interval);
+    out.println("Interval duration: " + interval.toDuration().plus(5000000).getStandardHours()); //TODO what does the plus(5000000) do? -Mark F.
+    if(interval.toDuration().getStandardHours() >= 24){
+    	out.println("Object " + pendingResult.getString("taskId") + " has timed out in IA. Notifying sender.");
+    	TwitterUtil.sendTimeoutTweet(pendingResult.getString("tweeterScreenName"), twitterInst, pendingResult.getString("photoUrl"), request);
+      //Remove
+    }
+  }
+
 } else {
 	out.println("No pending results");
 	iaPendingResults = new JSONArray();
 }
-
 // END PENDING IA RETRIEVAL
 
 //##################Begin loop through the each of the tweets since the last timestamp##################
@@ -150,17 +166,6 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
     e.printStackTrace();
     continue;
   }
-
-  //temporary: test parseDate()
-  // try{
-  //   String date = ParseDateLocation.parseDate(tweetText,context, tweet);
-  //   out.println("single date is: ");
-  //   out.println(date);
-  // } catch(Exception e){
-  //   out.println("something went terribly wrong getting the single date from the tweet text");
-  //   e.printStackTrace();
-  //   continue;
-  // }
 
   try{
     ArrayList<String> dates = ParseDateLocation.parseDateToArrayList(tweetText,context);

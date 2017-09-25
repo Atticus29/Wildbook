@@ -324,12 +324,20 @@ public class TwitterUtil {
     }
   }
 
-  public static void sendTimeoutTweet(String screenName, Twitter twitterInst, String id) {
-    String reply = "Hello @" + screenName + "The image you sent for tweet " + id + " was unable to be processed";
+  public static void sendTimeoutTweet(String screenName, Twitter twitterInst, String imageUrl,  HttpServletRequest request) {
+    String reply = "Hello, @" + screenName + ". Analysis for image " + imageUrl + " couldn't be processed within 24 hrs.";
     String reply2 = "@" + screenName + ", if you'd like to make a manual submission, please go to http://www.flukebook.org/submit.jsp";
     try {
       String status = createTweet(reply, twitterInst);
       String status2 = createTweet(reply2, twitterInst);
+      try{
+        System.out.println("Entered try for removeEntryFromPendingIaByImageUrl");
+        removeEntryFromPendingIaByImageUrl(imageUrl, request);
+        System.out.println("Got past try for removeEntryFromPendingIaByImageUrl");
+      } catch(Exception f){
+        System.out.println("removeEntryFromPendingIaByImageId failed inside sendDetectionAndIdentificationTweet method");
+        f.printStackTrace();
+      }
     } catch(TwitterException e) {
       e.printStackTrace();
     }

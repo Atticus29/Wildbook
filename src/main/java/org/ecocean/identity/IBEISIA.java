@@ -1178,12 +1178,11 @@ System.out.println("**** type ---------------> [" + type + "]");
               e.printStackTrace();
             }
             try{
-              imageUrl = TwitterUtil.findImageUrlInIaPendingLogFromTaskId(taskID, request);//TODO still have to generate this method
+              imageUrl = TwitterUtil.findImageUrlInIaPendingLogFromTaskId(taskID, request);
             } catch(Exception e){
               e.printStackTrace();
             }
             try{
-              //TODO generate twitterInst
               Twitter twitterInst = TwitterUtil.init(request);
               rtn.put("processResult", processCallbackDetect(taskID, logs, resp, myShepherd, request, screenName, imageUrl, twitterInst));
             } catch(Exception e){
@@ -1193,6 +1192,7 @@ System.out.println("**** type ---------------> [" + type + "]");
 
         } else if ("identify".equals(type)) {
             rtn.put("success", true);
+            System.out.println("About to call processCallbackIdentify"); //TODO eventually remove this line
             rtn.put("processResult", processCallbackIdentify(taskID, logs, resp, request));
         } else {
             rtn.put("error", "unknown task action type " + type);
