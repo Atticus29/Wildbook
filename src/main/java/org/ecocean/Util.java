@@ -594,9 +594,17 @@ public class Util {
     }
 
     public static void writeToFile(String data, String path) throws FileNotFoundException {
-      PrintWriter out = new PrintWriter(path);
-      out.println(data);
-      out.close();
+      PrintWriter out = null;
+      try{
+        out = new PrintWriter(new FileInputStream(path, false));
+        out.println(data);
+        out.close();
+      } catch(Exception e){
+        e.printStackTrace();
+      }
+      if(out == null){
+        throw new FileNotFoundException("File at " + path + " could not be found");
+      }
     }
 
     public static String readFromFile(String path) throws FileNotFoundException, IOException {
