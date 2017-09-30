@@ -430,6 +430,7 @@ public class TwitterUtil {
     }
     JSONArray results = new JSONArray(list);
     System.out.println("iaPendingResultsFile will read: " + results.toString());
+    System.out.println("Destination directory is " + dataDir + iaPendingResultsFile);
     try{
       Util.writeToFile(results.toString(), dataDir + iaPendingResultsFile);
       System.out.println("successfully wrote pendingResultsFile content to file");
