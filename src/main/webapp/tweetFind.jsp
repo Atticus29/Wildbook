@@ -88,35 +88,6 @@ try {
 	e.printStackTrace();
 }
 
-// Check if JSON data exists
-if(iaPendingResults != null){
-	// TODO: check if IA has finished processing the pending results
-  out.println("iaPendingResults:");
-	out.println(iaPendingResults);
-
-  //TODO: check if there are any entries that are older than 24 hours, tweet user, and remove
-
-  JSONObject pendingResult = null;
-  for(int i = 0; i<iaPendingResults.length(); i++){
-    pendingResult = iaPendingResults.getJSONObject(i);
-    DateTime resultCreation = new DateTime(pendingResult.getString("creationDate"));
-    DateTime timeNow = new DateTime();
-    Interval interval = new Interval(resultCreation, timeNow);
-    out.println("Interval: " + interval);
-    out.println("Interval duration: " + interval.toDuration().plus(5000000).getStandardHours()); //TODO what does the plus(5000000) do? -Mark F.
-    if(interval.toDuration().getStandardHours() >= 24){
-    	out.println("Object " + pendingResult.getString("taskId") + " has timed out in IA. Notifying sender.");
-    	TwitterUtil.sendTimeoutTweet(pendingResult.getString("tweeterScreenName"), twitterInst, pendingResult.getString("photoUrl"), request);
-      //Remove
-    }
-  }
-
-} else {
-	out.println("No pending results");
-	iaPendingResults = new JSONArray();
-}
-// END PENDING IA RETRIEVAL
-
 //##################Begin loop through the each of the tweets since the last timestamp##################
 // out.println("size of the arrayList of statuses is " + Integer.toString(qr.getTweets().size()));
 List<Status> tweetStatuses = qr.getTweets();
@@ -251,6 +222,36 @@ try {
 rtn.put("success", true);
 rtn.put("data", tarr);
 out.println(rtn);
+
+// Check if JSON data exists
+if(iaPendingResults != null){
+	// TODO: check if IA has finished processing the pending results
+  out.println("iaPendingResults:");
+	out.println(iaPendingResults);
+
+  //TODO: check if there are any entries that are older than 24 hours, tweet user, and remove
+
+  JSONObject pendingResult = null;
+  for(int i = 0; i<iaPendingResults.length(); i++){
+    pendingResult = iaPendingResults.getJSONObject(i);
+    DateTime resultCreation = new DateTime(pendingResult.getString("creationDate"));
+    DateTime timeNow = new DateTime();
+    Interval interval = new Interval(resultCreation, timeNow);
+    out.println("Interval: " + interval);
+    out.println("Interval duration: " + interval.toDuration().plus(5000000).getStandardHours()); //TODO what does the plus(5000000) do? -Mark F.
+    if(interval.toDuration().getStandardHours() >= 24){
+    	out.println("Object " + pendingResult.getString("taskId") + " has timed out in IA. Notifying sender.");
+    	TwitterUtil.sendTimeoutTweet(pendingResult.getString("tweeterScreenName"), twitterInst, pendingResult.getString("photoUrl"), request);
+      //Remove
+    }
+  }
+
+} else {
+	out.println("No pending results");
+	iaPendingResults = new JSONArray();
+}
+// END PENDING IA RETRIEVAL
+
 
 myShepherd.closeDBTransaction();
 
