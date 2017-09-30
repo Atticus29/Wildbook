@@ -596,7 +596,7 @@ public class Util {
     public static void writeToFile(String data, String path) throws FileNotFoundException {
       PrintWriter out = null;
       try{
-        out = new PrintWriter(new FileInputStream(path, false));
+        out = new PrintWriter(new FileOutputStream(path, false));
         out.println(data);
         out.close();
       } catch(Exception e){
