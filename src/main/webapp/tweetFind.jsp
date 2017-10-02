@@ -23,7 +23,7 @@ org.ecocean.servlet.ServletUtilities,
 org.ecocean.media.*,
 org.ecocean.ParseDateLocation.*,
 java.util.concurrent.ThreadLocalRandom,
-import java.io.*
+java.io.*
               "
 %>
 
