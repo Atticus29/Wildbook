@@ -232,8 +232,11 @@ if(iaPendingResults != null){
   //TODO: check if there are any entries that are older than 24 hours, tweet user, and remove
 
   JSONObject pendingResult = null;
+  String currentJobId = null;
   for(int i = 0; i<iaPendingResults.length(); i++){
     pendingResult = iaPendingResults.getJSONObject(i);
+    currentJobId = IBEISIA.findJobIDFromTaskID(pendingResult.getString("taskId"), context);
+    System.out.println("currentJobId is: " + currentJobId);
     //get the task ID from the pendingResult
     //run curl from here on http://34.213.108.79/IBEISIAGetJobStatus.jsp?jobid=jobid-0187 (generic), which initiates the detection and identification (because it's not currently happening automatically)
     //the various tweets and stuff happen from the call above
