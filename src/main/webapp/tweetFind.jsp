@@ -22,7 +22,8 @@ twitter4j.*,
 org.ecocean.servlet.ServletUtilities,
 org.ecocean.media.*,
 org.ecocean.ParseDateLocation.*,
-java.util.concurrent.ThreadLocalRandom
+java.util.concurrent.ThreadLocalRandom,
+import java.io.*
               "
 %>
 
@@ -233,13 +234,15 @@ if(iaPendingResults != null){
 
   JSONObject pendingResult = null;
   String currentJobId = null;
+  Boolean curlStatus = null;
+  String getJobStatusBaseURL = "http://34.213.108.79/IBEISIAGetJobStatus.jsp?jobid=";
   for(int i = 0; i<iaPendingResults.length(); i++){
     pendingResult = iaPendingResults.getJSONObject(i);
     currentJobId = IBEISIA.findJobIDFromTaskID(pendingResult.getString("taskId"), context);
-    System.out.println("currentJobId is: " + currentJobId);
-    //get the task ID from the pendingResult
-    //run curl from here on http://34.213.108.79/IBEISIAGetJobStatus.jsp?jobid=jobid-0187 (generic), which initiates the detection and identification (because it's not currently happening automatically)
-    //the various tweets and stuff happen from the call above
+
+    String[] cmd = {"curl", getJobStatusBaseURL + currentJobId};
+    Process p = Runtime.getRuntime().exec(cmd);
+
     DateTime resultCreation = new DateTime(pendingResult.getString("creationDate"));
     DateTime timeNow = new DateTime();
     Interval interval = new Interval(resultCreation, timeNow);
