@@ -528,4 +528,18 @@ public class TwitterUtil {
     }
   }
 
+  public static String getQueryUUIDFromJSONIdentificaitonResult(JSONObject JSONResult) throws Exception{
+    String UUID = null;
+    try{
+      UUID = JSONResult.getJSONObject("response").getJSONObject("json_result").getJSONArray("query_annot_uuid_list").getJSONObject(0).getString("__UUID__");
+    } catch(Exception e){
+      e.printStackTrace();
+    }
+    if(UUID != null){
+      return UUID;
+    } else{
+      throw new Exception("UUID is null in getQueryUUIDFromJSONResult method");
+    }
+  }
+
 }
