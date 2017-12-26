@@ -542,4 +542,19 @@ public class TwitterUtil {
     }
   }
 
+  public static ArrayList<Float> getArrayOfConfidences(JSONObject JSONResult) throws Exception{
+    ArrayList<Float> finalConfidences = new ArrayList<Float>();
+    JSONArray confidences = JSONResult.getJSONObject("response").getJSONObject("json_result").getJSONObject("inference_dict").getJSONObject("annot_pair_dict").getJSONArray("confidence_list");
+    for(int i = 0; i<confidences.length(); i++){
+      String currentConfidenceString = confidences.getString(i);
+      Float confidence = Float.parseFloat(currentConfidenceString);
+      finalConfidences.add(confidence);
+    }
+    if(finalConfidences.size() > 0){
+      return finalConfidences;
+    } else {
+      throw new Exception ("finalConfidences array in getArrayOfConfidences method in twitterUtil was empty");
+    }
+  }
+
 }
