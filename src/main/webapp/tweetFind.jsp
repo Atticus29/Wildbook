@@ -235,7 +235,8 @@ if(iaPendingResults != null){
   JSONObject pendingResult = null;
   String currentJobId = null;
   Boolean curlStatus = null;
-  String getJobStatusBaseURL = "http://34.213.108.79/IBEISIAGetJobStatus.jsp?jobid=";
+  String currentIPAddress = "52.88.31.154"; //@TODO put this somewhere more permanent
+  String getJobStatusBaseURL = "http://" + currentIPAddress + "/IBEISIAGetJobStatus.jsp?jobid=";
   for(int i = 0; i<iaPendingResults.length(); i++){
     pendingResult = iaPendingResults.getJSONObject(i);
     currentJobId = IBEISIA.findJobIDFromTaskID(pendingResult.getString("taskId"), context);
