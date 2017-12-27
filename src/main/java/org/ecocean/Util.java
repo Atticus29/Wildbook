@@ -3,6 +3,7 @@ package org.ecocean;
 //import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
@@ -27,6 +28,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -594,9 +596,18 @@ public class Util {
     }
 
     public static void writeToFile(String data, String path) throws FileNotFoundException {
-      PrintWriter out = new PrintWriter(path);
-      out.println(data);
-      out.close();
+      PrintWriter out = null;
+      System.out.println("data to be written to file " + path + ": " + data);
+      try{
+        out = new PrintWriter(new FileOutputStream(path, false));
+        out.println(data);
+        out.close();
+      } catch(Exception e){
+        e.printStackTrace();
+      }
+      if(out == null){
+        throw new FileNotFoundException("File at " + path + " could not be found");
+      }
     }
 
     public static String readFromFile(String path) throws FileNotFoundException, IOException {
@@ -612,5 +623,13 @@ public class Util {
           String formatted = format.format(date);
           formatted = format.format(date);
           return formatted.toString();
+    }
+
+    public static int getIndexOfMax(ArrayList<Double> candidates) throws Exception{
+      if(candidates.size() < 1){
+        throw new Exception("arrayList passed to getIndexOfMax method was empty.");
+      }
+      Double maxValue = Collections.max(candidates);
+      return candidates.indexOf(maxValue);
     }
 }

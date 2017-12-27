@@ -18,6 +18,8 @@ import com.google.gson.Gson;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.io.IOException;
+import java.io.FileNotFoundException;
 
 /*
 import java.net.URL;
@@ -179,6 +181,48 @@ public class TwitterUtil {
     }
   }
 
+  public static ArrayList<String> getPhotoIds(org.json.JSONArray emedia, String tweeterScreenName, Twitter twitterInst) throws Exception{
+    ArrayList<String> photoIds = new ArrayList<>();
+    int photoCount = 0;
+    org.json.JSONObject jent = null;
+    for(int j=0; j<emedia.length(); j++){
+      try{
+        jent = emedia.getJSONObject(j);
+        photoIds.add(jent.getString("id"));
+      } catch(Exception e){
+        System.out.println("Error with JSONObject capture getPhotoIds method");
+        e.printStackTrace();
+      }
+    }
+    if (photoIds ==null & photoIds.size()<1){
+      throw new Exception ("photoIds was null or contained no elements");
+    }
+    return photoIds;
+  }
+
+  public static ArrayList<String> getPhotoUrls(org.json.JSONArray emedia, String tweeterScreenName, Twitter twitterInst) throws Exception{
+    ArrayList<String> photoUrls = new ArrayList<>();
+    int photoCount = 0;
+    org.json.JSONObject jent = null;
+    // Long mediaEntityId = null;
+    for(int j=0; j<emedia.length(); j++){
+      try{
+        jent = emedia.getJSONObject(j);
+        System.out.println("photoUrl:");
+        System.out.println(jent.getString("mediaURLHttps"));
+        photoUrls.add(jent.getString("mediaURLHttps"));
+      } catch(Exception e){
+        System.out.println("Error with JSONObject capture getPhotoUrls method");
+        e.printStackTrace();
+      }
+    }
+    if (photoUrls ==null & photoUrls.size()<1){
+      throw new Exception ("photoUrls was null or contained no elements");
+    }
+    return photoUrls;
+  }
+
+
   public static JSONObject makeParentTweetMediaAssetAndSave(Shepherd myShepherd, TwitterAssetStore tas, Status tweet, JSONObject tj){
     myShepherd.beginDBTransaction();
     try{
@@ -199,11 +243,12 @@ public class TwitterUtil {
     }
   }
 
-  public static JSONObject saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis(List<MediaAsset> mas, Long tweetID, Shepherd myShepherd, JSONObject tj, HttpServletRequest request){
+  public static JSONArray saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis(List<MediaAsset> mas, Long tweetID, Shepherd myShepherd, JSONObject tj, HttpServletRequest request, JSONArray tarr, JSONArray iaPendingResults, ArrayList<String> photoIds, ArrayList<String> photoUrls){
     if ((mas == null) || (mas.size() < 1)) {
     } else {
       JSONArray jent = new JSONArray();
-      for (MediaAsset ent : mas) {
+      for(int i=0; i<mas.size(); i++){
+        MediaAsset ent = mas.get(i);
         myShepherd.beginDBTransaction();
         try {
           JSONObject ej = new JSONObject();
@@ -215,9 +260,26 @@ public class TwitterUtil {
           ej.put("maId", ent.getId());
           ej.put("taskId", taskId);
           ej.put("creationDate", new LocalDateTime());
-          String tweeterScreenName = tj.getJSONObject("tweet").getJSONObject("user").getString("screen_name");
+          String tweeterScreenName = tj.getJSONObject("tweet").getJSONObject("user").getString("screenName");
           ej.put("tweeterScreenName", tweeterScreenName);
+          if(photoIds.size() != mas.size()){
+            System.out.println("Yikes! photoIds is not the same size as mas");
+          } else{
+            ej.put("photoId", photoIds.get(i));
+          }
+          if(photoUrls.size() != mas.size()){
+            System.out.println("Yikes! PhotoUrls note the same size as mas");
+          } else {
+            ej.put("photoUrl", photoUrls.get(i));
+          }
+
+
+          //jent = emedia.getJSONObject(j);
+          // mediaType = jent.getString("type");
+          // mediaEntityId = Long.parseLong(jent.getString("id"));
+
           jent.put(ej);
+          iaPendingResults.put(ej);
           // myShepherd.getPM().makePersistent(ej); //maybe?
           myShepherd.commitDBTransaction();
         } catch(Exception e){
@@ -227,38 +289,55 @@ public class TwitterUtil {
       }
       tj.put("entities", jent);
     }
-    return tj;
+    tarr.put(tj);
+    return iaPendingResults;
   }
 
 
-  public static void sendDetectionAndIdentificationTweet(String screenName, String imageId, Twitter twitterInst, String whaleId, boolean detected, boolean identified, String info){
+  public static void sendDetectionAndIdentificationTweet(String screenName, String imageUrl, Twitter twitterInst, String whaleId, boolean detected, boolean identified, String info, HttpServletRequest request){
+    System.out.println("Entered sendDetectionAndIdentificationTweet");
     String tweet = null, tweet2 = null;
     if(detected && identified){
-      tweet = "Hi, @" + screenName + "! We detected a whale in " + imageId + " and identified it as " + whaleId + "!";
+      tweet = "Hi, @" + screenName + "! We detected a whale in " + imageUrl + " and identified it as " + whaleId + "!";
       tweet2 = "@" + screenName + ", here's some info on " + whaleId + ": " + info; //TODO flesh out either by pulling info from db now that whaleId is available, or by passing some info as an additional argument in this method
-
     } else if(detected && !identified){
-      tweet =  "Hi, @" + screenName + "! We detected a whale in " + imageId + " but we were not able to identify it.";
-      tweet2 = "@" + screenName + ", if you'd like to make a manual submission for " + imageId + ", please go to http://www.flukebook.org/submit.jsp";
+      tweet =  "Hi, @" + screenName + "! We detected a whale in " + imageUrl + " but we were not able to identify it.";
+      tweet2 = "@" + screenName + ", if you'd like to make a manual submission, please go to http://www.flukebook.org/submit.jsp";
     } else {
-      tweet =  "Hi, @" + screenName + "! We were not able to identify a whale in " + imageId + ".";
-      tweet2 = "@" + screenName + ", if you'd like to make a manual submission for " + imageId + ", please go to http://www.flukebook.org/submit.jsp";
+      tweet =  "Hi, @" + screenName + "! We were not able to identify a whale in " + imageUrl + ".";
+      tweet2 = "@" + screenName + ", if you'd like to make a manual submission, please go to http://www.flukebook.org/submit.jsp";
     }
 
     try {
       String status1 = createTweet(tweet, twitterInst);
       String status2 = createTweet(tweet2, twitterInst);
+      try{
+        System.out.println("Entered try for removeEntryFromPendingIaByImageUrl");
+        removeEntryFromPendingIaByImageUrl(imageUrl, request);
+        System.out.println("Got past try for removeEntryFromPendingIaByImageUrl");
+      } catch(Exception f){
+        System.out.println("removeEntryFromPendingIaByImageId failed inside sendDetectionAndIdentificationTweet method");
+        f.printStackTrace();
+      }
     } catch(TwitterException e){
       e.printStackTrace();
     }
   }
 
-  public static void sendTimeoutTweet(String screenName, Twitter twitterInst, String id) {
-    String reply = "Hello @" + screenName + "The image you sent for tweet " + id + " was unable to be processed";
+  public static void sendTimeoutTweet(String screenName, Twitter twitterInst, String imageUrl,  HttpServletRequest request) {
+    String reply = "Hello, @" + screenName + ". Analysis for image " + imageUrl + " couldn't be processed within 24 hrs.";
     String reply2 = "@" + screenName + ", if you'd like to make a manual submission, please go to http://www.flukebook.org/submit.jsp";
     try {
       String status = createTweet(reply, twitterInst);
       String status2 = createTweet(reply2, twitterInst);
+      try{
+        System.out.println("Entered try for removeEntryFromPendingIaByImageUrl");
+        removeEntryFromPendingIaByImageUrl(imageUrl, request);
+        System.out.println("Got past try for removeEntryFromPendingIaByImageUrl");
+      } catch(Exception f){
+        System.out.println("removeEntryFromPendingIaByImageId failed inside sendDetectionAndIdentificationTweet method");
+        f.printStackTrace();
+      }
     } catch(TwitterException e) {
       e.printStackTrace();
     }
@@ -286,4 +365,239 @@ public class TwitterUtil {
     }
     return new JSONArray(list);
   }
+
+  public static void removeEntryFromPendingIaByImageUrl(String imageUrl, HttpServletRequest request) throws Exception{
+    try{
+      removeEntryFromPendingIaByGenericString("photoUrl", imageUrl, request);
+    } catch(Exception e){
+      e.printStackTrace();
+      throw new Exception ("removeEntryFromPendingIaByImageUrl in TwitterUtil.java failed");
+    }
+  }
+
+  public static void removeEntryFromPendingIaByImageId(String imageId, HttpServletRequest request) throws Exception{
+    try{
+      removeEntryFromPendingIaByGenericString("photoId", imageId, request);
+    } catch(Exception e){
+      e.printStackTrace();
+      throw new Exception ("removeEntryFromPendingIaByImageId in TwitterUtil.java failed");
+    }
+  }
+
+  public static void removeEntryFromPendingIaByGenericString(String targetLabel, String id, HttpServletRequest request) throws Exception{ //TODO this is ugly and could be made DRYer -Mark F.
+    System.out.println("Entered removeEntryFromPendingIaByGenericString");
+    ArrayList<JSONObject> list = new ArrayList<>();
+    String iaPendingResultsFile = "/pendingAssetsIA.json";
+    JSONArray iaPendingResults = null;
+    String rootDir = null;
+    try{
+      rootDir = request.getSession().getServletContext().getRealPath("/");
+    } catch(Exception e){
+      try{
+        rootDir = "/var/lib/tomcat7/webapps/wildbook/"; //TODO again, a terrible way to do this -Mark F.
+        // e.printStackTrace();
+      } catch(Exception f){
+        System.out.println("Can't find rootdir in removeEntryFromPendingIaByGenericString in TwitterUtil.java");
+        f.printStackTrace();
+      }
+    }
+    String dataDir = ServletUtilities.dataDir("context0", rootDir);
+    try {
+      String iaPendingResultsAsString = Util.readFromFile(dataDir + iaPendingResultsFile);
+      System.out.println(iaPendingResultsAsString);
+      iaPendingResults = new JSONArray(iaPendingResultsAsString);
+    } catch(Exception e){
+      System.out.println("Failed to open iaPendingResults from file in TwitterUtil.java removeEntryFromPendingIaByGenericString");
+      e.printStackTrace();
+    }
+    for(int i = 0; i < iaPendingResults.length(); i++){
+      System.out.println("got into entry for loop of removeEntryFromPendingIaByGenericString");
+      JSONObject entry = iaPendingResults.getJSONObject(i);
+      try{ //TODO you can remove this whole try catch statement after October, 2017 -Mark F
+        System.out.println(targetLabel + " is: ");
+        System.out.println(entry.getString(targetLabel));
+        System.out.println ("id is: ");
+        System.out.println(id);
+      } catch(Exception e){
+        e.printStackTrace();
+      }
+      if(entry.getString(targetLabel).equals(id)){
+        System.out.println(targetLabel + " of " + id + " was detected in iaPendingResultsFile; removing now!");
+        continue;
+      } else {
+        list.add(iaPendingResults.getJSONObject(i));
+      }
+    }
+    JSONArray results = new JSONArray(list);
+    System.out.println("iaPendingResultsFile will read: " + results.toString());
+    System.out.println("Destination directory is " + dataDir + iaPendingResultsFile);
+    try{
+      Util.writeToFile(results.toString(), dataDir + iaPendingResultsFile);
+      System.out.println("successfully wrote pendingResultsFile content to file");
+    } catch(Exception e){
+      System.out.println("Failed to re-write iaPendingResultsFile in removeEntryFromPendingIaByGenericString in TwitterUtil.java");
+      e.printStackTrace();
+    }
+  }
+
+  public static Long getSinceIdFromTwitterTimeStampFile(String path) throws Exception{
+    Long sinceId = null;
+    try{
+    	// the timestamp is written with a new line at the end, so we need to strip that out before converting
+      String timeStampAsText = Util.readFromFile(path); //dataDir + twitterTimeStampFile
+      timeStampAsText = timeStampAsText.replace("\n", "");
+      sinceId = Long.parseLong(timeStampAsText, 10);
+    } catch(FileNotFoundException e){
+    	e.printStackTrace();
+    } catch(IOException e){
+    	e.printStackTrace();
+    } catch(NumberFormatException e){
+    	e.printStackTrace();
+    }
+    if(sinceId != null){
+        return sinceId;
+    } else{
+      throw new Exception ("sinceId in getSinceIdFromTwitterTimeStampFile is null");
+    }
+  }
+
+  public static String findImageIdInIaPendingLogFromTaskId(String taskId, HttpServletRequest request) throws Exception{
+    String returnVal = null;
+    try{
+      return findGenericStringItemInIaPendingLogFromTaskId("photoId", taskId, request);
+    } catch(Exception e){
+      e.printStackTrace();
+      throw new Exception ("findImageIdInIaPendingLogFromTaskId in TwitterUtil.java failed");
+    }
+  }
+
+  public static String findScreenNameInIaPendingLogFromTaskId(String taskId, HttpServletRequest request) throws Exception{
+    String returnVal = null;
+    try{
+      return findGenericStringItemInIaPendingLogFromTaskId("tweeterScreenName", taskId, request);
+    } catch(Exception e){
+      e.printStackTrace();
+      throw new Exception ("findScreenNameInIaPendingLogFromTaskId in TwitterUtil.java failed");
+    }
+  }
+
+  public static String findGenericStringItemInIaPendingLogFromTaskId(String target, String taskId, HttpServletRequest request) throws Exception{
+    String returnVal = null;
+    String rootDir = null;
+    try{
+      rootDir = request.getSession().getServletContext().getRealPath("/");
+    } catch(Exception e){
+      try{
+        rootDir = "/var/lib/tomcat7/webapps/wildbook/"; //TODO this is terrible, but I couldn't think of a better way. -Mark
+        // e.printStackTrace();
+      } catch(Exception f){
+        System.out.println("Can't find rootdir in findGenericStringItemInIaPendingLogFromTaskId in TwitterUtil.java");
+        f.printStackTrace();
+      }
+    }
+    String dataDir = ServletUtilities.dataDir("context0", rootDir);
+    String iaPendingResultsFile = "/pendingAssetsIA.json";
+    try {
+    	String iaPendingResultsAsString = Util.readFromFile(dataDir + iaPendingResultsFile);
+    	JSONArray iaPendingResults = new JSONArray(iaPendingResultsAsString);
+      for(int i =0; i<iaPendingResults.length(); i++){
+        JSONObject entry = iaPendingResults.getJSONObject(i);
+        if (entry.getString("taskId").equals(taskId)){
+          returnVal = entry.getString(target);
+          break;
+        }
+      }
+    } catch(Exception e){
+    	e.printStackTrace();
+    }
+
+    if (returnVal != null){
+      return returnVal;
+    } else{
+      throw new Exception ("imageId in findGenericStringItemInIaPendingLogFromTaskId was null");
+    }
+  }
+
+  public static String findImageUrlInIaPendingLogFromTaskId(String taskId, HttpServletRequest request) throws Exception{
+    String returnVal = null;
+    try{
+      return findGenericStringItemInIaPendingLogFromTaskId("photoUrl", taskId, request);
+    } catch(Exception e){
+      e.printStackTrace();
+      throw new Exception ("findImageUrlInIaPendingLogFromTaskId in TwitterUtil.java failed");
+    }
+  }
+
+  public static String getQueryUUIDFromJSONIdentificaitonResult(JSONObject JSONResult) throws Exception{
+    String UUID = null;
+    try{
+      UUID = JSONResult.getJSONObject("response").getJSONObject("json_result").getJSONArray("query_annot_uuid_list").getJSONObject(0).getString("__UUID__");
+    } catch(Exception e){
+      e.printStackTrace();
+    }
+    if(UUID != null){
+      return UUID;
+    } else{
+      throw new Exception("UUID is null in getQueryUUIDFromJSONResult method");
+    }
+  }
+
+  public static ArrayList<Double> getArrayOfConfidencesFromJSONIdentificaitonResult(JSONObject JSONResult) throws Exception{
+    ArrayList<Double> finalConfidences = new ArrayList<Double>();
+    JSONArray confidences = JSONResult.getJSONObject("response").getJSONObject("json_result").getJSONObject("inference_dict").getJSONObject("annot_pair_dict").getJSONArray("confidence_list");
+    for(int i = 0; i<confidences.length(); i++){
+      String currentConfidenceString = confidences.getString(i);
+      Double confidence = Double.parseDouble(currentConfidenceString);
+      finalConfidences.add(confidence);
+    }
+    if(finalConfidences.size() > 0){
+      return finalConfidences;
+    } else {
+      throw new Exception ("finalConfidences array in getArrayOfConfidences method in twitterUtil was empty");
+    }
+  }
+
+  public static ArrayList<String> getArrayOfUUIDsFromJSONIdentificaitonResult(JSONObject JSONResult) throws Exception{ //@TODO test this for a case where there is more than one result
+    ArrayList<String> finalUUIDs = new ArrayList<String>();
+    JSONArray review_pair_list = JSONResult.getJSONObject("response").getJSONObject("json_result").getJSONObject("inference_dict").getJSONObject("annot_pair_dict").getJSONArray("review_pair_list");
+    for(int i = 0; i < review_pair_list.length(); i++){
+      String isItUUID1OrUUID2;
+      String currentUUID1 = review_pair_list.getJSONObject(i).getJSONObject("annot_uuid_1").getString("__UUID__");
+      String currentUUID2 = review_pair_list.getJSONObject(i).getJSONObject("annot_uuid_2").getString("__UUID__");
+      String uuid = TwitterUtil.getQueryUUIDFromJSONIdentificaitonResult(JSONResult);
+      if(currentUUID1.equals(uuid)){
+        isItUUID1OrUUID2 = "2";
+      } else if(currentUUID2.equals(uuid)){
+        isItUUID1OrUUID2 = "1";
+      } else{
+        throw new Exception("uuid of query doesn't match uuid1 or uuid2 in getArrayOfUUIDs method. This may not be damning... it may just mean that I didn't understand how this would work. -Mark Fisher");
+      }
+      if (isItUUID1OrUUID2.equals("1")){
+        finalUUIDs.add(currentUUID1);
+      } else if (isItUUID1OrUUID2.equals("2")){
+        finalUUIDs.add(currentUUID2);
+      }
+    }
+    if(finalUUIDs.size() > 0){
+      System.out.println(finalUUIDs);
+      return finalUUIDs;
+    } else{
+      throw new Exception("finalUUIDs was zero length in getArrayOfUUIDs method in twitterUtil");
+    }
+  }
+
+  public static String getUUIDOfBestMatchFromIdentificationJSONResults(JSONObject JSONResult) throws Exception{
+    String returnVal;
+    ArrayList<Double> confidences = getArrayOfConfidencesFromJSONIdentificaitonResult(JSONResult);
+    int maxIndex = Util.getIndexOfMax(confidences);
+    ArrayList<String> correspondingUUIDs = getArrayOfUUIDsFromJSONIdentificaitonResult(JSONResult);
+    returnVal = correspondingUUIDs.get(maxIndex);
+    if(returnVal != null){
+      return returnVal;
+    } else{
+      throw new Exception("returnVal was null in getUUIDOfBestMatchFromIdentificationJSONResults method in TwitterUtil");
+    }
+  }
+
+
 }

@@ -13,6 +13,8 @@ java.io.File,
 java.util.Date,
 org.json.JSONObject,
 org.json.JSONArray,
+org.joda.time.DateTime,
+org.joda.time.Interval,
 org.ecocean.identity.IBEISIA,
 twitter4j.QueryResult,
 twitter4j.Status,
@@ -21,8 +23,7 @@ org.ecocean.servlet.ServletUtilities,
 org.ecocean.media.*,
 org.ecocean.ParseDateLocation.*,
 java.util.concurrent.ThreadLocalRandom,
-org.joda.time.DateTime,
-org.joda.time.Interval
+java.io.*
               "
 %>
 
@@ -33,6 +34,7 @@ Long tweetID = null;
 String tweetText = null;
 Long mostRecentTweetID = null;
 String rootDir = request.getSession().getServletContext().getRealPath("/");
+out.println("rootDir is " + rootDir);
 String dataDir = ServletUtilities.dataDir("context0", rootDir);
 String context = ServletUtilities.getContext(request);
 Long sinceId = 890302524275662848L;
@@ -87,52 +89,6 @@ try {
 	e.printStackTrace();
 }
 
-// Check if JSON data exists
-if(iaPendingResults != null){
-
-	// out.println(iaPendingResults);
-	for(int i = 0; i < iaPendingResults.length(); i++){
-		JSONObject resultStatus = null;
-		JSONObject pendingResult = null;
-		try {
-			pendingResult = iaPendingResults.getJSONObject(i);
-			resultStatus = IBEISIA.getTaskResults(pendingResult.getString("taskId"), context);
-		} catch(Exception e){
-			e.printStackTrace();
-			out.println("Unable to get result status from IBEISIA for pending result");
-		}
-		if(resultStatus != null){
-			// If job is complete, remove from iaPendingResults
-			out.println("Result status: " + resultStatus);
-
-			if(resultStatus.getBoolean("success")){
-				out.println("IA complete for object " + pendingResult.getString("taskId") + "! Removing from pending");
-				iaPendingResults = TwitterUtil.removePendingEntry(iaPendingResults, i);
-			} else {
-				out.println("IA failed for object " + pendingResult.getString("taskId") + ".");
-			}
-		} else {
-			System.out.println("Pending result " + pendingResult.getString("taskId") + " has not been processed yet.");
-
-			// Check if 24 hrs have passed since the result process was started and notify sender if it's timed out
-			DateTime resultCreation = new DateTime(pendingResult.getString("creationDate"));
-			DateTime timeNow = new DateTime();
-			Interval interval = new Interval(resultCreation, timeNow);
-
-			if(interval.toDuration().getStandardHours() >= 24){
-				out.println("Object " + pendingResult.getString("taskId") + " has timed out in IA. Notifying sender.");
-				TwitterUtil.sendTimeoutTweet(pendingResult.getString("tweeterScreenName"), twitterInst, pendingResult.getString("maId"));
-			}
-		}
-	}
-
-} else {
-	out.println("No pending results");
-	iaPendingResults = new JSONArray();
-}
-
-// END PENDING IA RETRIEVAL
-
 //##################Begin loop through the each of the tweets since the last timestamp##################
 // out.println("size of the arrayList of statuses is " + Integer.toString(qr.getTweets().size()));
 List<Status> tweetStatuses = qr.getTweets();
@@ -186,17 +142,6 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
     continue;
   }
 
-  //temporary: test parseDate()
-  // try{
-  //   String date = ParseDateLocation.parseDate(tweetText,context, tweet);
-  //   out.println("single date is: ");
-  //   out.println(date);
-  // } catch(Exception e){
-  //   out.println("something went terribly wrong getting the single date from the tweet text");
-  //   e.printStackTrace();
-  //   continue;
-  // }
-
   try{
     ArrayList<String> dates = ParseDateLocation.parseDateToArrayList(tweetText,context);
     //TODO parseDateToArrayList may need to be updated (and overloaded?)?
@@ -229,8 +174,17 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
 
   //sendPhotoSpecificCourtesyTweet will detect a photo in your tweet object and tweet the user an acknowledgement about this. If multiple images are sent in the same tweet, this response will only happen once.
   TwitterUtil.sendPhotoSpecificCourtesyTweet(emedia, tweeterScreenName, twitterInst);
+  ArrayList<String> photoIds = TwitterUtil.getPhotoIds(emedia, tweeterScreenName, twitterInst);
+  ArrayList<String> photoUrls = TwitterUtil.getPhotoUrls(emedia, tweeterScreenName, twitterInst);
+  System.out.println("PhotoUrls: ");
+  System.out.println(photoUrls);
 
   tj = TwitterUtil.makeParentTweetMediaAssetAndSave(myShepherd, tas, tweet, tj);
+
+  System.out.println("twitter obj:");
+  System.out.println(tj.toString());
+
+
   //retrieve ma now that it has been saved
   ma = tas.find(p, myShepherd);
 
@@ -238,8 +192,7 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
 
   // dates = addPhotoDatesToPreviouslyParsedDates(dates, mas); //TODO write this/ think about when we want this to happen. We will ultimately add the dates and locations to encounter objects, so perhaps this should only occur downstream of successful detection? Another question is how to tack all of the previously-captured date candidates (or just the best one from ParseDateLocation.parseDate()?) onto each photo while keeping the photo-specific captured date strings attached to only their parent photo...
 
-  tj = TwitterUtil.saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis(mas, tweetID, myShepherd, tj, request);
-  //TODO iaPendingResults.put(ej); needs to go in this method, but how to extrac iaPendingResults after???
+  iaPendingResults = TwitterUtil.saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis(mas, tweetID, myShepherd, tj, request, tarr, iaPendingResults, photoIds, photoUrls);
 	tarr.put(tj);
 }
 //End looping through the tweets
@@ -269,7 +222,46 @@ try {
 
 rtn.put("success", true);
 rtn.put("data", tarr);
-// out.println(rtn);
+out.println(rtn);
+
+// Check if JSON data exists
+if(iaPendingResults != null){
+	// TODO: check if IA has finished processing the pending results
+  out.println("iaPendingResults:");
+	out.println(iaPendingResults);
+
+  //TODO: check if there are any entries that are older than 24 hours, tweet user, and remove
+
+  JSONObject pendingResult = null;
+  String currentJobId = null;
+  Boolean curlStatus = null;
+  String currentIPAddress = "52.88.31.154"; //@TODO put this somewhere more permanent
+  String getJobStatusBaseURL = "http://" + currentIPAddress + "/IBEISIAGetJobStatus.jsp?jobid=";
+  for(int i = 0; i<iaPendingResults.length(); i++){
+    pendingResult = iaPendingResults.getJSONObject(i);
+    currentJobId = IBEISIA.findJobIDFromTaskID(pendingResult.getString("taskId"), context);
+
+    String[] cmd = {"curl", getJobStatusBaseURL + currentJobId};
+    Process p = Runtime.getRuntime().exec(cmd);
+
+    DateTime resultCreation = new DateTime(pendingResult.getString("creationDate"));
+    DateTime timeNow = new DateTime();
+    Interval interval = new Interval(resultCreation, timeNow);
+    out.println("Interval: " + interval);
+    out.println("Interval duration: " + interval.toDuration().plus(5000000).getStandardHours()); //TODO what does the plus(5000000) do? -Mark F.
+    if(interval.toDuration().getStandardHours() >= 24){
+    	out.println("Object " + pendingResult.getString("taskId") + " has timed out in IA. Notifying sender.");
+    	TwitterUtil.sendTimeoutTweet(pendingResult.getString("tweeterScreenName"), twitterInst, pendingResult.getString("photoUrl"), request);
+      //Remove
+    }
+  }
+
+} else {
+	out.println("No pending results");
+	iaPendingResults = new JSONArray();
+}
+// END PENDING IA RETRIEVAL
+
 
 myShepherd.closeDBTransaction();
 
