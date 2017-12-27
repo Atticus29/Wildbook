@@ -315,17 +315,37 @@
   // End NLP tests
 
   //Test JSON identification file
+  //@TODO test these all on JSON results containing more than one match and less than one match
 
   String identificationJSONStr = Util.readFromFile("/Users/mf/Desktop/identification_result.json");
   JSONObject identificationJSON = new JSONObject(identificationJSONStr);
-  String uuid = TwitterUtil.getQueryUUIDFromJSONIdentificaitonResult(identificationJSON);
-  out.println(uuid);
-  ArrayList<Float> confidences = TwitterUtil.getArrayOfConfidences(identificationJSON);
-  out.println(confidences);
+  try{
+    String uuid = TwitterUtil.getQueryUUIDFromJSONIdentificaitonResult(identificationJSON);
+    out.println(uuid);
+  } catch(Exception e){
+    e.printStackTrace();
+  }
+  try{
+    ArrayList<Float> confidences = TwitterUtil.getArrayOfConfidencesFromJSONIdentificaitonResult(identificationJSON);
+    out.println(confidences);
+  } catch(Exception e){
+    e.printStackTrace();
+  }
+  try{
+    ArrayList<String> correspondingUUIDs = TwitterUtil.getArrayOfUUIDsFromJSONIdentificaitonResult(identificationJSON);
+    out.println(correspondingUUIDs);
+  } catch(Exception e){
+    e.printStackTrace();
+  }
+
   %>
 
 
 
 <%!
-//add method here
+public int getIndexOfMax(ArrayList<Float> candidates){
+  return 3;
+  // Float maxValue = Collections.max(candidates);
+  // return candidates.indexOf(maxValue);
+}
 %>

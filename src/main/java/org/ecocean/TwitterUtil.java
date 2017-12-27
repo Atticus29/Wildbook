@@ -542,7 +542,7 @@ public class TwitterUtil {
     }
   }
 
-  public static ArrayList<Float> getArrayOfConfidences(JSONObject JSONResult) throws Exception{
+  public static ArrayList<Float> getArrayOfConfidencesFromJSONIdentificaitonResult(JSONObject JSONResult) throws Exception{
     ArrayList<Float> finalConfidences = new ArrayList<Float>();
     JSONArray confidences = JSONResult.getJSONObject("response").getJSONObject("json_result").getJSONObject("inference_dict").getJSONObject("annot_pair_dict").getJSONArray("confidence_list");
     for(int i = 0; i<confidences.length(); i++){
@@ -556,5 +556,35 @@ public class TwitterUtil {
       throw new Exception ("finalConfidences array in getArrayOfConfidences method in twitterUtil was empty");
     }
   }
+
+  public static ArrayList<String> getArrayOfUUIDsFromJSONIdentificaitonResult(JSONObject JSONResult) throws Exception{ //@TODO test this for a case where there is more than one result
+    ArrayList<String> finalUUIDs = new ArrayList<String>();
+    JSONArray review_pair_list = JSONResult.getJSONObject("response").getJSONObject("json_result").getJSONObject("inference_dict").getJSONObject("annot_pair_dict").getJSONArray("review_pair_list");
+    for(int i = 0; i < review_pair_list.length(); i++){
+      String isItUUID1OrUUID2;
+      String currentUUID1 = review_pair_list.getJSONObject(i).getJSONObject("annot_uuid_1").getString("__UUID__");
+      String currentUUID2 = review_pair_list.getJSONObject(i).getJSONObject("annot_uuid_2").getString("__UUID__");
+      String uuid = TwitterUtil.getQueryUUIDFromJSONIdentificaitonResult(JSONResult);
+      if(currentUUID1.equals(uuid)){
+        isItUUID1OrUUID2 = "2";
+      } else if(currentUUID2.equals(uuid)){
+        isItUUID1OrUUID2 = "1";
+      } else{
+        throw new Exception("uuid of query doesn't match uuid1 or uuid2 in getArrayOfUUIDs method. This may not be damning... it may just mean that I didn't understand how this would work. -Mark Fisher");
+      }
+      if (isItUUID1OrUUID2.equals("1")){
+        finalUUIDs.add(currentUUID1);
+      } else if (isItUUID1OrUUID2.equals("2")){
+        finalUUIDs.add(currentUUID2);
+      }
+    }
+    if(finalUUIDs.size() > 0){
+      System.out.println(finalUUIDs);
+      return finalUUIDs;
+    } else{
+      throw new Exception("finalUUIDs was zero length in getArrayOfUUIDs method in twitterUtil");
+    }
+  }
+
 
 }
