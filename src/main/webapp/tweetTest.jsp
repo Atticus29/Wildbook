@@ -369,10 +369,17 @@
     e.printStackTrace();
   }
 
+  try{
+    String bestUUID = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(identificationJSON);
+    System.out.println("bestUUID is: " + bestUUID);
+  } catch(Exception e){
+    e.printStackTrace();
+  }
+
   %>
 
 
 
 <%!
-
+//Method here
 %>

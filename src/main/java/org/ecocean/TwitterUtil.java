@@ -586,5 +586,18 @@ public class TwitterUtil {
     }
   }
 
+  public static String getUUIDOfBestMatchFromIdentificationJSONResults(JSONObject JSONResult) throws Exception{
+    String returnVal;
+    ArrayList<Double> confidences = getArrayOfConfidencesFromJSONIdentificaitonResult(JSONResult);
+    int maxIndex = Util.getIndexOfMax(confidences);
+    ArrayList<String> correspondingUUIDs = getArrayOfUUIDsFromJSONIdentificaitonResult(JSONResult);
+    returnVal = correspondingUUIDs.get(maxIndex);
+    if(returnVal != null){
+      return returnVal;
+    } else{
+      throw new Exception("returnVal was null in getUUIDOfBestMatchFromIdentificationJSONResults method in TwitterUtil");
+    }
+  }
+
 
 }
