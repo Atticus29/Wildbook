@@ -314,68 +314,6 @@
   }
   // End NLP tests
 
-  //Test JSON identification file
-  //@TODO test these all on JSON results containing more than one match and less than one match
-
-  String identificationJSONStr = Util.readFromFile("/Users/mf/Desktop/identification_result.json");
-  JSONObject identificationJSON = new JSONObject(identificationJSONStr);
-  try{
-    String uuid = TwitterUtil.getQueryUUIDFromJSONIdentificaitonResult(identificationJSON);
-    out.println(uuid);
-  } catch(Exception e){
-    e.printStackTrace();
-  }
-  try{
-    ArrayList<Double> confidences = TwitterUtil.getArrayOfConfidencesFromJSONIdentificaitonResult(identificationJSON);
-    out.println(confidences);
-    int maxIndex = Util.getIndexOfMax(confidences);
-    System.out.println(maxIndex);
-  } catch(Exception e){
-    e.printStackTrace();
-  }
-
-  try{
-    ArrayList<Double> test1 = new ArrayList<Double>();
-    Double a = 1.0;
-    test1.add(a);
-    test1.add(2.3);
-    test1.add(4.8);
-    test1.add(3.1415);
-    int maxIndex = Util.getIndexOfMax(test1);
-    System.out.println(maxIndex);
-    ArrayList<Double> test3 = new ArrayList<Double>();
-    test3.add(1.0);
-    test3.add(4.8);
-    test3.add(4.8);
-    test3.add(3.1415);
-    maxIndex = Util.getIndexOfMax(test3);
-    System.out.println(maxIndex);
-  } catch(Exception e){
-    e.printStackTrace();
-  }
-
-  try{
-    ArrayList<Double> test2 = new ArrayList<Double>();
-    int maxIndex = Util.getIndexOfMax(test2);
-    System.out.println(maxIndex);
-  } catch(Exception e){
-    e.printStackTrace();
-  }
-
-  try{
-    ArrayList<String> correspondingUUIDs = TwitterUtil.getArrayOfUUIDsFromJSONIdentificaitonResult(identificationJSON);
-    out.println(correspondingUUIDs);
-  } catch(Exception e){
-    e.printStackTrace();
-  }
-
-  try{
-    String bestUUID = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(identificationJSON);
-    System.out.println("bestUUID is: " + bestUUID);
-  } catch(Exception e){
-    e.printStackTrace();
-  }
-
   %>
 
 
