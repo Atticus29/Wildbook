@@ -3,6 +3,7 @@ package org.ecocean;
 //import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
@@ -622,5 +623,13 @@ public class Util {
           String formatted = format.format(date);
           formatted = format.format(date);
           return formatted.toString();
+    }
+
+    public static int getIndexOfMax(ArrayList<Double> candidates) throws Exception{
+      if(candidates.size() < 1){
+        throw new Exception("arrayList passed to getIndexOfMax method was empty.");
+      }
+      Double maxValue = Collections.max(candidates);
+      return candidates.indexOf(maxValue);
     }
 }

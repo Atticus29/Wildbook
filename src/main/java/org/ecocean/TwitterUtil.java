@@ -542,12 +542,12 @@ public class TwitterUtil {
     }
   }
 
-  public static ArrayList<Float> getArrayOfConfidencesFromJSONIdentificaitonResult(JSONObject JSONResult) throws Exception{
-    ArrayList<Float> finalConfidences = new ArrayList<Float>();
+  public static ArrayList<Double> getArrayOfConfidencesFromJSONIdentificaitonResult(JSONObject JSONResult) throws Exception{
+    ArrayList<Double> finalConfidences = new ArrayList<Double>();
     JSONArray confidences = JSONResult.getJSONObject("response").getJSONObject("json_result").getJSONObject("inference_dict").getJSONObject("annot_pair_dict").getJSONArray("confidence_list");
     for(int i = 0; i<confidences.length(); i++){
       String currentConfidenceString = confidences.getString(i);
-      Float confidence = Float.parseFloat(currentConfidenceString);
+      Double confidence = Double.parseDouble(currentConfidenceString);
       finalConfidences.add(confidence);
     }
     if(finalConfidences.size() > 0){
