@@ -955,7 +955,7 @@ public static String nlpDateParse(String text) throws Exception{
   text = text.replaceAll("[,.!?;:]", "$0 ");
   System.out.println("text: " + text);
   String[] text1 = text.replaceAll("[^A-Za-z0-9 ]", "").toLowerCase().split("\\s+"); //TODO I think this does a better version of what the above (text = text.replaceAll("[,.!?;:]", "$0 ");) does?? -Mark Fisher
-  String text2 = String.join(" ", text1);
+  String text2 = join(text1, " ");
 
   System.out.println("text2: " + text2);
   edu.stanford.nlp.pipeline.Annotation annotation = new edu.stanford.nlp.pipeline.Annotation(text2);
@@ -1230,7 +1230,7 @@ public static ArrayList<String> nlpDateParseToArrayList(String text){
   text = text.replaceAll("[,.!?;:]", "$0 ");
   System.out.println("text: " + text);
   String[] text1 = text.replaceAll("[^A-Za-z0-9 ]", "").toLowerCase().split("\\s+");
-  String text2 = String.join(" ", text1);
+  String text2 = join(text1, " ");
 
   System.out.println("text2: " + text2);
   // Create annotation using new string
