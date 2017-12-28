@@ -29,6 +29,9 @@
   //Test JSON identification file
   //@TODO test these all on JSON results containing more than one match and less than one match
 
+  Shepherd myShepherd = new Shepherd(ServletUtilities.getContext(request));
+  myShepherd.setAction("tweetFind.jsp");
+
   String identificationJSONStr = Util.readFromFile("/Users/mf/Desktop/identification_result.json");
   JSONObject identificationJSON = new JSONObject(identificationJSONStr);
   try{
@@ -88,4 +91,26 @@
     e.printStackTrace();
   }
 
+  try{
+    String bestUUID = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(identificationJSON);
+    String markedIndividualID = getMarkedIndividualIDFromEncounterUUID(bestUUID);
+    System.out.println("markedIndividualID is " + markedIndividualID);
+    out.println(markedIndividualID);
+  } catch(Exception e){
+    e.printStackTrace();
+  }
+
+  %>
+
+  <%!
+  public String getMarkedIndividualIDFromEncounterUUID(String encounterUUID) throws Exception{
+    String returnVal=null;
+    Encounter currentEncounter = myShepherd.getEncounter(encounterUUID);
+    returnVal = currentEncounter.getIndividualID();
+    if (returnVal != null){
+      return returnVal;
+    } else{
+      throw new Exception("markedIndividualID was null in getMarkedIndividualIDFromEncounterUUID method from TwitterUtil.java");
+    }
+  }
   %>
