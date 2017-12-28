@@ -862,8 +862,7 @@ public static String nlpDateParse(String text, Status tweet) throws Exception{
 
   text = text.replaceAll("[,.!?;:]", "$0 ");
   System.out.println("text: " + text);
-  String[] text1 = text.replaceAll("[^A-Za-z0-9 ]", "").toLowerCase()
-    .split("\\s+"); //TODO I think this does a better version of what the above (text = text.replaceAll("[,.!?;:]", "$0 ");) does?? -Mark Fisher
+  String[] text1 = text.replaceAll("[^A-Za-z0-9 ]", "").toLowerCase().split("\\s+"); //TODO I think this does a better version of what the above (text = text.replaceAll("[,.!?;:]", "$0 ");) does?? -Mark Fisher
   String text2 = String.join(" ", text1);
 
   System.out.println("text2: " + text2);
@@ -942,8 +941,7 @@ public static String nlpDateParse(String text) throws Exception{
 
   text = text.replaceAll("[,.!?;:]", "$0 ");
   System.out.println("text: " + text);
-  String[] text1 = text.replaceAll("[^A-Za-z0-9 ]", "").toLowerCase()
-    .split("\\s+"); //TODO I think this does a better version of what the above (text = text.replaceAll("[,.!?;:]", "$0 ");) does?? -Mark Fisher
+  String[] text1 = text.replaceAll("[^A-Za-z0-9 ]", "").toLowerCase().split("\\s+"); //TODO I think this does a better version of what the above (text = text.replaceAll("[,.!?;:]", "$0 ");) does?? -Mark Fisher
   String text2 = String.join(" ", text1);
 
   System.out.println("text2: " + text2);
