@@ -849,6 +849,19 @@ public static ArrayList<String> nlpLocationParse(String text) throws RuntimeExce
 }
 
 
+public static String join(String r[],String d)
+{
+  if (r.length == 0) return "";
+  StringBuilder sb = new StringBuilder();
+  int i;
+  for(i=0;i<r.length-1;i++){
+    sb.append(r[i]);
+    sb.append(d);
+  }
+  sb.append(r[i]);
+  return sb.toString();
+}
+
 //overloaded version to deal with tweets
 public static String nlpDateParse(String text, Status tweet) throws Exception{
   System.out.println("Entering nlpDateParse twitter version with text " + text);
@@ -863,7 +876,7 @@ public static String nlpDateParse(String text, Status tweet) throws Exception{
   text = text.replaceAll("[,.!?;:]", "$0 ");
   System.out.println("text: " + text);
   String[] text1 = text.replaceAll("[^A-Za-z0-9 ]", "").toLowerCase().split("\\s+"); //TODO I think this does a better version of what the above (text = text.replaceAll("[,.!?;:]", "$0 ");) does?? -Mark Fisher
-  String text2 = String.join(" ", text1);
+  String text2 = join(text1, " ");
 
   System.out.println("text2: " + text2);
   edu.stanford.nlp.pipeline.Annotation annotation = new edu.stanford.nlp.pipeline.Annotation(text2);
@@ -1154,48 +1167,48 @@ public static java.util.Date convertStringToDate(String dateString) throws Excep
 }
 
 public static ArrayList<String> removeYesterdayDatesIfTheyAreNotTheOnlyDates(ArrayList<String> candidates) throws Exception{
-    String yesterday = getYesterdayDateString();
-    ArrayList<String> returnCandidates = new ArrayList<String>();
-    int yesterdayCounter = 0;
-    for(int i = 0; i<candidates.size(); i++){
-      if (candidates.get(i).equals(yesterday)){
-        yesterdayCounter ++;
-      } else {
-        returnCandidates.add(candidates.get(i));
-      }
+  String yesterday = getYesterdayDateString();
+  ArrayList<String> returnCandidates = new ArrayList<String>();
+  int yesterdayCounter = 0;
+  for(int i = 0; i<candidates.size(); i++){
+    if (candidates.get(i).equals(yesterday)){
+      yesterdayCounter ++;
+    } else {
+      returnCandidates.add(candidates.get(i));
     }
-    if(yesterdayCounter == candidates.size() | yesterdayCounter == 0){
-      //yesterday is the only date or yesterday doesn't occur at all
-      returnCandidates = candidates;
-    } else if (yesterdayCounter != 0 && yesterdayCounter < candidates.size()){
-      //keep returnCandidates as it is from the for loop above
-    }
-    if(returnCandidates == null | returnCandidates.size()<1){
-      throw new Exception("removeYesterdayDatesIfTheyAreNotTheOnlyDates method returned null or empty arrayList");
-    } else{
-      return returnCandidates;
-    }
+  }
+  if(yesterdayCounter == candidates.size() | yesterdayCounter == 0){
+    //yesterday is the only date or yesterday doesn't occur at all
+    returnCandidates = candidates;
+  } else if (yesterdayCounter != 0 && yesterdayCounter < candidates.size()){
+    //keep returnCandidates as it is from the for loop above
+  }
+  if(returnCandidates == null | returnCandidates.size()<1){
+    throw new Exception("removeYesterdayDatesIfTheyAreNotTheOnlyDates method returned null or empty arrayList");
+  } else{
+    return returnCandidates;
+  }
 }
 
 public static String getTodayDateString() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        return dateFormat.format(getToday());
+  DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+  return dateFormat.format(getToday());
 }
 
 public static java.util.Date getToday() {
-    final Calendar cal = Calendar.getInstance();
-    return cal.getTime();
+  final Calendar cal = Calendar.getInstance();
+  return cal.getTime();
 }
 
 public static String getYesterdayDateString() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        return dateFormat.format(getYesterday());
+  DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+  return dateFormat.format(getYesterday());
 }
 
 public static java.util.Date getYesterday() {
-    final Calendar cal = Calendar.getInstance();
-    cal.add(Calendar.DATE, -1);
-    return cal.getTime();
+  final Calendar cal = Calendar.getInstance();
+  cal.add(Calendar.DATE, -1);
+  return cal.getTime();
 }
 
 

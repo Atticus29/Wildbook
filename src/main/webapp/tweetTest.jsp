@@ -51,36 +51,6 @@
   String monthYearString = "Saw a whale April, 2017.";
   String yearString = "Saw a whale in 2015.";
 
-  // Test methods
-  ArrayList<String> results = null;
-  results = ParseDateLocation.parseLocation(monthYearString, context);
-  out.println("results from " + monthYearString + " is " + results);
-
-  results = ParseDateLocation.parseLocation(yearString, context);
-  out.println("results from " + yearString + " is " + results);
-
-  results = ParseDateLocation.parseLocation(dateTest, context);
-  out.println("results from " + dateTest + " is " + results);
-
-  results = ParseDateLocation.parseLocation(dateTest2, context);
-  out.println("results from " + dateTest2 + " is " + results);
-
-  results = ParseDateLocation.parseLocation(testTweetText, context);
-  out.println("results from " + testTweetText + " is " + results);
-
-  results = ParseDateLocation.parseLocation(testTweetTextNonEnglish, context);
-  out.println("results from " + testTweetTextNonEnglish + " is " + results);
-
-  results = ParseDateLocation.parseLocation(textTweetGpsText, context);
-  out.println("results from " + textTweetGpsText + " is " + results);
-
-  results = ParseDateLocation.parseLocation(testTweetMultipleLocations, context);
-  out.println("results from " + testTweetMultipleLocations + " is " + results);
-
-  results = ParseDateLocation.parseLocation(testTweetNLPLocation, context);
-  out.println("results from " + testTweetNLPLocation + " is " + results);
-
-  out.println("Don't forget to conduct additional tests on an emulator with gps coordinates from somewhere in asia.");
 
   // Testing tweetMethods
   String randomNumStr = Integer.toString(ThreadLocalRandom.current().nextInt(1, 10000 + 1));
