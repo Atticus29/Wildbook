@@ -91,14 +91,14 @@
     e.printStackTrace();
   }
 
-  // try{
-  //   String bestUUID = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(identificationJSON);
-  //   String markedIndividualID = getMarkedIndividualIDFromEncounterUUID(bestUUID);
-  //   System.out.println("markedIndividualID is " + markedIndividualID);
-  //   out.println(markedIndividualID);
-  // } catch(Exception e){
-  //   e.printStackTrace();
-  // }
+  try{
+    String bestUUID = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(identificationJSON);
+    String markedIndividualID = getMarkedIndividualIDFromEncounterUUID(bestUUID);
+    System.out.println("markedIndividualID is " + markedIndividualID);
+    out.println(markedIndividualID);
+  } catch(Exception e){
+    e.printStackTrace();
+  }
 
   //Test with non-result JSON
   identificationJSONStr = Util.readFromFile("/Users/mf/Desktop/patternMatchResultNoMatches.json");
@@ -154,14 +154,14 @@
 
   <%!
   //@TODO test with db intact?
-  // public String getMarkedIndividualIDFromEncounterUUID(String encounterUUID) throws Exception{
-  //   String returnVal=null;
-  //   Encounter currentEncounter = myShepherd.getEncounter(encounterUUID);
-  //   returnVal = currentEncounter.getIndividualID();
-  //   if (returnVal != null){
-  //     return returnVal;
-  //   } else{
-  //     throw new Exception("markedIndividualID was null in getMarkedIndividualIDFromEncounterUUID method from TwitterUtil.java");
-  //   }
-  // }
+  public String getMarkedIndividualIDFromEncounterUUID(String encounterUUID) throws Exception{
+    String returnVal=null;
+    Encounter currentEncounter = myShepherd.getEncounter(encounterUUID);
+    returnVal = currentEncounter.getIndividualID();
+    if (returnVal != null){
+      return returnVal;
+    } else{
+      throw new Exception("markedIndividualID was null in getMarkedIndividualIDFromEncounterUUID method from TwitterUtil.java");
+    }
+  }
   %>
