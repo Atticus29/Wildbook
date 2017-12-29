@@ -91,18 +91,52 @@
     e.printStackTrace();
   }
 
+  // try{
+  //   String bestUUID = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(identificationJSON);
+  //   String markedIndividualID = getMarkedIndividualIDFromEncounterUUID(bestUUID);
+  //   System.out.println("markedIndividualID is " + markedIndividualID);
+  //   out.println(markedIndividualID);
+  // } catch(Exception e){
+  //   e.printStackTrace();
+  // }
+
+  //Test with non-result JSON
+  String identificationJSONStr = Util.readFromFile("/Users/mf/Desktop/patternMatchResultNoMatches.json");
+  JSONObject identificationJSON = new JSONObject(identificationJSONStr);
   try{
-    String bestUUID = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(identificationJSON);
-    String markedIndividualID = getMarkedIndividualIDFromEncounterUUID(bestUUID);
-    System.out.println("markedIndividualID is " + markedIndividualID);
-    out.println(markedIndividualID);
+    String uuid = TwitterUtil.getQueryUUIDFromJSONIdentificaitonResult(identificationJSON);
+    out.println(uuid);
   } catch(Exception e){
     e.printStackTrace();
   }
 
+  try{
+    String bestUUID = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(identificationJSON);
+    System.out.println("bestUUID is: " + bestUUID);
+  } catch(Exception e){
+    e.printStackTrace();
+  }
+
+  //Test with two-result JSON
+  String identificationJSONStr = Util.readFromFile("/Users/mf/Desktop/patternMatchResultsTwoMatchesFaked.json");
+  JSONObject identificationJSON = new JSONObject(identificationJSONStr);
+  try{
+    String uuid = TwitterUtil.getQueryUUIDFromJSONIdentificaitonResult(identificationJSON);
+    out.println(uuid);
+  } catch(Exception e){
+    e.printStackTrace();
+  }
+
+  try{
+    String bestUUID = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(identificationJSON);
+    System.out.println("bestUUID is: " + bestUUID);
+  } catch(Exception e){
+    e.printStackTrace();
+  }
   %>
 
   <%!
+  //@TODO test with db intact?
   public String getMarkedIndividualIDFromEncounterUUID(String encounterUUID) throws Exception{
     String returnVal=null;
     Encounter currentEncounter = myShepherd.getEncounter(encounterUUID);
