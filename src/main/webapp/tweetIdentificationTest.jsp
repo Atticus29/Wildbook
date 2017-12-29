@@ -101,8 +101,8 @@
   // }
 
   //Test with non-result JSON
-  String identificationJSONStr = Util.readFromFile("/Users/mf/Desktop/patternMatchResultNoMatches.json");
-  JSONObject identificationJSON = new JSONObject(identificationJSONStr);
+  identificationJSONStr = Util.readFromFile("/Users/mf/Desktop/patternMatchResultNoMatches.json");
+  identificationJSON = new JSONObject(identificationJSONStr);
   try{
     String uuid = TwitterUtil.getQueryUUIDFromJSONIdentificaitonResult(identificationJSON);
     out.println(uuid);
@@ -118,8 +118,25 @@
   }
 
   //Test with two-result JSON
-  String identificationJSONStr = Util.readFromFile("/Users/mf/Desktop/patternMatchResultsTwoMatchesFaked.json");
-  JSONObject identificationJSON = new JSONObject(identificationJSONStr);
+  identificationJSONStr = Util.readFromFile("/Users/mf/Desktop/patternMatchResultsTwoMatchesFaked.json");
+  identificationJSON = new JSONObject(identificationJSONStr);
+  try{
+    String uuid = TwitterUtil.getQueryUUIDFromJSONIdentificaitonResult(identificationJSON);
+    out.println(uuid);
+  } catch(Exception e){
+    e.printStackTrace();
+  }
+
+  try{
+    String bestUUID = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(identificationJSON);
+    System.out.println("bestUUID is: " + bestUUID);
+  } catch(Exception e){
+    e.printStackTrace();
+  }
+
+  //Test with two-result JSON where second result is higher-confidence
+  identificationJSONStr = Util.readFromFile("/Users/mf/Desktop/patternMatchResultsTwoMatchesFakedSwapped.json");
+  identificationJSON = new JSONObject(identificationJSONStr);
   try{
     String uuid = TwitterUtil.getQueryUUIDFromJSONIdentificaitonResult(identificationJSON);
     out.println(uuid);
@@ -137,14 +154,14 @@
 
   <%!
   //@TODO test with db intact?
-  public String getMarkedIndividualIDFromEncounterUUID(String encounterUUID) throws Exception{
-    String returnVal=null;
-    Encounter currentEncounter = myShepherd.getEncounter(encounterUUID);
-    returnVal = currentEncounter.getIndividualID();
-    if (returnVal != null){
-      return returnVal;
-    } else{
-      throw new Exception("markedIndividualID was null in getMarkedIndividualIDFromEncounterUUID method from TwitterUtil.java");
-    }
-  }
+  // public String getMarkedIndividualIDFromEncounterUUID(String encounterUUID) throws Exception{
+  //   String returnVal=null;
+  //   Encounter currentEncounter = myShepherd.getEncounter(encounterUUID);
+  //   returnVal = currentEncounter.getIndividualID();
+  //   if (returnVal != null){
+  //     return returnVal;
+  //   } else{
+  //     throw new Exception("markedIndividualID was null in getMarkedIndividualIDFromEncounterUUID method from TwitterUtil.java");
+  //   }
+  // }
   %>
