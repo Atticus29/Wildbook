@@ -240,6 +240,8 @@ if(iaPendingResults != null){
   for(int i = 0; i<iaPendingResults.length(); i++){
     pendingResult = iaPendingResults.getJSONObject(i);
     currentJobId = IBEISIA.findJobIDFromTaskID(pendingResult.getString("taskId"), context);
+    //@TODO change the curl call below to IBEISIA.getJobStatus(String jobid, String context), then, if status is error tweet about it and drop from iaPendingResults. If ok, use IBEISIA.getJobResult(String jobid, String context) 
+    //these can possibly throw exceptions (like IA has gone away) so best to catch those too.  i guess that was case 0 on the whiteboard
 
     String[] cmd = {"curl", getJobStatusBaseURL + currentJobId};
     Process p = Runtime.getRuntime().exec(cmd);
