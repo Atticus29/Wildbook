@@ -589,7 +589,14 @@ public class TwitterUtil {
   public static String getUUIDOfBestMatchFromIdentificationJSONResults(JSONObject JSONResult) throws Exception{
     String returnVal;
     ArrayList<Double> confidences = getArrayOfConfidencesFromJSONIdentificaitonResult(JSONResult);
+    if(confidences.size() < 1){
+      returnVal = "";
+    }
     int maxIndex = Util.getIndexOfMax(confidences);
+    if(confidences.get(maxIndex) < IBEISIA.getIdentificationCutoffValue()){
+      returnVal = "";
+    }
+    //@TODO check whether max confidence beats our cutoff! If not, throw exception.
     ArrayList<String> correspondingUUIDs = getArrayOfUUIDsFromJSONIdentificaitonResult(JSONResult);
     returnVal = correspondingUUIDs.get(maxIndex);
     if(returnVal != null){

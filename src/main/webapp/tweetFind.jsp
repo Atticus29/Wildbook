@@ -241,28 +241,48 @@ if(iaPendingResults != null){
     pendingResult = iaPendingResults.getJSONObject(i);
     currentJobId = IBEISIA.findJobIDFromTaskID(pendingResult.getString("taskId"), context);
 
-    // try{
-    //   JSONObject status = IBEISIA.getJobStatus(currentJobId, context);
-    // } catch(Exception e){
-    //   e.printStackTrace();
-    // }
+    try{
+      String status = IBEISIA.getJobStatus(currentJobId, context).getString("jobstatus");
+      System.out.println("Job status ==>" + status);
+      if (status.equals("completed")){
+        JSONObject jobResult = IBEISIA.getJobResult(currentJobId, context);
+        //@TODO find out whether this is detection or identification. If identification, do below
+        String bestUUIDMatch = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(jobResult);
+        if(bestUUIDMatch.equals("")){
+          TwitterUtil.sendDetectionAndIdentificationTweet(screenName, imageUrl, twitterInst, null, true, false, null, request);
+          //@TODO add an encounter for a novel animal and flag for review by a human
+        }
+        // String markedIndividualID = TwitterUtil.getMarkedIndividualIDFromEncounterUUID(bestUUIDMatch);
+        // @TODO uncomment ^ once that method is matured and moved to TwitterUtil.java
+        String info = "http://" + currentIPAddress + "/individuals.jsp/?number=" + markedIndividualID;
+        TwitterUtil.sendDetectionAndIdentificationTweet(screenName, imageUrl, twitterInst, markedIndividualID , true, true, info, request);
+        //@TODO add an encounter to the markedIndividualID
+
+
+      } else if (status.equals("unknown")){
+        Ignore and let it try until 72 hours pass?
+      }
+    } catch(Exception e){
+      //@TODO this is the case where IBEIS is not responding. Do nothing = keep it on the list for next time (unless it's old, which is handled below)
+      e.printStackTrace();
+    }
     //@TODO change the curl call below to IBEISIA.getJobStatus(String jobid, String context), then, if status is error tweet about it and drop from iaPendingResults. If ok, use IBEISIA.getJobResult(String jobid, String context)
     //these can possibly throw exceptions (like IA has gone away) so best to catch those too.  i guess that was case 0 on the whiteboard
 
     //@TODO add check for results and confidences having the same number of elements
 
-    String[] cmd = {"curl", getJobStatusBaseURL + currentJobId};
-    Process p = Runtime.getRuntime().exec(cmd);
+    // String[] cmd = {"curl", getJobStatusBaseURL + currentJobId};
+    // Process p = Runtime.getRuntime().exec(cmd);
 
     DateTime resultCreation = new DateTime(pendingResult.getString("creationDate"));
     DateTime timeNow = new DateTime();
     Interval interval = new Interval(resultCreation, timeNow);
     out.println("Interval: " + interval);
     out.println("Interval duration: " + interval.toDuration().plus(5000000).getStandardHours()); //TODO what does the plus(5000000) do? -Mark F.
-    if(interval.toDuration().getStandardHours() >= 24){
+    if(interval.toDuration().getStandardHours() >= 72){
     	out.println("Object " + pendingResult.getString("taskId") + " has timed out in IA. Notifying sender.");
     	TwitterUtil.sendTimeoutTweet(pendingResult.getString("tweeterScreenName"), twitterInst, pendingResult.getString("photoUrl"), request);
-      //Remove
+      //Note that sendTimeoutTweet calls removeEntryFromPendingIaByImageUrl.
     }
   }
 
