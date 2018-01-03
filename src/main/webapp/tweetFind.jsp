@@ -239,7 +239,7 @@ if(iaPendingResults != null){
   String currentImageURL = null;
   String currentTaskId = null;
   Boolean curlStatus = null;
-  String currentIPAddress = "52.88.31.154"; //@TODO put this somewhere more permanent
+  String currentIPAddress = "54.68.97.153"; //@TODO put this somewhere more permanent
   String getJobStatusBaseURL = "http://" + currentIPAddress + "/IBEISIAGetJobStatus.jsp?jobid=";
   for(int i = 0; i<iaPendingResults.length(); i++){
     pendingResult = iaPendingResults.getJSONObject(i);
@@ -257,23 +257,21 @@ if(iaPendingResults != null){
       if (status.equals("completed")){
         JSONObject jobResult = IBEISIA.getJobResult(currentJobId, context);
         //System.out.println(jobResult.toString());
-        if(isSuccessfulIdentification(jobResult)){
-	} else {
-
-	}
-        //@TODO find out whether this is detection or identification. If identification, do below
-        String bestUUIDMatch = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(jobResult);
-        if(bestUUIDMatch.equals("")){
-          TwitterUtil.sendDetectionAndIdentificationTweet(tweeterScreenName, currentImageURL, twitterInst, null, true, false, null, request);
-          //@TODO add an encounter for a novel animal and flag for review by a human
+        if(TwitterUtil.isSuccessfulDetection(jobResult)){
+          //Do nothing. Wait for it to return an identification result.
+        } else {
+          //@TODO we can rule out successful detection, unsuccessful anything else will fail below. Can we assume that this will only run if there is successful identification?
+          String bestUUIDMatch = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(jobResult);
+          if(bestUUIDMatch.equals("")){
+            TwitterUtil.sendDetectionAndIdentificationTweet(tweeterScreenName, currentImageURL, twitterInst, null, true, false, null, request);
+            //@TODO add an encounter for a novel animal and flag for review by a human
+          }
+          String markedIndividualID = getMarkedIndividualIDFromEncounterUUID(bestUUIDMatch,request);
+          // @TODO uncomment ^ once that method is matured and moved to TwitterUtil.java
+          String info = "http://" + currentIPAddress + "/individuals.jsp/?number=" + markedIndividualID;
+          TwitterUtil.sendDetectionAndIdentificationTweet(tweeterScreenName, currentImageURL, twitterInst, markedIndividualID , true, true, info, request);
+          //@TODO add an encounter to the markedIndividualID
         }
-        String markedIndividualID = getMarkedIndividualIDFromEncounterUUID(bestUUIDMatch,request);
-        // @TODO uncomment ^ once that method is matured and moved to TwitterUtil.java
-        String info = "http://" + currentIPAddress + "/individuals.jsp/?number=" + markedIndividualID;
-        TwitterUtil.sendDetectionAndIdentificationTweet(tweeterScreenName, currentImageURL, twitterInst, markedIndividualID , true, true, info, request);
-        //@TODO add an encounter to the markedIndividualID
-
-
       } else if (status.equals("unknown")){
         //Ignore and let it try until 72 hours pass?
       }
@@ -409,18 +407,6 @@ if (!success) {
 %>
 
 <%!
-  public boolean isSuccessfulIdentification(JSONObject jsonResult){
-    try{
-      JSONObject species = jsonResult.getJSONObject("response").getJSONObject("json_result");
-      JSONArray results_list = species.getJSONArray("results_list");
-      String first_result = results_list.getJSONArray(0).getJSONObject(0).getString("species");
-      return first_result != null;
-    } catch(Exception e){
-      e.printStackTrace();
-      return false;
-    }
-  }
-
   //@TODO test with db intact?
   public String getMarkedIndividualIDFromEncounterUUID(String encounterUUID, HttpServletRequest request) throws Exception{
     String returnVal=null;
