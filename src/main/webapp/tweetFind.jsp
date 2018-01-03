@@ -257,6 +257,7 @@ if(iaPendingResults != null){
       if (status.equals("completed")){
         JSONObject jobResult = IBEISIA.getJobResult(currentJobId, context);
         System.out.println(jobResult.toString());
+        isSuccessfulIdentification(jobResult);
         //@TODO find out whether this is detection or identification. If identification, do below
         String bestUUIDMatch = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(jobResult);
         if(bestUUIDMatch.equals("")){
@@ -405,6 +406,12 @@ if (!success) {
 %>
 
 <%!
+
+  public boolean isSuccessfulIdentification(JSONObject jsonResult){
+    String species = jsonResult.getJSONObject("response").getJSONArray("results_list").getJSONObject(0).getJSONObject(0).getString("species");
+    System.out.println(species);
+    return false;
+  }
   //@TODO test with db intact?
   public String getMarkedIndividualIDFromEncounterUUID(String encounterUUID, HttpServletRequest request) throws Exception{
     String returnVal=null;
