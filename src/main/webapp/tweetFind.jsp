@@ -267,7 +267,7 @@ if(iaPendingResults != null){
             //@TODO add an encounter for a novel animal and flag for review by a human
           }
           String markedIndividualID = getMarkedIndividualIDFromEncounterUUID(bestUUIDMatch,request);
-          // @TODO uncomment ^ once that method is matured and moved to TwitterUtil.java
+          // @TODO mature ^ and move to TwitterUtil.java
           String info = "http://" + currentIPAddress + "/individuals.jsp/?number=" + markedIndividualID;
           TwitterUtil.sendDetectionAndIdentificationTweet(tweeterScreenName, currentImageURL, twitterInst, markedIndividualID , true, true, info, request);
           //@TODO add an encounter to the markedIndividualID

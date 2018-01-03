@@ -606,7 +606,7 @@ public class TwitterUtil {
     }
   }
 
-  public static boolean isSuccessfulIdentification(JSONObject jsonResult){
+  public static boolean isSuccessfulDetection(JSONObject jsonResult){
     try{
       String species = jsonResult.getJSONObject("response").getJSONObject("json_result").getJSONArray("results_list").getJSONArray(0).getJSONObject(0).getString("species");
       return species != null;
