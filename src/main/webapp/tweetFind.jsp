@@ -36,6 +36,7 @@ Long mostRecentTweetID = null;
 String rootDir = request.getSession().getServletContext().getRealPath("/");
 out.println("rootDir is " + rootDir);
 String dataDir = ServletUtilities.dataDir("context0", rootDir);
+System.out.println("dataDir is: " + dataDir);
 String context = ServletUtilities.getContext(request);
 Long sinceId = 890302524275662848L;
 String twitterTimeStampFile = "/twitterTimeStamp.txt";
@@ -134,8 +135,9 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
 
 
   try{
-    ArrayList<String> locations = ParseDateLocation.parseLocation(tweetText, context);
-    out.println(locations);
+    //@TODO add this back in
+    //ArrayList<String> locations = ParseDateLocation.parseLocation(tweetText, context);
+    //out.println(locations);
   } catch(Exception e){
     out.println("something went terribly wrong getting locations from the tweet text");
     e.printStackTrace();
@@ -234,12 +236,14 @@ if(iaPendingResults != null){
 
   JSONObject pendingResult = null;
   String currentJobId = null;
+  String currentImageURL = null;
   Boolean curlStatus = null;
   String currentIPAddress = "52.88.31.154"; //@TODO put this somewhere more permanent
   String getJobStatusBaseURL = "http://" + currentIPAddress + "/IBEISIAGetJobStatus.jsp?jobid=";
   for(int i = 0; i<iaPendingResults.length(); i++){
     pendingResult = iaPendingResults.getJSONObject(i);
     currentJobId = IBEISIA.findJobIDFromTaskID(pendingResult.getString("taskId"), context);
+    currentImageURL = TwitterUtil.findImageUrlInIaPendingLogFromTaskId(pendingResult.getString("taskId"),request);
 
     try{
       String status = IBEISIA.getJobStatus(currentJobId, context).getString("jobstatus");
@@ -249,18 +253,18 @@ if(iaPendingResults != null){
         //@TODO find out whether this is detection or identification. If identification, do below
         String bestUUIDMatch = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(jobResult);
         if(bestUUIDMatch.equals("")){
-          TwitterUtil.sendDetectionAndIdentificationTweet(screenName, imageUrl, twitterInst, null, true, false, null, request);
+          TwitterUtil.sendDetectionAndIdentificationTweet(tweeterScreenName, currentImageURL, twitterInst, null, true, false, null, request);
           //@TODO add an encounter for a novel animal and flag for review by a human
         }
-        // String markedIndividualID = TwitterUtil.getMarkedIndividualIDFromEncounterUUID(bestUUIDMatch);
+        String markedIndividualID = getMarkedIndividualIDFromEncounterUUID(bestUUIDMatch,request);
         // @TODO uncomment ^ once that method is matured and moved to TwitterUtil.java
         String info = "http://" + currentIPAddress + "/individuals.jsp/?number=" + markedIndividualID;
-        TwitterUtil.sendDetectionAndIdentificationTweet(screenName, imageUrl, twitterInst, markedIndividualID , true, true, info, request);
+        TwitterUtil.sendDetectionAndIdentificationTweet(tweeterScreenName, currentImageURL, twitterInst, markedIndividualID , true, true, info, request);
         //@TODO add an encounter to the markedIndividualID
 
 
       } else if (status.equals("unknown")){
-        Ignore and let it try until 72 hours pass?
+        //Ignore and let it try until 72 hours pass?
       }
     } catch(Exception e){
       //@TODO this is the case where IBEIS is not responding. Do nothing = keep it on the list for next time (unless it's old, which is handled below)
@@ -392,3 +396,18 @@ if (!success) {
 
 
 %>
+
+<%!
+  //@TODO test with db intact?
+  public String getMarkedIndividualIDFromEncounterUUID(String encounterUUID, HttpServletRequest request) throws Exception{
+    String returnVal=null;
+    Shepherd newShepherd = new Shepherd(ServletUtilities.getContext(request));
+    Encounter currentEncounter = newShepherd.getEncounter(encounterUUID);
+    returnVal = currentEncounter.getIndividualID();
+    if (returnVal != null){
+      return returnVal;
+    } else{
+      throw new Exception("markedIndividualID was null in getMarkedIndividualIDFromEncounterUUID method from TwitterUtil.java");
+    }
+  }
+  %>
