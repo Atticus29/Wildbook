@@ -237,19 +237,26 @@ if(iaPendingResults != null){
   JSONObject pendingResult = null;
   String currentJobId = null;
   String currentImageURL = null;
+  String currentTaskId = null;
   Boolean curlStatus = null;
   String currentIPAddress = "52.88.31.154"; //@TODO put this somewhere more permanent
   String getJobStatusBaseURL = "http://" + currentIPAddress + "/IBEISIAGetJobStatus.jsp?jobid=";
   for(int i = 0; i<iaPendingResults.length(); i++){
     pendingResult = iaPendingResults.getJSONObject(i);
-    currentJobId = IBEISIA.findJobIDFromTaskID(pendingResult.getString("taskId"), context);
+    currentTaskId = pendingResult.getString("taskId");
+    System.out.println("current taskId is: " + currentTaskId);
+    currentJobId = IBEISIA.findJobIDFromTaskID(currentTaskId, context);
+    //currentJobId = "jobid-0797";
+    System.out.println("current JobId is: " + currentJobId);
     currentImageURL = TwitterUtil.findImageUrlInIaPendingLogFromTaskId(pendingResult.getString("taskId"),request);
 
     try{
-      String status = IBEISIA.getJobStatus(currentJobId, context).getString("jobstatus");
+      System.out.println(IBEISIA.getJobStatus(currentJobId, context).toString());
+      String status = IBEISIA.getJobStatus(currentJobId, context).getJSONObject("response").getString("jobstatus");
       System.out.println("Job status ==>" + status);
       if (status.equals("completed")){
         JSONObject jobResult = IBEISIA.getJobResult(currentJobId, context);
+        System.out.println(jobResult.toString());
         //@TODO find out whether this is detection or identification. If identification, do below
         String bestUUIDMatch = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(jobResult);
         if(bestUUIDMatch.equals("")){
