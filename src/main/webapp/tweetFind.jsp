@@ -246,18 +246,21 @@ if(iaPendingResults != null){
     currentTaskId = pendingResult.getString("taskId");
     System.out.println("current taskId is: " + currentTaskId);
     currentJobId = IBEISIA.findJobIDFromTaskID(currentTaskId, context);
-    //currentJobId = "jobid-0797";
+    currentJobId = "jobid-0797";
     System.out.println("current JobId is: " + currentJobId);
     currentImageURL = TwitterUtil.findImageUrlInIaPendingLogFromTaskId(pendingResult.getString("taskId"),request);
 
     try{
-      System.out.println(IBEISIA.getJobStatus(currentJobId, context).toString());
+      //System.out.println(IBEISIA.getJobStatus(currentJobId, context).toString());
       String status = IBEISIA.getJobStatus(currentJobId, context).getJSONObject("response").getString("jobstatus");
       System.out.println("Job status ==>" + status);
       if (status.equals("completed")){
         JSONObject jobResult = IBEISIA.getJobResult(currentJobId, context);
-        System.out.println(jobResult.toString());
-        isSuccessfulIdentification(jobResult);
+        //System.out.println(jobResult.toString());
+        if(isSuccessfulIdentification(jobResult)){
+	} else {
+
+	}
         //@TODO find out whether this is detection or identification. If identification, do below
         String bestUUIDMatch = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(jobResult);
         if(bestUUIDMatch.equals("")){
@@ -406,12 +409,18 @@ if (!success) {
 %>
 
 <%!
-
   public boolean isSuccessfulIdentification(JSONObject jsonResult){
-    String species = jsonResult.getJSONObject("response").getJSONArray("results_list").getJSONObject(0).getJSONObject(0).getString("species");
-    System.out.println(species);
-    return false;
+    try{
+      JSONObject species = jsonResult.getJSONObject("response").getJSONObject("json_result");
+      JSONArray results_list = species.getJSONArray("results_list");
+      String first_result = results_list.getJSONArray(0).getJSONObject(0).getString("species");
+      return first_result != null;
+    } catch(Exception e){
+      e.printStackTrace();
+      return false;
+    }
   }
+
   //@TODO test with db intact?
   public String getMarkedIndividualIDFromEncounterUUID(String encounterUUID, HttpServletRequest request) throws Exception{
     String returnVal=null;
