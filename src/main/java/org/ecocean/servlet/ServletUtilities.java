@@ -864,7 +864,6 @@ public static String join(String r[],String d)
 
 //overloaded version to deal with tweets
 public static String nlpDateParse(String text, Status tweet) throws Exception{
-  System.out.println("Entering nlpDateParse twitter version with text " + text);
   //create my pipeline with the help of the annotators I added.
   Properties props = new Properties();
   AnnotationPipeline pipeline = new AnnotationPipeline();
@@ -874,11 +873,9 @@ public static String nlpDateParse(String text, Status tweet) throws Exception{
   pipeline.addAnnotator(new TimeAnnotator("sutime", props));
 
   text = text.replaceAll("[,.!?;:]", "$0 ");
-  System.out.println("text: " + text);
   String[] text1 = text.replaceAll("[^A-Za-z0-9 ]", "").toLowerCase().split("\\s+"); //TODO I think this does a better version of what the above (text = text.replaceAll("[,.!?;:]", "$0 ");) does?? -Mark Fisher
   String text2 = join(text1, " ");
 
-  System.out.println("text2: " + text2);
   edu.stanford.nlp.pipeline.Annotation annotation = new edu.stanford.nlp.pipeline.Annotation(text2);
 
   //get current date (no time) and formatted with Joda time.
@@ -897,7 +894,6 @@ public static String nlpDateParse(String text, Status tweet) throws Exception{
     Temporal myDate = cm.get(TimeExpression.Annotation.class).getTemporal();
     //        TimeExpression.Annotation:The CoreMap key for storing a TimeExpression annotation.
     String dateStr = myDate.toString();
-    System.out.println(".....found date: " + dateStr);
     arrayListDates.add(dateStr.replaceAll("-XX", ""));
   }
   System.out.println("NLP dates found+:" + arrayListDates);
@@ -919,7 +915,6 @@ public static String nlpDateParse(String text, Status tweet) throws Exception{
         java.util.Date tweetDate = tweet.getCreatedAt();
         DateFormat dfTweetStamp = new SimpleDateFormat("yyyy-MM-dd");
         selectedDate = dfTweetStamp.format(tweetDate);
-        System.out.println("Date of tweet when all other candidates were eliminated is: " + selectedDate);
         return selectedDate;
       } catch(Exception e){
         e.printStackTrace();
@@ -933,7 +928,6 @@ public static String nlpDateParse(String text, Status tweet) throws Exception{
       java.util.Date tweetDate = tweet.getCreatedAt();
       DateFormat dfTweetStamp = new SimpleDateFormat("yyyy-MM-dd");
       String selectedDate = dfTweetStamp.format(tweetDate);
-      System.out.println("Date of tweet when no other candidates existed is: " + selectedDate);
       return selectedDate;
     } catch(Exception e){
       e.printStackTrace();
@@ -943,7 +937,6 @@ public static String nlpDateParse(String text, Status tweet) throws Exception{
 }
 
 public static String nlpDateParse(String text) throws Exception{
-  System.out.println("Entering nlpDateParse with text " + text);
   //create my pipeline with the help of the annotators I added.
   Properties props = new Properties();
   AnnotationPipeline pipeline = new AnnotationPipeline();
@@ -953,11 +946,9 @@ public static String nlpDateParse(String text) throws Exception{
   pipeline.addAnnotator(new TimeAnnotator("sutime", props));
 
   text = text.replaceAll("[,.!?;:]", "$0 ");
-  System.out.println("text: " + text);
   String[] text1 = text.replaceAll("[^A-Za-z0-9 ]", "").toLowerCase().split("\\s+"); //TODO I think this does a better version of what the above (text = text.replaceAll("[,.!?;:]", "$0 ");) does?? -Mark Fisher
   String text2 = join(text1, " ");
 
-  System.out.println("text2: " + text2);
   edu.stanford.nlp.pipeline.Annotation annotation = new edu.stanford.nlp.pipeline.Annotation(text2);
 
   //get current date (no time) and formatted with Joda time.
@@ -976,7 +967,6 @@ public static String nlpDateParse(String text) throws Exception{
     Temporal myDate = cm.get(TimeExpression.Annotation.class).getTemporal();
     //        TimeExpression.Annotation:The CoreMap key for storing a TimeExpression annotation.
     String dateStr = myDate.toString();
-    System.out.println(".....found date: " + dateStr);
     arrayListDates.add(dateStr.replaceAll("-XX", ""));
   }
   System.out.println("NLP dates found+:" + arrayListDates);
@@ -1017,7 +1007,7 @@ public static String selectBestDateFromCandidates(String[] candidates) throws Ex
       // e.printStackTrace();
     }
     try{
-      System.out.println(validDates);
+      // System.out.println(validDates);
     } catch(Exception e){
       System.out.println("couldn't print validDates");
       // e.printStackTrace();
@@ -1027,10 +1017,6 @@ public static String selectBestDateFromCandidates(String[] candidates) throws Ex
     ArrayList<String> validDatesWithFutureDatesRemoved = new ArrayList<String>();
     try{
       validDatesWithFutureDatesRemoved = removeFutureDates(validDates);
-      System.out.println("Before future removal:");
-      System.out.println(validDates);
-      System.out.println("After future removal:");
-      System.out.println(validDatesWithFutureDatesRemoved);
     } catch(Exception e){
       System.out.println("couldn't run removeFutureDates");
       // e.printStackTrace();
@@ -1041,7 +1027,6 @@ public static String selectBestDateFromCandidates(String[] candidates) throws Ex
     ArrayList<String> validDatesFilteredByYesterday = new ArrayList<String>();
     try{
       validDatesFilteredByYesterday = removeYesterdayDatesIfTheyAreNotTheOnlyDates(validDatesWithFutureDatesRemoved);
-      System.out.println(validDatesFilteredByYesterday);
     } catch(Exception e){
       System.out.println("couldn't print validDatesFilteredByYesterday");
       // e.printStackTrace();
@@ -1216,7 +1201,6 @@ public static java.util.Date getYesterday() {
 ** just the best date
 */
 public static ArrayList<String> nlpDateParseToArrayList(String text){
-  System.out.println("Entering nlpParseDateArray");
 
   // create pipeline with annotators like above
   Properties props = new Properties();
@@ -1228,11 +1212,9 @@ public static ArrayList<String> nlpDateParseToArrayList(String text){
 
   // replace special characters using regex
   text = text.replaceAll("[,.!?;:]", "$0 ");
-  System.out.println("text: " + text);
   String[] text1 = text.replaceAll("[^A-Za-z0-9 ]", "").toLowerCase().split("\\s+");
   String text2 = join(text1, " ");
 
-  System.out.println("text2: " + text2);
   // Create annotation using new string
   edu.stanford.nlp.pipeline.Annotation annotation = new edu.stanford.nlp.pipeline.Annotation(text2);
 
@@ -1250,11 +1232,8 @@ public static ArrayList<String> nlpDateParseToArrayList(String text){
   for(CoreMap cm : timexAnnsAll){
     Temporal myDate = cm.get(TimeExpression.Annotation.class).getTemporal();
     String dateStr = myDate.toString();
-    System.out.println(".....found date: " + dateStr);
     arrayListDates.add(dateStr.replaceAll("-XX", ""));
   }
-  System.out.println("NLP dates found+: " + arrayListDates);
-
   return arrayListDates;
 }
 

@@ -34,9 +34,7 @@ Long tweetID = null;
 String tweetText = null;
 Long mostRecentTweetID = null;
 String rootDir = request.getSession().getServletContext().getRealPath("/");
-out.println("rootDir is " + rootDir);
 String dataDir = ServletUtilities.dataDir("context0", rootDir);
-System.out.println("dataDir is: " + dataDir);
 String context = ServletUtilities.getContext(request);
 Long sinceId = 890302524275662848L;
 String twitterTimeStampFile = "/twitterTimeStamp.txt";
@@ -174,17 +172,15 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
     continue;
   }
 
-  //sendPhotoSpecificCourtesyTweet will detect a photo in your tweet object and tweet the user an acknowledgement about this. If multiple images are sent in the same tweet, this response will only happen once.
+  //sendPhotoSpecificCourtesyTweet will detect a photo in your tweet object and tweet the user an acknowledgement about this. If multiple images are sent in the same tweet, this response will only happen once. @TODO make this send photo URLs instead of IDs
   TwitterUtil.sendPhotoSpecificCourtesyTweet(emedia, tweeterScreenName, twitterInst);
   ArrayList<String> photoIds = TwitterUtil.getPhotoIds(emedia, tweeterScreenName, twitterInst);
   ArrayList<String> photoUrls = TwitterUtil.getPhotoUrls(emedia, tweeterScreenName, twitterInst);
-  System.out.println("PhotoUrls: ");
-  System.out.println(photoUrls);
 
   tj = TwitterUtil.makeParentTweetMediaAssetAndSave(myShepherd, tas, tweet, tj);
 
-  System.out.println("twitter obj:");
-  System.out.println(tj.toString());
+  // System.out.println("twitter obj:");
+  // System.out.println(tj.toString());
 
 
   //retrieve ma now that it has been saved
@@ -246,12 +242,11 @@ if(iaPendingResults != null){
     currentTaskId = pendingResult.getString("taskId");
     System.out.println("current taskId is: " + currentTaskId);
     currentJobId = IBEISIA.findJobIDFromTaskID(currentTaskId, context);
-    currentJobId = "jobid-0797";
+    // currentJobId = "jobid-0797";
     System.out.println("current JobId is: " + currentJobId);
     currentImageURL = TwitterUtil.findImageUrlInIaPendingLogFromTaskId(pendingResult.getString("taskId"),request);
 
     try{
-      //System.out.println(IBEISIA.getJobStatus(currentJobId, context).toString());
       String status = IBEISIA.getJobStatus(currentJobId, context).getJSONObject("response").getString("jobstatus");
       System.out.println("Job status ==>" + status);
       if (status.equals("completed")){
