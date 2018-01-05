@@ -1173,7 +1173,6 @@ System.out.println("**** type ---------------> [" + type + "]");
             rtn.put("success", true);
             try{
               screenName = TwitterUtil.findScreenNameInIaPendingLogFromTaskId(taskID, request);
-              System.out.println("Retrieved screen name: " + screenName);
             } catch(Exception e){
               e.printStackTrace();
             }

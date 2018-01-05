@@ -94,18 +94,18 @@ try {
 List<Status> tweetStatuses = qr.getTweets();
 for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().size(); i++
   Status tweet = tweetStatuses.get(i);
-  // out.println("i is " + Integer.toString(i));
+  out.println("i in the tweet loop is " + Integer.toString(i));
 
   if(i == 0){
     mostRecentTweetID = (Long) tweet.getId();
   }
   tweetID = (Long) tweet.getId();
   if(tweetID == null){
-    // out.println("tweetID is null. Skipping");
+    out.println("tweetID is null. Skipping");
     continue;
   }
 
-  // out.println("newIncomingTweet: " + tweetID);
+  out.println("newIncomingTweet: " + tweetID);
 
 	JSONObject p = new JSONObject();
 	p.put("id", tweet.getId());
@@ -135,7 +135,7 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
 
   try{
     //@TODO add this back in
-    //ArrayList<String> locations = ParseDateLocation.parseLocation(tweetText, context);
+    // ArrayList<String> locations = ParseDateLocation.parseLocation(tweetText, context);
     //out.println(locations);
   } catch(Exception e){
     out.println("something went terribly wrong getting locations from the tweet text");
@@ -169,7 +169,7 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
 	JSONArray emedia = null;
 	emedia = jtweet.optJSONArray("extendedMediaEntities");
   if((emedia == null) || (emedia.length() < 1)){
-    TwitterUtil.sendCourtesyTweet(tweeterScreenName, "", twitterInst, tweetID+1);
+    TwitterUtil.sendCourtesyTweet(tweeterScreenName, "", twitterInst, null);
     continue;
   }
 

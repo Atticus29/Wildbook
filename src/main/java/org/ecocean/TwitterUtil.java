@@ -124,26 +124,12 @@ public class TwitterUtil {
     return new TwitterFactory(cb.build());
   }
 
-  public static void sendCourtesyTweet(String screenName, String mediaType,  Twitter twitterInst, Long twitterId) {
+  public static void sendCourtesyTweet(String screenName, String mediaType,  Twitter twitterInst, String photoUrl) {
     String reply = null;
-    if(mediaType.equals("photo")) {
-      reply = "Thank you for the photo(s), including id " + Long.toString(twitterId) + ", @" + screenName + "! Result pending!";
+    if(mediaType.equals("photo") && photoUrl != null) {
+      reply = "Thank you for the photo: " + photoUrl + ", @" + screenName + "! Result pending!";
     } else {
-      reply = "Thanks for tweet " + Long.toString(twitterId) + ", @" + screenName + "! Could you send me a pic in a new tweet?";
-    }
-    try {
-      String status = createTweet(reply, twitterInst);
-    } catch(TwitterException e) {
-      e.printStackTrace();
-    }
-  }
-
-  public static void sendCourtesyTweet(String screenName, String mediaType,  Twitter twitterInst, String id) {
-    String reply = null;
-    if(mediaType.equals("photo")) {
-      reply = "Thank you for the photo(s), including id " + id + ", @" + screenName + "! Result pending!";
-    } else {
-      reply = "Thanks for tweet " + id + ", @" + screenName + "! Could you send me a pic in a new tweet?";
+      reply = "Thanks for the tweet, @" + screenName + "! Could you send me a pic in a new tweet?";
     }
     try {
       String status = createTweet(reply, twitterInst);
@@ -156,6 +142,12 @@ public class TwitterUtil {
     int photoCount = 0;
     org.json.JSONObject jent = null;
     String mediaType = null;
+    ArrayList<String> photoUrls = null;
+    try{
+      photoUrls = getPhotoIds(emedia, tweeterScreenName, twitterInst);
+    } catch(Exception e){
+      e.printStackTrace();
+    }
     Long mediaEntityId = null;
     for(int j=0; j<emedia.length(); j++){
       try{
@@ -168,10 +160,10 @@ public class TwitterUtil {
       }
 
       try{
-        if(mediaType.equals("photo")){
+        if(mediaType.equals("photo") && photoUrls.get(j) != null){
           //For now, just one courtesy tweet per tweet, even if the tweet contains multiple images
           if(photoCount<1){
-            TwitterUtil.sendCourtesyTweet(tweeterScreenName, mediaType, twitterInst, mediaEntityId);
+            TwitterUtil.sendCourtesyTweet(tweeterScreenName, mediaType, twitterInst, photoUrls.get(j));
           }
           photoCount += 1;
         }
