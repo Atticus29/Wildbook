@@ -63,6 +63,7 @@ if(tas == null){
 	myShepherd.commitDBTransaction();
 }
 
+myShepherd.beginDBTransaction();
 // Retrieve timestamp for the last twitter check
 try{
 	// the timestamp is written with a new line at the end, so we need to strip that out before converting
@@ -246,7 +247,7 @@ if(iaPendingResults != null){
     currentTaskId = pendingResult.getString("taskId");
     System.out.println("current taskId is: " + currentTaskId);
     currentJobId = IBEISIA.findJobIDFromTaskID(currentTaskId, context);
-    currentJobId = "jobid-0797";
+    //currentJobId = "jobid-0797";
     System.out.println("current JobId is: " + currentJobId);
     currentImageURL = TwitterUtil.findImageUrlInIaPendingLogFromTaskId(pendingResult.getString("taskId"),request);
 
@@ -306,7 +307,8 @@ if(iaPendingResults != null){
 // END PENDING IA RETRIEVAL
 
 
-myShepherd.closeDBTransaction();
+System.out.println("ABOUT TO COMMIT");
+myShepherd.commitDBTransaction();
 
 /*
 String ids[] = null;
