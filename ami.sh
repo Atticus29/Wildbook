@@ -30,4 +30,5 @@ sudo chmod 777 /opt/tomcat/webapps/wildbook.war
 #cd /var/lib; sudo chmod -R 777 tomcat7/; sudo chown -R tomcat7 tomcat7/; sudo chgrp -R tomcat7 tomcat7/
 #cd /opt/; sudo chmod -R 777 tomcat/; sudo chown -R ubuntu tomcat/; sudo chgrp -R ubuntu tomcat/
 sudo cd /opt/; sudo chmod -R 777 tomcat/; sudo chown -R tomcat tomcat/; sudo chgrp -R tomcat tomcat/
+sudo mkdir /tmp/ScheduledQueue
 
