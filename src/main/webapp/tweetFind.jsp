@@ -253,22 +253,24 @@ if(iaPendingResults != null){
       System.out.println("Job status ==>" + status);
       if (status.equals("completed")){
         JSONObject jobResult = IBEISIA.getJobResult(currentJobId, context);
-        //System.out.println(jobResult.toString());
-        if(TwitterUtil.isSuccessfulDetection(jobResult)){
-          //Do nothing. Wait for it to return an identification result.
-        } else {
-          //@TODO we can rule out successful detection, unsuccessful anything else will fail below. Can we assume that this will only run if there is successful identification?
-          String bestUUIDMatch = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(jobResult);
-          if(bestUUIDMatch.equals("")){
-            TwitterUtil.sendDetectionAndIdentificationTweet(tweeterScreenName, currentImageURL, twitterInst, null, true, false, null, request);
-            //@TODO add an encounter for a novel animal and flag for review by a human
-          }
-          String markedIndividualID = getMarkedIndividualIDFromEncounterUUID(bestUUIDMatch,request);
-          // @TODO mature ^ and move to TwitterUtil.java
-          String info = "http://" + currentIPAddress + "/individuals.jsp/?number=" + markedIndividualID;
-          TwitterUtil.sendDetectionAndIdentificationTweet(tweeterScreenName, currentImageURL, twitterInst, markedIndividualID , true, true, info, request);
-          //@TODO add an encounter to the markedIndividualID
-        }
+        IBEISIA.processCallback(currentTaskId, jobResult, request);
+
+        //@TODO move code block below into IBEISIA.java?? Or move some of that stuff here?
+        // if(TwitterUtil.isSuccessfulDetection(jobResult)){
+        //   //Do nothing. Wait for it to return an identification result.
+        // } else {
+        //   //@TODO we can rule out successful detection, unsuccessful anything else will fail below. Can we assume that this will only run if there is successful identification?
+        //   String bestUUIDMatch = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(jobResult);
+        //   if(bestUUIDMatch.equals("")){
+        //     TwitterUtil.sendDetectionAndIdentificationTweet(tweeterScreenName, currentImageURL, twitterInst, null, true, false, null, request);
+        //     //@TODO add an encounter for a novel animal and flag for review by a human
+        //   }
+        //   String markedIndividualID = getMarkedIndividualIDFromEncounterUUID(bestUUIDMatch,request);
+        //   // @TODO mature ^ and move to TwitterUtil.java
+        //   String info = "http://" + currentIPAddress + "/individuals.jsp/?number=" + markedIndividualID;
+        //   TwitterUtil.sendDetectionAndIdentificationTweet(tweeterScreenName, currentImageURL, twitterInst, markedIndividualID , true, true, info, request);
+        //   //@TODO add an encounter to the markedIndividualID
+        // }
       } else if (status.equals("unknown")){
         //Ignore and let it try until 72 hours pass?
       }
@@ -276,6 +278,7 @@ if(iaPendingResults != null){
       //@TODO this is the case where IBEIS is not responding. Do nothing = keep it on the list for next time (unless it's old, which is handled below)
       e.printStackTrace();
     }
+
     //@TODO change the curl call below to IBEISIA.getJobStatus(String jobid, String context), then, if status is error tweet about it and drop from iaPendingResults. If ok, use IBEISIA.getJobResult(String jobid, String context)
     //these can possibly throw exceptions (like IA has gone away) so best to catch those too.  i guess that was case 0 on the whiteboard
 
