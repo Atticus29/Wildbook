@@ -76,7 +76,7 @@ try{
 	e.printStackTrace();
 }
 rtn.put("sinceId", sinceId);
-out.println("sinceId is " + sinceId);
+
 QueryResult qr = TwitterUtil.findTweets("@wildmetweetbot", sinceId);
 JSONArray tarr = new JSONArray();
 // out.println(qr.getTweets().size());
@@ -94,18 +94,18 @@ try {
 List<Status> tweetStatuses = qr.getTweets();
 for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().size(); i++
   Status tweet = tweetStatuses.get(i);
-  out.println("i in the tweet loop is " + Integer.toString(i));
+  out.println(tweet);
+
 
   if(i == 0){
     mostRecentTweetID = (Long) tweet.getId();
   }
   tweetID = (Long) tweet.getId();
   if(tweetID == null){
-    out.println("tweetID is null. Skipping");
+
     continue;
   }
 
-  out.println("newIncomingTweet: " + tweetID);
 
 	JSONObject p = new JSONObject();
 	p.put("id", tweet.getId());
@@ -127,7 +127,7 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
       continue;
     }
   }catch(Exception e){
-    out.println("something went terribly wrong getting tweet text");
+
     e.printStackTrace();
     continue;
   }
@@ -138,7 +138,7 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
     // ArrayList<String> locations = ParseDateLocation.parseLocation(tweetText, context);
     //out.println(locations);
   } catch(Exception e){
-    out.println("something went terribly wrong getting locations from the tweet text");
+
     e.printStackTrace();
     continue;
   }
@@ -147,7 +147,7 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
     ArrayList<String> dates = ParseDateLocation.parseDateToArrayList(tweetText,context);
     //TODO parseDateToArrayList may need to be updated (and overloaded?)?
   } catch(Exception e){
-    out.println("something went terribly wrong getting dates from the tweet text");
+
     e.printStackTrace();
     continue;
   }
@@ -155,7 +155,7 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
   try{
     tweeterScreenName = tweet.getUser().getScreenName();
     if(tweeterScreenName == null){
-      out.println("screen name is null. Skipping");
+
       continue;
     }
   } catch(Exception e){
@@ -206,7 +206,7 @@ if(mostRecentTweetID == null){
 }
 try{
   Util.writeToFile(Long.toString(newSinceIdString), dataDir + twitterTimeStampFile);
-  out.println("wrote a new twitterTimeStamp: " + newSinceIdString);
+
 } catch(FileNotFoundException e){
   e.printStackTrace();
 }
@@ -215,20 +215,20 @@ try{
 try {
 	String iaPendingResultsAsString = iaPendingResults.toString();
 	Util.writeToFile(iaPendingResultsAsString, dataDir + iaPendingResultsFile);
-	out.println("Successfully wrote pending results to file");
+
 } catch (Exception e){
 	e.printStackTrace();
 }
 
 rtn.put("success", true);
 rtn.put("data", tarr);
-out.println(rtn);
+
 
 // Check if JSON data exists
 if(iaPendingResults != null){
 	// TODO: check if IA has finished processing the pending results
-  out.println("iaPendingResults:");
-	out.println(iaPendingResults);
+
+
 
   //TODO: check if there are any entries that are older than 24 hours, tweet user, and remove
 
@@ -290,17 +290,17 @@ if(iaPendingResults != null){
     DateTime resultCreation = new DateTime(pendingResult.getString("creationDate"));
     DateTime timeNow = new DateTime();
     Interval interval = new Interval(resultCreation, timeNow);
-    out.println("Interval: " + interval);
-    out.println("Interval duration: " + interval.toDuration().plus(5000000).getStandardHours()); //TODO what does the plus(5000000) do? -Mark F.
+
+
     if(interval.toDuration().getStandardHours() >= 72){
-    	out.println("Object " + pendingResult.getString("taskId") + " has timed out in IA. Notifying sender.");
+
     	TwitterUtil.sendTimeoutTweet(pendingResult.getString("tweeterScreenName"), twitterInst, pendingResult.getString("photoUrl"), request);
       //Note that sendTimeoutTweet calls removeEntryFromPendingIaByImageUrl.
     }
   }
 
 } else {
-	out.println("No pending results");
+
 	iaPendingResults = new JSONArray();
 }
 // END PENDING IA RETRIEVAL
