@@ -144,7 +144,7 @@ public class TwitterUtil {
     String mediaType = null;
     ArrayList<String> photoUrls = null;
     try{
-      photoUrls = getPhotoIds(emedia, tweeterScreenName, twitterInst);
+      photoUrls = getPhotoUrls(emedia, tweeterScreenName, twitterInst);
       System.out.println("PhotoURLS");
       System.out.println(photoUrls);
     } catch(Exception e){
