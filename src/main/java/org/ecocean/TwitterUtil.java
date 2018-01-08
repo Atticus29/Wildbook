@@ -145,9 +145,10 @@ public class TwitterUtil {
     ArrayList<String> photoUrls = null;
     try{
       photoUrls = getPhotoUrls(emedia, tweeterScreenName, twitterInst);
-      System.out.println("PhotoURLS");
-      System.out.println(photoUrls);
+      // System.out.println("PhotoURLS");
+      // System.out.println(photoUrls);
     } catch(Exception e){
+      System.out.println("couldn't get photo urls in sendPhotoSpecificCourtesyTweet method in twitterUtil");
       e.printStackTrace();
     }
     Long mediaEntityId = null;
@@ -160,7 +161,6 @@ public class TwitterUtil {
         System.out.println("Error with JSONObject capture");
         e.printStackTrace();
       }
-
       try{
         if(mediaType.equals("photo") && photoUrls.get(j) != null){
           //For now, just one courtesy tweet per tweet, even if the tweet contains multiple images

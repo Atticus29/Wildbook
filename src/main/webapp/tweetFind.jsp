@@ -94,7 +94,7 @@ try {
 List<Status> tweetStatuses = qr.getTweets();
 for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().size(); i++
   Status tweet = tweetStatuses.get(i);
-  out.println(tweet);
+  // out.println(tweet);
 
 
   if(i == 0){
@@ -102,7 +102,6 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
   }
   tweetID = (Long) tweet.getId();
   if(tweetID == null){
-
     continue;
   }
 
@@ -113,32 +112,32 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
   // Attempt to find MediaAsset for tweet, and skip media asset creation if it exists
 	MediaAsset ma = tas.find(p, myShepherd);
 	if (ma != null) {
+    out.println("Media asset associated with tweet " + tweet.getId() + " is already known");
 		continue;
 	}
 
 	// ##################Check for tweet and entities##################
 	JSONObject jtweet = TwitterUtil.toJSONObject(tweet);
 	if (jtweet == null){
+    out.println("The tweet object for tweet + " + tweet.getId() + " is null");
     continue;
   }
   try{
     tweetText = tweet.getText();
+    out.println("Tweet text is " + tweet.getText());
     if(tweetText == null){
       continue;
     }
   }catch(Exception e){
-
     e.printStackTrace();
     continue;
   }
-
 
   try{
     //@TODO add this back in
     // ArrayList<String> locations = ParseDateLocation.parseLocation(tweetText, context);
     //out.println(locations);
   } catch(Exception e){
-
     e.printStackTrace();
     continue;
   }
@@ -147,15 +146,14 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
     ArrayList<String> dates = ParseDateLocation.parseDateToArrayList(tweetText,context);
     //TODO parseDateToArrayList may need to be updated (and overloaded?)?
   } catch(Exception e){
-
     e.printStackTrace();
     continue;
   }
 
   try{
     tweeterScreenName = tweet.getUser().getScreenName();
+    out.println("tweeterScreenName is " + tweeterScreenName);
     if(tweeterScreenName == null){
-
       continue;
     }
   } catch(Exception e){
@@ -169,16 +167,20 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
 	JSONArray emedia = null;
 	emedia = jtweet.optJSONArray("extendedMediaEntities");
   if((emedia == null) || (emedia.length() < 1)){
+    out.println("There were no extendedMediaEntities in tweet reading " + tweet.getText());
     TwitterUtil.sendCourtesyTweet(tweeterScreenName, "", twitterInst, null);
     continue;
   }
 
   //sendPhotoSpecificCourtesyTweet will detect a photo in your tweet object and tweet the user an acknowledgement about this. If multiple images are sent in the same tweet, this response will only happen once. @TODO make this send photo URLs instead of IDs
   TwitterUtil.sendPhotoSpecificCourtesyTweet(emedia, tweeterScreenName, twitterInst);
+
   ArrayList<String> photoIds = TwitterUtil.getPhotoIds(emedia, tweeterScreenName, twitterInst);
   ArrayList<String> photoUrls = TwitterUtil.getPhotoUrls(emedia, tweeterScreenName, twitterInst);
-  System.out.println(photoUrls);
+  // System.out.println(photoUrls);
 
+
+  //LEFT OFF HERE
   tj = TwitterUtil.makeParentTweetMediaAssetAndSave(myShepherd, tas, tweet, tj);
 
   // System.out.println("twitter obj:");
