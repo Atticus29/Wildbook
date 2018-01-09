@@ -163,11 +163,14 @@ public class TwitterUtil {
       }
       try{
         if(mediaType.equals("photo") && photoUrls.get(j) != null){
+
+          //@ATTN Jon, do we want it tweeting a courtesy ("got your image") tweet for every image, or just the first image in each tweet that may contain one or more images?
+          TwitterUtil.sendCourtesyTweet(tweeterScreenName, mediaType, twitterInst, photoUrls.get(j));
           //For now, just one courtesy tweet per tweet, even if the tweet contains multiple images
-          if(photoCount<1){
-            TwitterUtil.sendCourtesyTweet(tweeterScreenName, mediaType, twitterInst, photoUrls.get(j));
-          }
-          photoCount += 1;
+          // if(photoCount<1){
+          //   TwitterUtil.sendCourtesyTweet(tweeterScreenName, mediaType, twitterInst, photoUrls.get(j));
+          // }
+          // photoCount += 1;
         }
       } catch(Exception e){
         e.printStackTrace();
