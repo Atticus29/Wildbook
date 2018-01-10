@@ -242,6 +242,7 @@ public class TwitterUtil {
 
   public static JSONArray saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis(List<MediaAsset> mas, Long tweetID, Shepherd myShepherd, JSONObject tj, HttpServletRequest request, JSONArray tarr, JSONArray iaPendingResults, ArrayList<String> photoIds, ArrayList<String> photoUrls){
     if ((mas == null) || (mas.size() < 1)) {
+      System.out.println("mas was null or size less than 1 in saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis");
     } else {
       JSONArray jent = new JSONArray();
       for(int i=0; i<mas.size(); i++){
@@ -252,12 +253,13 @@ public class TwitterUtil {
           // MediaAssetMetadata entMd = ent.updateMetadata();
           MediaAssetFactory.save(ent, myShepherd);
           System.out.println("Ent's mediaAssetID is " + ent.toString());
-          // MediaAssetFactory.save(ent, myShepherd);
           String taskId = IBEISIA.IAIntake(ent, myShepherd, request);
+          System.out.println("taskId in saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis for entity " + Integer.toString(i) + " is: " + taskId);
           ej.put("maId", ent.getId());
           ej.put("taskId", taskId);
           ej.put("creationDate", new LocalDateTime());
           String tweeterScreenName = tj.getJSONObject("tweet").getJSONObject("user").getString("screenName");
+          System.out.println("tweeterScreenName in saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis is: " + tweeterScreenName);
           ej.put("tweeterScreenName", tweeterScreenName);
           if(photoIds.size() != mas.size()){
             System.out.println("Yikes! photoIds is not the same size as mas");
@@ -267,20 +269,19 @@ public class TwitterUtil {
           if(photoUrls.size() != mas.size()){
             System.out.println("Yikes! PhotoUrls note the same size as mas");
           } else {
+            System.out.println("photoUrl in saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis method is: " + photoUrls.get(i));
             ej.put("photoUrl", photoUrls.get(i));
           }
-
-
-          //jent = emedia.getJSONObject(j);
+          // jent = emedia.getJSONObject(j);
           // mediaType = jent.getString("type");
           // mediaEntityId = Long.parseLong(jent.getString("id"));
-
           jent.put(ej);
           iaPendingResults.put(ej);
           // myShepherd.getPM().makePersistent(ej); //maybe?
           myShepherd.commitDBTransaction();
         } catch(Exception e){
           myShepherd.rollbackDBTransaction();
+          System.out.println("something went wrong in the big series of commands in saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis");
           e.printStackTrace();
         }
       }
