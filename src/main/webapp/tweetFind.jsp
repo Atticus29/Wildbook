@@ -94,7 +94,8 @@ try {
 List<Status> tweetStatuses = qr.getTweets();
 for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().size(); i++
   Status tweet = tweetStatuses.get(i);
-  // out.println(tweet);
+  out.println("total number of tweets captured is " + Integer.toString(tweetStatuses.size()));
+  out.println(tweet.getText());
 
 
   if(i == 0){
@@ -188,6 +189,9 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
 
   //retrieve ma now that it has been saved
   ma = tas.find(p, myShepherd);
+  if (ma = null){
+    out.println("Something went wrong ma has not been saved or retrieved correctly");
+  }
 
   List<MediaAsset> mas = TwitterAssetStore.entitiesAsMediaAssetsGsonObj(ma, tweetID);
   // out.println(mas); //working as expected here
@@ -195,7 +199,7 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
   // dates = addPhotoDatesToPreviouslyParsedDates(dates, mas); //TODO write this/ think about when we want this to happen. We will ultimately add the dates and locations to encounter objects, so perhaps this should only occur downstream of successful detection? Another question is how to tack all of the previously-captured date candidates (or just the best one from ParseDateLocation.parseDate()?) onto each photo while keeping the photo-specific captured date strings attached to only their parent photo...
   out.println("About to call saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis");
   iaPendingResults = TwitterUtil.saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis(mas, tweetID, myShepherd, tj, request, tarr, iaPendingResults, photoIds, photoUrls);
-  out.println(iaPendingResults);
+  // out.println(iaPendingResults);
 	tarr.put(tj);
 }
 //End looping through the tweets

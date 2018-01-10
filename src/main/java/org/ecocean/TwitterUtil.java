@@ -246,13 +246,14 @@ public class TwitterUtil {
     } else {
       JSONArray jent = new JSONArray();
       for(int i=0; i<mas.size(); i++){
+        System.out.println("Total number of media assets to looop through in saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis: " + Integer.toString(mas.size()));
         MediaAsset ent = mas.get(i);
         myShepherd.beginDBTransaction();
         try {
           JSONObject ej = new JSONObject();
           // MediaAssetMetadata entMd = ent.updateMetadata();
           MediaAssetFactory.save(ent, myShepherd);
-          System.out.println("Ent's mediaAssetID is " + ent.toString());
+          System.out.println("Ent's mediaAssetID in saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis is " + ent.toString());
           String taskId = IBEISIA.IAIntake(ent, myShepherd, request);
           System.out.println("taskId in saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis for entity " + Integer.toString(i) + " is: " + taskId);
           ej.put("maId", ent.getId());
