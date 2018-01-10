@@ -102,6 +102,8 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
     mostRecentTweetID = (Long) tweet.getId();
   }
   tweetID = (Long) tweet.getId();
+  Date tweetDate = tweet.getCreatedAt();
+  out.println("Date is: " + tweetDate.toString());
   if(tweetID == null){
     continue;
   }
