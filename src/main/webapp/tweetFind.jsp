@@ -191,7 +191,7 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
 
   //retrieve ma now that it has been saved
   ma = tas.find(p, myShepherd);
-  if (ma = null){
+  if (ma == null){
     out.println("Something went wrong ma has not been saved or retrieved correctly");
   }
 
