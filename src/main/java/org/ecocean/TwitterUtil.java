@@ -58,7 +58,8 @@ public class TwitterUtil {
     Query query = new Query(search);
     if (sinceId >= 0l){
       System.out.println("sinceId is " + Long.toString(sinceId) + " and is >= 0l");
-      query.setSinceId(sinceId);
+      query.setSince("2018-01-12");
+      // query.setSinceId(sinceId);
     }
     return tw.search(query);
   }
