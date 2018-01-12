@@ -40,6 +40,7 @@ Long sinceId = 951926801697095680L;
 String twitterTimeStampFile = "/twitterTimeStamp.txt";
 String iaPendingResultsFile = "/pendingAssetsIA.json";
 JSONArray iaPendingResults = null;
+QueryResult qr = null;
 
 out.println("tweetFind.jsp currently being executed");
 
@@ -79,7 +80,15 @@ try{
 }
 rtn.put("sinceId", sinceId);
 
-QueryResult qr = TwitterUtil.findTweets("@wildmetweetbot", sinceId);
+
+
+try{
+  qr = TwitterUtil.findTweets("@wildmetweetbot", sinceId);
+} catch(Exception e){
+  out.println("something went wrong running findTweets");
+  e.printStackTrace();
+}
+
 JSONArray tarr = new JSONArray();
 // out.println(qr.getTweets().size());
 
