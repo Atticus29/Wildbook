@@ -36,7 +36,7 @@ Long mostRecentTweetID = null;
 String rootDir = request.getSession().getServletContext().getRealPath("/");
 String dataDir = ServletUtilities.dataDir("context0", rootDir);
 String context = ServletUtilities.getContext(request);
-Long sinceId = 890302524275662848L;
+Long sinceId = 951917200008359936L;
 String twitterTimeStampFile = "/twitterTimeStamp.txt";
 String iaPendingResultsFile = "/pendingAssetsIA.json";
 JSONArray iaPendingResults = null;
@@ -96,6 +96,7 @@ out.println("is qr null?: " + Boolean.toString(qr == null));
 out.println("size of the arrayList of statuses is " + Integer.toString(qr.getTweets().size()));
 List<Status> tweetStatuses = qr.getTweets();
 for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().size(); i++
+  //@TODO check that the 0th tweet is the most recent? Or oldest of the current batch?
   Status tweet = tweetStatuses.get(i);
   out.println("total number of tweets captured is " + Integer.toString(tweetStatuses.size()));
   out.println(tweet.getText());
@@ -103,8 +104,10 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
 
   if(i == 0){
     mostRecentTweetID = (Long) tweet.getId();
+    out.println("tweet with index 0 has tweetId: " + Long.toString(mostRecentTweetID));
   }
   tweetID = (Long) tweet.getId();
+  out.println("current tweet with index " + Integer.toString(i) + " has id: " + Long.toString(tweetID));
   Date tweetDate = tweet.getCreatedAt();
   out.println("Date is: " + tweetDate.toString());
   if(tweetID == null){
