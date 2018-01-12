@@ -92,7 +92,8 @@ try {
 }
 
 //##################Begin loop through the each of the tweets since the last timestamp##################
-// out.println("size of the arrayList of statuses is " + Integer.toString(qr.getTweets().size()));
+out.println("is qr null?: " + Boolean.toString(qr == null));
+out.println("size of the arrayList of statuses is " + Integer.toString(qr.getTweets().size()));
 List<Status> tweetStatuses = qr.getTweets();
 for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().size(); i++
   Status tweet = tweetStatuses.get(i);
