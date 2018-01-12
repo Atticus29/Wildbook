@@ -41,6 +41,8 @@ String twitterTimeStampFile = "/twitterTimeStamp.txt";
 String iaPendingResultsFile = "/pendingAssetsIA.json";
 JSONArray iaPendingResults = null;
 
+out.println("tweetFind.jsp currently being executed");
+
 try {
     baseUrl = CommonConfiguration.getServerURL(request, request.getContextPath());
 } catch (java.net.URISyntaxException ex) {}
