@@ -1276,7 +1276,10 @@ System.out.println("+++++++++++ >>>> skipEncounters ???? " + skipEncounters);
                             System.out.println("Detection didn't find a whale fluke");
                             System.out.println("ImageUrl in processCallbackDetect is: " + imageUrl);
 
-                            TwitterUtil.sendDetectionAndIdentificationTweet(screenName, imageUrl, twitterInst, null, false, false, "", request);
+                            String rootDir = request.getSession().getServletContext().getRealPath("/");
+                            String dataDir = ServletUtilities.dataDir("context0", rootDir);
+                            String tweetQueueFile = "/tweetQueue.txt";
+                            TwitterUtil.addDetectionAndIdentificationTweetToQueue(screenName, imageUrl, twitterInst, null, false, false, "", request, dataDir + tweetQueueFile);
                             continue;
                         }
                         //these are annotations we can make automatically from ia detection.  we also do the same upon review return

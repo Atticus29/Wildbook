@@ -39,6 +39,7 @@ String context = ServletUtilities.getContext(request);
 Long sinceId = 951926801697095680L;
 String twitterTimeStampFile = "/twitterTimeStamp.txt";
 String iaPendingResultsFile = "/pendingAssetsIA.json";
+String tweetQueueFile = "/tweetQueue.txt";
 JSONArray iaPendingResults = null;
 QueryResult qr = null;
 
@@ -185,12 +186,12 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
 	emedia = jtweet.optJSONArray("extendedMediaEntities");
   if((emedia == null) || (emedia.length() < 1)){
     out.println("There were no extendedMediaEntities in tweet reading " + tweet.getText());
-    TwitterUtil.sendCourtesyTweet(tweeterScreenName, "", twitterInst, null);
+    TwitterUtil.addCourtesyTweetToQueue(tweeterScreenName, "", twitterInst, null);
     continue;
   }
 
   //sendPhotoSpecificCourtesyTweet will detect a photo in your tweet object and tweet the user an acknowledgement about this. If multiple images are sent in the same tweet, this response will only happen once. @TODO make this send photo URLs instead of IDs
-  TwitterUtil.sendPhotoSpecificCourtesyTweet(emedia, tweeterScreenName, twitterInst);
+  TwitterUtil.addPhotoSpecificCourtesyTweetToQueue(emedia, tweeterScreenName, twitterInst);
 
   ArrayList<String> photoIds = TwitterUtil.getPhotoIds(emedia, tweeterScreenName, twitterInst);
   ArrayList<String> photoUrls = TwitterUtil.getPhotoUrls(emedia, tweeterScreenName, twitterInst);
@@ -280,19 +281,20 @@ if(iaPendingResults != null){
         IBEISIA.processCallback(currentTaskId, jobResult, request);
 
         //@TODO move code block below into IBEISIA.java?? Or move some of that stuff here?
+        //@TODO find out where the jobId and taskId for an identification are given out, and make sure that's added to pendingResults
         // if(TwitterUtil.isSuccessfulDetection(jobResult)){
         //   //Do nothing. Wait for it to return an identification result.
         // } else {
         //   //@TODO we can rule out successful detection, unsuccessful anything else will fail below. Can we assume that this will only run if there is successful identification?
         //   String bestUUIDMatch = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(jobResult);
         //   if(bestUUIDMatch.equals("")){
-        //     TwitterUtil.sendDetectionAndIdentificationTweet(tweeterScreenName, currentImageURL, twitterInst, null, true, false, null, request);
+        //     TwitterUtil.addDetectionAndIdentificationTweetToQueue(tweeterScreenName, currentImageURL, twitterInst, null, true, false, null, request);
         //     //@TODO add an encounter for a novel animal and flag for review by a human
         //   }
         //   String markedIndividualID = getMarkedIndividualIDFromEncounterUUID(bestUUIDMatch,request);
         //   // @TODO mature ^ and move to TwitterUtil.java
         //   String info = "http://" + currentIPAddress + "/individuals.jsp/?number=" + markedIndividualID;
-        //   TwitterUtil.sendDetectionAndIdentificationTweet(tweeterScreenName, currentImageURL, twitterInst, markedIndividualID , true, true, info, request);
+        //   TwitterUtil.addDetectionAndIdentificationTweetToQueue(tweeterScreenName, currentImageURL, twitterInst, markedIndividualID , true, true, info, request);
         //   //@TODO add an encounter to the markedIndividualID
         // }
       } else if (status.equals("unknown")){
@@ -332,6 +334,8 @@ if(iaPendingResults != null){
 
 System.out.println("ABOUT TO COMMIT");
 myShepherd.commitDBTransaction();
+
+TwitterUtil.sendThisManyTweetsFromTheQueue(4, dataDir + tweetQueueFile, twitterInst);
 
 /*
 String ids[] = null;

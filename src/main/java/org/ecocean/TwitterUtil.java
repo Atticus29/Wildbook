@@ -2,6 +2,7 @@ package org.ecocean;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Properties;
+import java.lang.Math;
 import org.ecocean.servlet.ServletUtilities;
 import org.joda.time.LocalDateTime;
 import org.json.JSONObject;
@@ -125,7 +126,7 @@ public class TwitterUtil {
     return new TwitterFactory(cb.build());
   }
 
-  public static void sendCourtesyTweet(String screenName, String mediaType,  Twitter twitterInst, String photoUrl) {
+  public static void addCourtesyTweetToQueue(String screenName, String mediaType,  Twitter twitterInst, String photoUrl, String pathToQueueFile) {
     String reply = null;
     if(mediaType.equals("photo") && photoUrl != null) {
       reply = "Thank you for the photo: " + photoUrl + ", @" + screenName + "! Result pending!";
@@ -133,13 +134,13 @@ public class TwitterUtil {
       reply = "Thanks for the tweet, @" + screenName + "! Could you send me a pic in a new tweet?";
     }
     try {
-      String status = createTweet(reply, twitterInst);
-    } catch(TwitterException e) {
+      addTweetToQueue(reply, twitterInst, pathToQueueFile);
+    } catch(Exception e) {
       e.printStackTrace();
     }
   }
 
-  public static void sendPhotoSpecificCourtesyTweet(org.json.JSONArray emedia, String tweeterScreenName, Twitter twitterInst){
+  public static void addPhotoSpecificCourtesyTweetToQueue(org.json.JSONArray emedia, String tweeterScreenName, Twitter twitterInst, String pathToQueueFile){
     int photoCount = 0;
     org.json.JSONObject jent = null;
     String mediaType = null;
@@ -166,7 +167,7 @@ public class TwitterUtil {
         if(mediaType.equals("photo") && photoUrls.get(j) != null){
 
           //@ATTN Jon, do we want it tweeting a courtesy ("got your image") tweet for every image, or just the first image in each tweet that may contain one or more images?
-          TwitterUtil.sendCourtesyTweet(tweeterScreenName, mediaType, twitterInst, photoUrls.get(j));
+          TwitterUtil.addCourtesyTweetToQueue(tweeterScreenName, mediaType, twitterInst, photoUrls.get(j), pathToQueueFile);
           //For now, just one courtesy tweet per tweet, even if the tweet contains multiple images
           // if(photoCount<1){
           //   TwitterUtil.sendCourtesyTweet(tweeterScreenName, mediaType, twitterInst, photoUrls.get(j));
@@ -294,8 +295,8 @@ public class TwitterUtil {
   }
 
 
-  public static void sendDetectionAndIdentificationTweet(String screenName, String imageUrl, Twitter twitterInst, String whaleId, boolean detected, boolean identified, String info, HttpServletRequest request){
-    System.out.println("Entered sendDetectionAndIdentificationTweet");
+  public static void addDetectionAndIdentificationTweetToQueue(String screenName, String imageUrl, Twitter twitterInst, String whaleId, boolean detected, boolean identified, String info, HttpServletRequest request, String pathToQueueFile){
+    System.out.println("Entered addDetectionAndIdentificationTweetToQueue");
     String tweet = null, tweet2 = null;
     if(detected && identified){
       tweet = "Hi, @" + screenName + "! We detected a whale in " + imageUrl + " and identified it as " + whaleId + "!";
@@ -309,36 +310,36 @@ public class TwitterUtil {
     }
 
     try {
-      String status1 = createTweet(tweet, twitterInst);
-      String status2 = createTweet(tweet2, twitterInst);
+      addTweetToQueue(tweet, twitterInst, pathToQueueFile);
+      addTweetToQueue(tweet2, twitterInst, pathToQueueFile);
       try{
         System.out.println("Entered try for removeEntryFromPendingIaByImageUrl");
         removeEntryFromPendingIaByImageUrl(imageUrl, request);
         System.out.println("Got past try for removeEntryFromPendingIaByImageUrl");
       } catch(Exception f){
-        System.out.println("removeEntryFromPendingIaByImageId failed inside sendDetectionAndIdentificationTweet method");
+        System.out.println("removeEntryFromPendingIaByImageId failed inside addDetectionAndIdentificationTweetToQueue method");
         f.printStackTrace();
       }
-    } catch(TwitterException e){
+    } catch(Exception e){
       e.printStackTrace();
     }
   }
 
-  public static void sendTimeoutTweet(String screenName, Twitter twitterInst, String imageUrl,  HttpServletRequest request) {
+  public static void addTimeoutTweetToQueue(String screenName, Twitter twitterInst, String imageUrl,  HttpServletRequest request, String pathToQueueFile) {
     String reply = "Hello, @" + screenName + ". Analysis for image " + imageUrl + " couldn't be processed within 24 hrs.";
     String reply2 = "@" + screenName + ", if you'd like to make a manual submission, please go to http://www.flukebook.org/submit.jsp";
     try {
-      String status = createTweet(reply, twitterInst);
-      String status2 = createTweet(reply2, twitterInst);
+      addTweetToQueue(reply, twitterInst, pathToQueueFile);
+      addTweetToQueue(reply2, twitterInst, pathToQueueFile);
       try{
         System.out.println("Entered try for removeEntryFromPendingIaByImageUrl");
         removeEntryFromPendingIaByImageUrl(imageUrl, request);
         System.out.println("Got past try for removeEntryFromPendingIaByImageUrl");
       } catch(Exception f){
-        System.out.println("removeEntryFromPendingIaByImageId failed inside sendDetectionAndIdentificationTweet method");
+        System.out.println("removeEntryFromPendingIaByImageId failed inside addDetectionAndIdentificationTweetToQueue method");
         f.printStackTrace();
       }
-    } catch(TwitterException e) {
+    } catch(Exception e) {
       e.printStackTrace();
     }
   }
@@ -510,7 +511,6 @@ public class TwitterUtil {
     } catch(Exception e){
     	e.printStackTrace();
     }
-
     if (returnVal != null){
       return returnVal;
     } else{
@@ -616,5 +616,66 @@ public class TwitterUtil {
     }
   }
 
+  public static void sendThisManyTweetsFromTheQueue(int totalTweetCount, String pathToQueueFile, Twitter twitterInst){
+    String tweetQueueAsText = null;
+    if(pathToQueueFile != null){
+      try{
+        tweetQueueAsText = Util.readFromFile(pathToQueueFile);
+      } catch(Exception e){
+        e.printStackTrace();
+      }
+      if(tweetQueueAsText != null){
+        JSONArray tweetQueue = new JSONArray(tweetQueueAsText);
+        int tweetCount = Math.min(totalTweetCount, tweetQueue.length()); //just in case totalTweetCount is larger than the remaining tweets
+        for(int i = 0; i < tweetCount; i++){
+          JSONObject currentEntry = tweetQueue.getJSONObject(i);
+          String currentReply = currentEntry.getString("reply");
+          try{
+            createTweet(currentReply, twitterInst);
+            removeTweetFromQueue(currentReply, twitterInst, pathToQueueFile);
+          } catch(TwitterException e){
+            e.printStackTrace();
+          } catch(Exception f){
+            f.printStackTrace();
+          }
+        }
+      }
+    }
+  }
 
+  public static void addTweetToQueue(String reply, Twitter twitterInst, String pathToQueueFile) throws Exception{
+    if(pathToQueueFile != null){
+      String tweetQueueAsText = Util.readFromFile(pathToQueueFile);
+      JSONArray tweetQueue = new JSONArray(tweetQueueAsText);
+      JSONObject newEntry = new JSONObject();
+      newEntry.put("creationDate", new LocalDateTime());
+      newEntry.put("reply", reply);
+      tweetQueue.put(newEntry);
+      tweetQueueAsText = tweetQueue.toString();
+    	Util.writeToFile(tweetQueueAsText, pathToQueueFile);
+    } else{
+      throw new Exception ("pathToQueueFile was null in addTweetToQueue method");
+    }
+  }
+
+  public static void removeTweetFromQueue(String reply, Twitter twitterInst, String pathToQueueFile) throws Exception{
+    if(pathToQueueFile != null){
+      String tweetQueueAsText = Util.readFromFile(pathToQueueFile);
+      JSONArray tweetQueue = new JSONArray(tweetQueueAsText);
+      JSONArray newTweetQueue = new JSONArray();
+      for(int i=0; i<tweetQueue.length(); i++){
+        JSONObject currentEntry = tweetQueue.getJSONObject(i);
+        String currentReply = currentEntry.getString("reply");
+        System.out.println("currentReply is: " + currentReply);
+        if(currentReply.equals(reply)){
+          System.out.println("We have an entry that's equal: " + reply);
+          continue;
+        }
+        newTweetQueue.put(currentEntry);
+      }
+      Util.writeToFile(newTweetQueue.toString(), pathToQueueFile);
+    } else{
+      throw new Exception("pathToQueueFile was null in removeTweetFromQueue method");
+    }
+  }
 }
