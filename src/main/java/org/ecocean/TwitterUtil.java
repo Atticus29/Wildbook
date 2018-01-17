@@ -8,6 +8,7 @@ import org.joda.time.LocalDateTime;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
+import java.util.concurrent.TimeUnit;
 
 import org.ecocean.media.TwitterAssetStore;
 import org.ecocean.media.MediaAsset;
@@ -637,6 +638,12 @@ public class TwitterUtil {
             e.printStackTrace();
           } catch(Exception f){
             f.printStackTrace();
+          }
+          //@TODO add a ten second delay here
+          try{
+            TimeUnit.SECONDS.sleep(10);
+          } catch(Exception e){
+            e.printStackTrace();
           }
         }
       }
