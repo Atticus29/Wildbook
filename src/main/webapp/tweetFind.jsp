@@ -40,6 +40,7 @@ Long sinceId = 951926801697095680L;
 String twitterTimeStampFile = "/twitterTimeStamp.txt";
 String iaPendingResultsFile = "/pendingAssetsIA.json";
 String tweetQueueFile = "/tweetQueue.txt";
+String pathToQueueFile = dataDir + tweetQueueFile;
 JSONArray iaPendingResults = null;
 QueryResult qr = null;
 
@@ -186,12 +187,12 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
 	emedia = jtweet.optJSONArray("extendedMediaEntities");
   if((emedia == null) || (emedia.length() < 1)){
     out.println("There were no extendedMediaEntities in tweet reading " + tweet.getText());
-    TwitterUtil.addCourtesyTweetToQueue(tweeterScreenName, "", twitterInst, null);
+    TwitterUtil.addCourtesyTweetToQueue(tweeterScreenName, "", twitterInst, null, pathToQueueFile);
     continue;
   }
 
   //sendPhotoSpecificCourtesyTweet will detect a photo in your tweet object and tweet the user an acknowledgement about this. If multiple images are sent in the same tweet, this response will only happen once. @TODO make this send photo URLs instead of IDs
-  TwitterUtil.addPhotoSpecificCourtesyTweetToQueue(emedia, tweeterScreenName, twitterInst);
+  TwitterUtil.addPhotoSpecificCourtesyTweetToQueue(emedia, tweeterScreenName, twitterInst, pathToQueueFile);
 
   ArrayList<String> photoIds = TwitterUtil.getPhotoIds(emedia, tweeterScreenName, twitterInst);
   ArrayList<String> photoUrls = TwitterUtil.getPhotoUrls(emedia, tweeterScreenName, twitterInst);
@@ -320,7 +321,7 @@ if(iaPendingResults != null){
 
     if(interval.toDuration().getStandardHours() >= 72){
 
-    	TwitterUtil.sendTimeoutTweet(pendingResult.getString("tweeterScreenName"), twitterInst, pendingResult.getString("photoUrl"), request);
+    	TwitterUtil.addTimeoutTweetToQueue(pendingResult.getString("tweeterScreenName"), twitterInst, pendingResult.getString("photoUrl"), request, pathToQueueFile);
       //Note that sendTimeoutTweet calls removeEntryFromPendingIaByImageUrl.
     }
   }
@@ -335,6 +336,7 @@ if(iaPendingResults != null){
 System.out.println("ABOUT TO COMMIT");
 myShepherd.commitDBTransaction();
 
+//@TODO change this number to that from the limit call to the API
 TwitterUtil.sendThisManyTweetsFromTheQueue(4, dataDir + tweetQueueFile, twitterInst);
 
 /*
