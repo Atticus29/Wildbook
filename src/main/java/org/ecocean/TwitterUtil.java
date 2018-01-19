@@ -322,6 +322,7 @@ public class TwitterUtil {
         f.printStackTrace();
       }
     } catch(Exception e){
+      System.out.println("addTweetToQueue failed inside addDetectionAndIdentificationTweetToQueue method");
       e.printStackTrace();
     }
   }
