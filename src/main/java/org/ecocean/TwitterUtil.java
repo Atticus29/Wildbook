@@ -130,9 +130,9 @@ public class TwitterUtil {
   public static void addCourtesyTweetToQueue(String screenName, String mediaType,  Twitter twitterInst, String photoUrl, String pathToQueueFile) {
     String reply = null;
     if(mediaType.equals("photo") && photoUrl != null) {
-      reply = "Thank you for the photo: " + photoUrl + ", @" + screenName + "! Result pending!";
+      reply = "@" + screenName + ", thank you for the photo: " + photoUrl + "! Result pending!";
     } else {
-      reply = "Thanks for the tweet, @" + screenName + "! Could you send me a pic in a new tweet?";
+      reply = "@" + screenName + ", thanks for the tweet! Could you send me a pic in a new tweet?";
     }
     try {
       addTweetToQueue(reply, twitterInst, pathToQueueFile);
@@ -300,13 +300,13 @@ public class TwitterUtil {
     System.out.println("Entered addDetectionAndIdentificationTweetToQueue");
     String tweet = null, tweet2 = null;
     if(detected && identified){
-      tweet = "Hi, @" + screenName + "! We detected a whale in " + imageUrl + " and identified it as " + whaleId + "!";
+      tweet = "@" + screenName + ", we detected a whale in " + imageUrl + " and identified it as " + whaleId + "!";
       tweet2 = "@" + screenName + ", here's some info on " + whaleId + ": " + info; //TODO flesh out either by pulling info from db now that whaleId is available, or by passing some info as an additional argument in this method
     } else if(detected && !identified){
-      tweet =  "Hi, @" + screenName + "! We detected a whale in " + imageUrl + " but we were not able to identify it.";
+      tweet =  "@" + screenName + ", we detected a whale in " + imageUrl + " but we were not able to identify it.";
       tweet2 = "@" + screenName + ", if you'd like to make a manual submission, please go to http://www.flukebook.org/submit.jsp";
     } else {
-      tweet =  "Hi, @" + screenName + "! We were not able to identify a whale in " + imageUrl + ".";
+      tweet =  "@" + screenName + ", we were not able to identify a whale in " + imageUrl + ".";
       tweet2 = "@" + screenName + ", if you'd like to make a manual submission, please go to http://www.flukebook.org/submit.jsp";
     }
 
@@ -328,7 +328,7 @@ public class TwitterUtil {
   }
 
   public static void addTimeoutTweetToQueue(String screenName, Twitter twitterInst, String imageUrl,  HttpServletRequest request, String pathToQueueFile) {
-    String reply = "Hello, @" + screenName + ". Analysis for image " + imageUrl + " couldn't be processed within 24 hrs.";
+    String reply = "@" + screenName + ", analysis for image " + imageUrl + " couldn't be processed within 24 hrs.";
     String reply2 = "@" + screenName + ", if you'd like to make a manual submission, please go to http://www.flukebook.org/submit.jsp";
     try {
       addTweetToQueue(reply, twitterInst, pathToQueueFile);
