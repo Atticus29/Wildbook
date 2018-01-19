@@ -337,7 +337,10 @@ System.out.println("ABOUT TO COMMIT");
 myShepherd.commitDBTransaction();
 
 //@TODO change this number to that from the limit call to the API
-TwitterUtil.sendThisManyTweetsFromTheQueue(4, dataDir + tweetQueueFile, twitterInst);
+//@ATTN this is currently running 1 tweet per minute (assuming the cron job is per minute). It's a precaution if you can't ever see the API limit status call decrementing and use that as your count of how many tweets are remaining
+TwitterUtil.sendThisManyTweetsFromTheQueue(1, dataDir + tweetQueueFile, twitterInst);
+Map<String,RateLimitStatus> rateLimitStatusMap = twitterInst.getRateLimitStatus();
+System.out.println(rateLimitStatusMap);
 
 /*
 String ids[] = null;

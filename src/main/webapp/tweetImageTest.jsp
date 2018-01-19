@@ -5,6 +5,8 @@ java.util.ArrayList,
 java.io.FileNotFoundException,
 java.io.IOException,
 java.util.List,
+java.util.Map,
+java.util.HashMap,
 java.io.BufferedReader,
 java.io.IOException,
 java.io.InputStream,
@@ -36,6 +38,16 @@ Long timeStamp = 890302524275662848L;
 
 // Twitter Instance
 Twitter twitterInst = TwitterUtil.init(request);
+
+
+//Check on status posting limits
+Map<String,RateLimitStatus> rateLimitStatusMap = twitterInst.getRateLimitStatus();
+ //.get("/statuses/mentions_timeline");
+ // System.out.println(rateLimitStatusMap);
+// System.out.println("Limit: " + rateLimitStatusMap.getLimit());
+// System.out.println("Remaining: " + rateLimitStatusMap.getRemaining());
+// System.out.println("ResetTimeInSeconds: " + rateLimitStatusMap.getResetTimeInSeconds());
+// System.out.println("SecondsUntilReset: " + rateLimitStatusMap.getSecondsUntilReset());
 
 // ### Test different tweets against the Twitterbot ###
 
@@ -191,5 +203,8 @@ try {
   out.println("Unable to send multi-image tweet.");
 }
 // ###              End tweet tests                 ###
+
+rateLimitStatusMap = twitterInst.getRateLimitStatus();
+System.out.println(rateLimitStatusMap);
 
 %>

@@ -4,11 +4,11 @@
 #cp /usr/local/apache-tomcat-7.0.79/webapps/wildbook/tweetTest.jsp ~/Desktop/Wildbook_javaTweetBot/src/main/webapp/
 #cp /usr/local/apache-tomcat-7.0.79/webapps/wildbook/tweetImageTest.jsp ~/Desktop/Wildbook_javaTweetBot/src/main/webapp/
 
-sudo rm -rf /usr/local/apache-tomcat-7.0.79/webapps/wildbook.war
+rm -rf /usr/local/apache-tomcat-7.0.79/webapps/wildbook.war
 
-sudo rm -rf /usr/local/apache-tomcat-7.0.79/webapps/wildbook
+rm -rf /usr/local/apache-tomcat-7.0.79/webapps/wildbook
 
-sudo rm -rf /usr/local/apache-tomcat-7.0.79/logs/catalina.out
+rm -rf /usr/local/apache-tomcat-7.0.79/logs/catalina.out
 
 mvn clean install -DskipTests -Dmaven.javadoc.skip=true && cp /Users/mf/Desktop/Wildbook_javaTweetBot/target/wildbook-6.0.0-EXPERIMENTAL.war /usr/local/apache-tomcat-7.0.79/webapps/wildbook.war
 
