@@ -1272,10 +1272,14 @@ public static void waitForTrainingJobs(ArrayList<String> taskIds, String context
           boolean skipEncounters = asset.hasLabel("_frame");
           System.out.println("+++++++++++ >>>> skipEncounters ???? " + skipEncounters);
           for (int a = 0 ; a < janns.length() ; a++) {
+            System.out.println("Entered janns for loop in processCallbackDetect");
             JSONObject jann = janns.optJSONObject(a);
-            if (jann == null) continue;
+            if (jann == null){
+              System.out.println("jann is null. Skipping. processCallbackDetect");
+              continue;
+            }
             if (jann.optDouble("confidence", -1.0) < getDetectionCutoffValue() || !jann.optString("species", "unkown").equals("whale_fluke")) { // wasn't detected with high confidence or wasn't a detected as a whale fluke
-            
+
             needsReview = true;
             System.out.println("Detection didn't find a whale fluke");
             System.out.println("ImageUrl in processCallbackDetect is: " + imageUrl);
