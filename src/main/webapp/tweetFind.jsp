@@ -86,7 +86,7 @@ rtn.put("sinceId", sinceId);
 
 
 try{
-  qr = TwitterUtil.findTweets("@wildmetweetbot", sinceId);
+  qr = TwitterUtil.findTweets("@FlukeBot", sinceId);
 } catch(Exception e){
   out.println("something went wrong running findTweets");
   e.printStackTrace();
@@ -279,6 +279,7 @@ if(iaPendingResults != null){
       String status = IBEISIA.getJobStatus(currentJobId, context).getJSONObject("response").getString("jobstatus");
       System.out.println("Job status ==>" + status);
       if (status.equals("completed")){
+        //@TODO takea look at IBEISIAGetJobStatus parsing to see whether everything is useable
         JSONObject jobResult = IBEISIA.getJobResult(currentJobId, context);
         IBEISIA.processCallback(currentTaskId, jobResult, request);
 

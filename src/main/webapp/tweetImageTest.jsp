@@ -51,18 +51,18 @@ Map<String,RateLimitStatus> rateLimitStatusMap = twitterInst.getRateLimitStatus(
 
 // ### Test different tweets against the Twitterbot ###
 
-String simpleTweetText = "@wildmetweetbot! I saw a whale!";
-String dateTweetText = "@wildmetweetbot, I saw a whale on June 3, 2017!";
-String oneImageTweetText = "@wildmetweetbot, I took a picture of a whale!";
-String oneImageNotWhaleTweetText = "@wildmetweetbot, I took a picture of a whale! This is a whale, right?";
-String multImageTweetText = "@wildmetweetbot, I took some pictures of whales!";
-String multImageNotWhaleTweetText = "@wildmetweetbot, I took some pictures of whales! These are whales, aren't they?";
-String multImageOneNotWhaleTweetText = "@wildmetweetbot, I took some pictures of whales! These are both whales, aren't they?";
-String locationTweetText = "@wildmetweetbot Saw this cool humpback whale in the galapagos, Ecuador!";
-String nonEnglishLocationTweetText = "@wildmetweetbot! Ayer vi una ballena increible en los galapagos en mexico.";
-String textTweetGpsText = "@wildmetweetbot saw a whale at 45.5938,-122.737 in ningaloo. #bestvacationever";
-String futureTweetText = "@wildmetweetbot Saw a whale on July 2, 2017. I'm going to see one tomorrow too!";
-String pastTweetText = "@wildmetweetbot Saw a whale on July 2, 2017. I saw one yesterday, too!";
+String simpleTweetText = "@FlukeBot! I saw a whale!";
+String dateTweetText = "@FlukeBot, I saw a whale on June 3, 2017!";
+String oneImageTweetText = "@FlukeBot, I took a picture of a whale!";
+String oneImageNotWhaleTweetText = "@FlukeBot, I took a picture of a whale! This is a whale, right?";
+String multImageTweetText = "@FlukeBot, I took some pictures of whales!";
+String multImageNotWhaleTweetText = "@FlukeBot, I took some pictures of whales! These are whales, aren't they?";
+String multImageOneNotWhaleTweetText = "@FlukeBot, I took some pictures of whales! These are both whales, aren't they?";
+String locationTweetText = "@FlukeBot Saw this cool humpback whale in the galapagos, Ecuador!";
+String nonEnglishLocationTweetText = "@FlukeBot! Ayer vi una ballena increible en los galapagos en mexico.";
+String textTweetGpsText = "@FlukeBot saw a whale at 45.5938,-122.737 in ningaloo. #bestvacationever";
+String futureTweetText = "@FlukeBot Saw a whale on July 2, 2017. I'm going to see one tomorrow too!";
+String pastTweetText = "@FlukeBot Saw a whale on July 2, 2017. I saw one yesterday, too!";
 
 File imageFileWhale1 = new File(dataDir + "/images/testWhale1.jpg");
 File imageFileWhale2 = new File(dataDir + "/images/testWhale2.jpg");
