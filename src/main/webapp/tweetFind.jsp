@@ -281,9 +281,16 @@ if(iaPendingResults != null){
       if (status.equals("completed")){
         //@TODO takea look at IBEISIAGetJobStatus parsing to see whether everything is useable
         JSONObject jobResult = IBEISIA.getJobResult(currentJobId, context);
+        JSONObject rlog = new JSONObject();
+    		rlog.put("jobID", currentJobId);
+    		rlog.put("_action", "getJobResult");
+    		rlog.put("_response", jobResult);
+    		IBEISIA.log(currentTaskId, currentJobId, rlog, context);
+    		// all.put("jobResult", rlog);
+    		JSONObject proc = IBEISIA.processCallback(currentTaskId, rlog, request);
         IBEISIA.processCallback(currentTaskId, jobResult, request);
 
-        //@TODO move code block below into IBEISIA.java?? Or move some of that stuff here?
+        //@TODO move code block below into IBEISIA.java?? Or move some of that stuff here? It's weird that half of it is there and half is here
         //@TODO find out where the jobId and taskId for an identification are given out, and make sure that's added to pendingResults
         // if(TwitterUtil.isSuccessfulDetection(jobResult)){
         //   //Do nothing. Wait for it to return an identification result.
