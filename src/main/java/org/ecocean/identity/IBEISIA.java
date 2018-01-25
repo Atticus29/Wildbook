@@ -2721,9 +2721,6 @@ public static void waitForIAPriming() {
 
     //ditto above, most things
     public static String IAIntake(Annotation ann, Shepherd myShepherd, HttpServletRequest request) throws ServletException, IOException {
-      System.out.println("* * * * * * * IAIntake(ident) NOT YET IMPLEMENTED ====> " + ann);
-      // return Util.generateUUID();
-
       String baseUrl = null;
       try {
         baseUrl = CommonConfiguration.getServerURL(request, request.getContextPath());
