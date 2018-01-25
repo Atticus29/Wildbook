@@ -1309,6 +1309,7 @@ public static void waitForTrainingJobs(ArrayList<String> taskIds, String context
             // }
           } catch (Exception ex) {
             System.out.println("WARNING: IAIntake threw exception " + ex);
+            ex.printStackTrace();
           }
           numCreated++;
         }
