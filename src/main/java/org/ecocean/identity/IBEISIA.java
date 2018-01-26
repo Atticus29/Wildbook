@@ -2722,6 +2722,8 @@ public static void waitForIAPriming() {
     //ditto above, most things
     public static String IAIntake(Annotation ann, Shepherd myShepherd, HttpServletRequest request) throws ServletException, IOException {
       String baseUrl = null;
+System.out.println("request = " + request);
+System.out.println("????? " + request.getContextPath());
       try {
         baseUrl = CommonConfiguration.getServerURL(request, request.getContextPath());
       } catch (java.net.URISyntaxException ex) {}
