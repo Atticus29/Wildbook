@@ -1153,14 +1153,28 @@ public static void waitForTrainingJobs(ArrayList<String> taskIds, String context
     return null;
   }
 
-  public static JSONObject processCallback(String taskID, JSONObject resp, HttpServletRequest request) {
+  public static JSONObject processCallback(String taskID, JSONObject resp, HttpServletRequest request) throws Exception{
+    String rootDir = request.getSession().getServletContext().getRealPath("/");
+    String context = ServletUtilities.getContext(request);
+    String baseUrl = null;
+    try{
+      baseUrl = CommonConfiguration.getServerURL(request, request.getContextPath());
+    } catch(java.net.URISyntaxException e){
+      e.printStackTrace();
+    }
+    if(baseUrl == null){
+      throw new Exception("baseUrl in processCallback method is null");
+    }
+    return processCallback(taskID, resp, context, rootDir, baseUrl);
+  }
+
+  public static JSONObject processCallback(String taskID, JSONObject resp, String context, String rootDir, String baseUrl) {
     System.out.println("CALLBACK GOT: (taskID " + taskID + ") " + resp);
     String screenName = null;
     String imageUrl = null;
     JSONObject rtn = new JSONObject("{\"success\": false}");
     rtn.put("taskId", taskID);
     if (taskID == null) return rtn;
-    String context = ServletUtilities.getContext(request);
     Shepherd myShepherd=new Shepherd(context);
     myShepherd.setAction("IBEISIA.processCallback");
     myShepherd.beginDBTransaction();
@@ -1173,27 +1187,27 @@ public static void waitForTrainingJobs(ArrayList<String> taskIds, String context
     if ("detect".equals(type)) {
       rtn.put("success", true);
       try{
-        screenName = TwitterUtil.findScreenNameInIaPendingLogFromTaskId(taskID, request);
+        screenName = TwitterUtil.findScreenNameInIaPendingLogFromTaskId(taskID, rootDir);
       } catch(Exception e){
         e.printStackTrace();
       }
       try{
-        imageUrl = TwitterUtil.findImageUrlInIaPendingLogFromTaskId(taskID, request);
+        imageUrl = TwitterUtil.findImageUrlInIaPendingLogFromTaskId(taskID, rootDir);
       } catch(Exception e){
         e.printStackTrace();
       }
       try{
-        Twitter twitterInst = TwitterUtil.init(request);
-        rtn.put("processResult", processCallbackDetect(taskID, logs, resp, myShepherd, request, screenName, imageUrl, twitterInst));
+        Twitter twitterInst = TwitterUtil.init(context);
+        rtn.put("processResult", processCallbackDetect(taskID, logs, resp, myShepherd, screenName, imageUrl, twitterInst, baseUrl, rootDir, context));
       } catch(Exception e){
-        rtn.put("processResult", processCallbackDetect(taskID, logs, resp, myShepherd, request));
+        rtn.put("processResult", processCallbackDetect(taskID, logs, resp, myShepherd, baseUrl, rootDir, context));
       }
 
 
     } else if ("identify".equals(type)) {
       rtn.put("success", true);
       System.out.println("About to call processCallbackIdentify"); //TODO eventually remove this line
-      rtn.put("processResult", processCallbackIdentify(taskID, logs, resp, request));
+      rtn.put("processResult", processCallbackIdentify(taskID, logs, resp, context));
     } else {
       rtn.put("error", "unknown task action type " + type);
     }
@@ -1206,11 +1220,42 @@ public static void waitForTrainingJobs(ArrayList<String> taskIds, String context
   {"_action":"getJobResult","_response":{"response":{"json_result":{"score_list":[0],"results_list":[[{"xtl":679,"theta":0,"height":366,"width":421,"class":"elephant_savanna","confidence":0.215,"ytl":279},{"xtl":71,"theta":0,"height":206,"width":166,"class":"elephant_savanna","confidence":0.2685,"ytl":425},{"xtl":1190,"theta":0,"height":222,"width":67,"class":"elephant_savanna","confidence":0.2947,"ytl":433}]],"image_uuid_list":[{"__UUID__":"f0f9cc19-a56d-3a81-be40-bc51e65714e6"}]},"status":"ok","jobid":"jobid-0025"},"status":{"message":"","cache":-1,"code":200,"success":true}},"jobID":"jobid-0025"}
   */
 
-  private static JSONObject processCallbackDetect(String taskID, ArrayList<IdentityServiceLog> logs, JSONObject resp, Shepherd myShepherd, HttpServletRequest request) {
-    return processCallbackDetect(taskID, logs, resp, myShepherd, request, null, null, null);
+  private static JSONObject processCallbackDetect(String taskID, ArrayList<IdentityServiceLog> logs, JSONObject resp, Shepherd myShepherd, HttpServletRequest request) throws Exception{
+    String baseUrl = null;
+    try{
+      baseUrl = CommonConfiguration.getServerURL(request, request.getContextPath()); //@ATTN there's another signature where this is passed as an argument -Mark F.
+    } catch(java.net.URISyntaxException e){
+      e.printStackTrace();
+    }
+    String rootDir = request.getSession().getServletContext().getRealPath("/"); //@ATTN there's another signature where this is passed as an argument -Mark F.
+    String context = ServletUtilities.getContext(request); //@ATTN there's another signature where this is passed as an argument -Mark F.
+    if(baseUrl == null){
+      throw new Exception("baseUrl in processCallbackDetect is null");
+    }
+    return processCallbackDetect(taskID, logs, resp, myShepherd, null, null, null, baseUrl, rootDir, context);
   }
 
-  private static JSONObject processCallbackDetect(String taskID, ArrayList<IdentityServiceLog> logs, JSONObject resp, Shepherd myShepherd, HttpServletRequest request, String screenName, String imageUrl, Twitter twitterInst) {
+  private static JSONObject processCallbackDetect(String taskID, ArrayList<IdentityServiceLog> logs, JSONObject resp, Shepherd myShepherd, String baseUrl, String rootDir, String context) {
+    return processCallbackDetect(taskID, logs, resp, myShepherd, null, null, null, baseUrl, rootDir, context);
+  }
+
+
+  private static JSONObject processCallbackDetect(String taskID, ArrayList<IdentityServiceLog> logs, JSONObject resp, HttpServletRequest request, Shepherd myShepherd, String screenName, String imageUrl, Twitter twitterInst) throws Exception{
+    String baseUrl = null;
+    try{
+      baseUrl = CommonConfiguration.getServerURL(request, request.getContextPath()); //@ATTN there's another signature where this is passed as an argument -Mark F.
+    } catch(java.net.URISyntaxException e){
+      e.printStackTrace();
+    }
+    String rootDir = request.getSession().getServletContext().getRealPath("/"); //@ATTN there's another signature where this is passed as an argument -Mark F.
+    String context = ServletUtilities.getContext(request); //@ATTN there's another signature where this is passed as an argument -Mark F.
+    if(baseUrl == null){
+      throw new Exception ("baseUrl is null in processCallbackDetect");
+    }
+    return processCallbackDetect(taskID, logs, resp, myShepherd, screenName, imageUrl, twitterInst, baseUrl, rootDir, context);
+  }
+
+  private static JSONObject processCallbackDetect(String taskID, ArrayList<IdentityServiceLog> logs, JSONObject resp, Shepherd myShepherd, String screenName, String imageUrl, Twitter twitterInst, String baseUrl, String rootDir, String context) {
     System.out.println("Entered processCallbackDetect");
     JSONObject rtn = new JSONObject("{\"success\": false}");
     String[] ids = IdentityServiceLog.findObjectIDs(logs);
@@ -1285,10 +1330,9 @@ public static void waitForTrainingJobs(ArrayList<String> taskIds, String context
             System.out.println("Detection didn't find a whale fluke");
             System.out.println("ImageUrl in processCallbackDetect is: " + imageUrl);
 
-            String rootDir = request.getSession().getServletContext().getRealPath("/");
-            String dataDir = ServletUtilities.dataDir("context0", rootDir);
+            String dataDir = ServletUtilities.dataDir("context0", rootDir); //@TODO should context be hardcoded here? -Mark F.
             String tweetQueueFile = "/tweetQueue.txt";
-            TwitterUtil.addDetectionAndIdentificationTweetToQueue(screenName, imageUrl, twitterInst, null, false, false, "", request, dataDir + tweetQueueFile);
+            TwitterUtil.addDetectionAndIdentificationTweetToQueue(screenName, imageUrl, twitterInst, null, false, false, "", rootDir, dataDir + tweetQueueFile);
             continue;
           }
           //these are annotations we can make automatically from ia detection.  we also do the same upon review return
@@ -1298,14 +1342,14 @@ public static void waitForTrainingJobs(ArrayList<String> taskIds, String context
             System.out.println("WARNING: could not create Annotation from " + asset + " and " + jann);
             continue;
           }
-          if (!skipEncounters) _tellEncounter(myShepherd, request, ann);
+          if (!skipEncounters) _tellEncounter(myShepherd, ann);
           allAnns.add(ann);  //this is cumulative over *all MAs*
           newAnns.put(ann.getId());
           try {
             //TODO how to know *if* we should start identification
             // if(jann.optDouble("confidence", -1.0) >= getDetectionCutoffValue() && jann.optString("species", "unkown").equals("whale_fluke")){ //These criteria have actually already been satisfied above -Mark F.
             System.out.println("Detection found a whale fluke; sending to identification");
-            ident.put(ann.getId(), IAIntake(ann, myShepherd, request));
+            ident.put(ann.getId(), IAIntake(ann, myShepherd, context, baseUrl));
             // }
           } catch (Exception ex) {
             System.out.println("WARNING: IAIntake threw exception " + ex);
@@ -1344,7 +1388,7 @@ public static void waitForTrainingJobs(ArrayList<String> taskIds, String context
           je.put(enc.getCatalogNumber());
         }
         myShepherd.getPM().makePersistent(occ);
-        fromDetection(occ, myShepherd, request, ServletUtilities.getContext(request));
+        fromDetection(occ, myShepherd, context);
         jlog.put("collatedEncounters", je);
         jlog.put("collatedOccurrence", occ.getOccurrenceID());
       }
@@ -1363,20 +1407,24 @@ public static void waitForTrainingJobs(ArrayList<String> taskIds, String context
   return rtn;
 }
 
-private static void _tellEncounter(Shepherd myShepherd, HttpServletRequest request, Annotation ann) {
+private static void _tellEncounter(Shepherd myShepherd, HttpServletRequest request,Annotation ann) {
+  _tellEncounter(myShepherd, ann);
+}
+
+private static void _tellEncounter(Shepherd myShepherd, Annotation ann) {
   System.out.println("/------ _tellEncounter ann = " + ann);
   Encounter enc = ann.toEncounter(myShepherd);
   System.out.println("\\------ _tellEncounter enc = " + enc);
   if (enc == null) return;
   myShepherd.getPM().makePersistent(enc);
-  enc.detectedAnnotation(myShepherd, request, ann);
+  // enc.detectedAnnotation(myShepherd, request, ann); //@TODO detectedAnnotation hasn't been fully implemented yet
 }
 
-private static JSONObject processCallbackIdentify(String taskID, ArrayList<IdentityServiceLog> logs, JSONObject resp, HttpServletRequest request) {
-  return processCallbackIdentify(taskID, logs, resp, request, null, null, null);
+private static JSONObject processCallbackIdentify(String taskID, ArrayList<IdentityServiceLog> logs, JSONObject resp, String context) {
+  return processCallbackIdentify(taskID, logs, resp, null, null, null, context);
 }
 
-private static JSONObject processCallbackIdentify(String taskID, ArrayList<IdentityServiceLog> logs, JSONObject resp, HttpServletRequest request, String screenName, String imageId, Twitter twitterInst) {
+private static JSONObject processCallbackIdentify(String taskID, ArrayList<IdentityServiceLog> logs, JSONObject resp, String screenName, String imageId, Twitter twitterInst, String context) {
   System.out.println("Entered processCallbackDetect");
   JSONObject rtn = new JSONObject("{\"success\": false}");
   String[] ids = IdentityServiceLog.findObjectIDs(logs);
@@ -1385,7 +1433,6 @@ private static JSONObject processCallbackIdentify(String taskID, ArrayList<Ident
     return rtn;
   }
   HashMap<String,Annotation> anns = new HashMap<String,Annotation>();
-  String context = ServletUtilities.getContext(request);
   Shepherd myShepherd=new Shepherd(context);
   myShepherd.setAction("IBEISIA.processCallbackIdentify");
   myShepherd.beginDBTransaction();
@@ -2690,19 +2737,27 @@ public static void waitForIAPriming() {
   // ** attempt to create some placeholder calls to mimic what will some day (hopefully SOON!) be generalized IA class.  navigate with care.
   //    probably want to talk to jon if you have questions
 
+
+
   public static String IAIntake(MediaAsset ma, Shepherd myShepherd, HttpServletRequest request) throws ServletException, IOException {
     return IAIntake(new ArrayList<MediaAsset>(Arrays.asList(ma)), myShepherd, request);  //singleton just sends as list
   }
 
   public static String IAIntake(List<MediaAsset> mas, Shepherd myShepherd, HttpServletRequest request) throws ServletException, IOException {
+    String baseUrl = null;
+    try{
+      baseUrl = CommonConfiguration.getServerURL(request, request.getContextPath());
+    } catch(java.net.URISyntaxException e){
+      e.printStackTrace();
+    }
+    String context = ServletUtilities.getContext(request);
+    return IAIntake(mas, myShepherd, context, baseUrl);
+  }
+
+  public static String IAIntake(List<MediaAsset> mas, Shepherd myShepherd, String context, String baseUrl) throws ServletException, IOException {
     //TODO support parent-task (eventually?)
     //roughly IA.intake(MediaAsset) i hope... thus this does detection (returns taskId)
     //superhactacular!  now we piggyback on IAGateway which kinda does this.  sorta.  obvs this will come into IA.intake() ultimately no?
-    String baseUrl = null;
-    try {
-      baseUrl = CommonConfiguration.getServerURL(request, request.getContextPath());
-    } catch (java.net.URISyntaxException ex) {}
-      String context = ServletUtilities.getContext(request);
       JSONObject jin = new JSONObject();
       JSONObject jm = new JSONObject();
       JSONArray jmids = new JSONArray();
@@ -2722,247 +2777,253 @@ public static void waitForIAPriming() {
     //ditto above, most things
     public static String IAIntake(Annotation ann, Shepherd myShepherd, HttpServletRequest request) throws ServletException, IOException {
       String baseUrl = null;
-System.out.println("request = " + request);
-System.out.println("????? " + request.getContextPath());
-      try {
+      try{
         baseUrl = CommonConfiguration.getServerURL(request, request.getContextPath());
-      } catch (java.net.URISyntaxException ex) {}
-        String context = ServletUtilities.getContext(request);
-        JSONObject jin = new JSONObject();
-        JSONObject ja = new JSONObject();
-        JSONArray jaids = new JSONArray();
-        jaids.put(ann.getId());
-        ja.put("annotationIds", jaids);
-        jin.put("identify", ja);
-        JSONObject res = new JSONObject();
-        String taskId = Util.generateUUID();
-        res.put("taskId", taskId);
-        org.ecocean.servlet.IAGateway._doIdentify(jin, res, myShepherd, context, baseUrl);
-        System.out.println("IAIntake(identify:" + ann + ") [taskId=" + taskId + "] -> " + res);
-        return taskId;
-
-      }
-
-      /*
-      public static String IAIntake(List<Annotation> anns, Shepherd myShepherd, HttpServletRequest request) throws ServletException, IOException {
-      System.out.println("* * * * * * * IAIntake(ident) NOT YET IMPLEMENTED ====> " + ann);
-      return Util.generateUUID();
-    }
-    */
-
-    //this is called when a batch of encounters (which should be on this occurrence) were made from detection
-    // *as a group* ... see also Encounter.detectedAnnotation() for the one-at-a-time equivalent
-    public static void fromDetection(Occurrence occ, Shepherd myShepherd, HttpServletRequest request, String context)  {
-      System.out.println(">>>>>> detection created " + occ.toString());
-
-      //set the locationID/location/date on all encounters by inspecting detected comments on the first encounter
-      if((occ.getEncounters()!=null)&&(occ.getEncounters().get(0)!=null)){
-
-
-        String locCode=null;
-        String location="";
-        int year=-1;
-        int month=-1;
-        int day=-1;
-        List<Encounter> encounters=occ.getEncounters();
-        int numEncounters=encounters.size();
-        Encounter enc=encounters.get(0);
-        String ytRemarks=enc.getOccurrenceRemarks().trim().toLowerCase();
-
-        String detectedLanguage="en";
-        try{
-          detectedLanguage= DetectTranslate.detect(ytRemarks, context);
-
-          if(!detectedLanguage.toLowerCase().startsWith("en")){
-            ytRemarks= DetectTranslate.translate(ytRemarks, context);
-          }
-        }
-        catch(Exception e){
-          System.out.println("I hit an exception trying to detect language.");
-          e.printStackTrace();
-        }
-        //grab texts from yt videos through OCR (before we parse for location/ID and Date) and add it to remarks variable.
-        String ocrRemarks="";
-        try {
-          if((occ.getEncounters()!=null)&&(occ.getEncounters().size()>0)){
-            Encounter myEnc=occ.getEncounters().get(0);
-            List<MediaAsset> assets= myEnc.getMedia();
-            if((assets!=null)&&(assets.size()>0)){
-              MediaAsset myAsset = assets.get(0);
-              MediaAsset parent = myAsset.getParent(myShepherd);
-              if(parent!=null){
-                ArrayList<MediaAsset> frames= YouTubeAssetStore.findFrames(parent, myShepherd);
-                if((frames!=null)&&(frames.size()>0)){
-                  ArrayList<File>filesFrames= ocr.makeFilesFrames(frames);
-                  //if (ocr.getTextFrames(filesFrames)!=null) {
-                  ocrRemarks = ocr.getTextFrames(filesFrames, context);
-                  if(ocrRemarks==null)ocrRemarks="";
-                  System.out.println("I found OCR remarks: "+ocrRemarks);
-                  //}
-                  //else {
-                  //  ocrRemarks= "";
-                  //}
-                }
-              }
-              else{
-                System.out.println("I could not find any frames from YouTubeAssetStore.findFrames for asset:"+myAsset.getId()+" from Encounter "+myEnc.getCatalogNumber());
-              }
-            }
-          }
-        }
-        catch (Exception e) {
-          e.printStackTrace();
-          System.out.println("I hit an exception trying to find ocrRemarks.");
-        }
-
-        if(enc.getOccurrenceRemarks()!=null){
-
-          String remarks=ytRemarks+" "+enc.getRComments().trim().toLowerCase()+" "+ ocrRemarks.toLowerCase();
-
-          System.out.println("Let's parse these remarks for date and location: "+remarks);
-
-          Properties props = new Properties();
-
-          //OK, let's check the comments and tags for retrievable metadata
-          try {
-
-
-            //first parse for location and locationID
-            try{
-              props=ShepherdProperties.getProperties("submitActionClass.properties", "",context);
-              Enumeration m_enum = props.propertyNames();
-              while (m_enum.hasMoreElements()) {
-                String aLocationSnippet = ((String) m_enum.nextElement()).trim();
-                System.out.println("     Looking for: "+aLocationSnippet);
-                if (remarks.indexOf(aLocationSnippet) != -1) {
-                  locCode = props.getProperty(aLocationSnippet);
-                  location+=(aLocationSnippet+" ");
-                  System.out.println(".....Building an idea of location: "+location);
-                }
-              }
-
-            }
-            catch(Exception e){
-              e.printStackTrace();
-            }
-
-
-            //reset date to exclude OCR, which can currently confuse NLP
-            //remarks=ytRemarks+" "+enc.getRComments().trim().toLowerCase();
-
-
-
-            //reset remarks to avoid dates embedded in researcher comments
-            //              remarks=enc.getOccurrenceRemarks().trim().toLowerCase();
-            //if no one has set the date already, use NLP to try to figure it out
-            boolean setDate=true;
-            if(enc.getDateInMilliseconds()!=null){setDate=false;}
-            //next use natural language processing for date
-            if(setDate){
-              boolean NLPsuccess=false;
-              try{
-                System.out.println(">>>>>> looking for date with NLP");
-                //call Stanford NLP function to find and select a date from ytRemarks
-                String myDate= ServletUtilities.nlpDateParse(remarks);
-                System.out.println("Finished nlpPrseDate");;
-                //parse through the selected date to grab year, month and day separately.Remove cero from month and day with intValue.
-                if (myDate!=null) {
-                  System.out.println(">>>>>> NLP found date: "+myDate);
-                  //int numCharact= myDate.length();
-
-                  /*if(numCharact>=4){
-
-                  try{
-                  year=(new Integer(myDate.substring(0, 4))).intValue();
-                  NLPsuccess=true;
-
-                  if(numCharact>=7){
-                  try {
-                  month=(new Integer(myDate.substring(5, 7))).intValue();
-                  if(numCharact>=10){
-                  try {
-                  day=(new Integer(myDate.substring(8, 10))).intValue();
-                }
-                catch (Exception e) { day=-1; }
-              }
-              else{day=-1;}
-            }
-            catch (Exception e) { month=-1;}
-          }
-          else{month=-1;}
-
-        }
-        catch(Exception e){
+      } catch(java.net.URISyntaxException e){
         e.printStackTrace();
       }
+      String context = ServletUtilities.getContext(request);
+      if(baseUrl == null){
+        throw new IOException ("baseUrl is null in IAIntake");
+      }
+      return IAIntake(ann, myShepherd, context, baseUrl);
     }
-    */
 
-    //current datetime just for quality comparison
-    LocalDateTime dt = new LocalDateTime();
+    public static String IAIntake(Annotation ann, Shepherd myShepherd, String context, String baseUrl) throws ServletException, IOException {
+      JSONObject jin = new JSONObject();
+      JSONObject ja = new JSONObject();
+      JSONArray jaids = new JSONArray();
+      jaids.put(ann.getId());
+      ja.put("annotationIds", jaids);
+      jin.put("identify", ja);
+      JSONObject res = new JSONObject();
+      String taskId = Util.generateUUID();
+      res.put("taskId", taskId);
+      org.ecocean.servlet.IAGateway._doIdentify(jin, res, myShepherd, context, baseUrl);
+      System.out.println("IAIntake(identify:" + ann + ") [taskId=" + taskId + "] -> " + res);
+      return taskId;
+    }
 
-    DateTimeFormatter parser1 = ISODateTimeFormat.dateOptionalTimeParser();
-    LocalDateTime reportedDateTime=new LocalDateTime(parser1.parseLocalDateTime(myDate));
-    //System.out.println("     reportedDateTime is: "+reportedDateTime.toString(parser1));
-    StringTokenizer str=new StringTokenizer(myDate,"-");
-    int numTokens=str.countTokens();
-    System.out.println("     StringTokenizer for date has "+numTokens+" tokens for String input "+str.toString());
+    /*
+    public static String IAIntake(List<Annotation> anns, Shepherd myShepherd, HttpServletRequest request) throws ServletException, IOException {
+    System.out.println("* * * * * * * IAIntake(ident) NOT YET IMPLEMENTED ====> " + ann);
+    return Util.generateUUID();
+  }
+  */
 
-    if(numTokens>=1){
-      //try {
-      year=reportedDateTime.getYear();
-      if(year>(dt.getYear()+1)){
-        //badDate=true;
-        year=-1;
-        //throw new Exception("    An unknown exception occurred during date processing in EncounterForm. The user may have input an improper format: "+year+" > "+dt.getYear());
+  //this is called when a batch of encounters (which should be on this occurrence) were made from detection
+  // *as a group* ... see also Encounter.detectedAnnotation() for the one-at-a-time equivalent
+  public static void fromDetection(Occurrence occ, Shepherd myShepherd, String context)  {
+    System.out.println(">>>>>> detection created " + occ.toString());
+
+    //set the locationID/location/date on all encounters by inspecting detected comments on the first encounter
+    if((occ.getEncounters()!=null)&&(occ.getEncounters().get(0)!=null)){
+
+
+      String locCode=null;
+      String location="";
+      int year=-1;
+      int month=-1;
+      int day=-1;
+      List<Encounter> encounters=occ.getEncounters();
+      int numEncounters=encounters.size();
+      Encounter enc=encounters.get(0);
+      String ytRemarks=enc.getOccurrenceRemarks().trim().toLowerCase();
+
+      String detectedLanguage="en";
+      try{
+        detectedLanguage= DetectTranslate.detect(ytRemarks, context);
+
+        if(!detectedLanguage.toLowerCase().startsWith("en")){
+          ytRemarks= DetectTranslate.translate(ytRemarks, context);
+        }
+      }
+      catch(Exception e){
+        System.out.println("I hit an exception trying to detect language.");
+        e.printStackTrace();
+      }
+      //grab texts from yt videos through OCR (before we parse for location/ID and Date) and add it to remarks variable.
+      String ocrRemarks="";
+      try {
+        if((occ.getEncounters()!=null)&&(occ.getEncounters().size()>0)){
+          Encounter myEnc=occ.getEncounters().get(0);
+          List<MediaAsset> assets= myEnc.getMedia();
+          if((assets!=null)&&(assets.size()>0)){
+            MediaAsset myAsset = assets.get(0);
+            MediaAsset parent = myAsset.getParent(myShepherd);
+            if(parent!=null){
+              ArrayList<MediaAsset> frames= YouTubeAssetStore.findFrames(parent, myShepherd);
+              if((frames!=null)&&(frames.size()>0)){
+                ArrayList<File>filesFrames= ocr.makeFilesFrames(frames);
+                //if (ocr.getTextFrames(filesFrames)!=null) {
+                ocrRemarks = ocr.getTextFrames(filesFrames, context);
+                if(ocrRemarks==null)ocrRemarks="";
+                System.out.println("I found OCR remarks: "+ocrRemarks);
+                //}
+                //else {
+                //  ocrRemarks= "";
+                //}
+              }
+            }
+            else{
+              System.out.println("I could not find any frames from YouTubeAssetStore.findFrames for asset:"+myAsset.getId()+" from Encounter "+myEnc.getCatalogNumber());
+            }
+          }
+        }
+      }
+      catch (Exception e) {
+        e.printStackTrace();
+        System.out.println("I hit an exception trying to find ocrRemarks.");
       }
 
-      //} catch (Exception e) { year=-1;}
-    }
-    if(numTokens>=2){
-      try { month=reportedDateTime.getMonthOfYear(); } catch (Exception e) { month=-1;}
-    }
-    else{month=-1;}
-    //see if we can get a day, because we do want to support only yyy-MM too
-    if(str.countTokens()>=3){
-      try { day=reportedDateTime.getDayOfMonth(); } catch (Exception e) { day=0; }
-    }
-    else{day=-1;}
+      if(enc.getOccurrenceRemarks()!=null){
+
+        String remarks=ytRemarks+" "+enc.getRComments().trim().toLowerCase()+" "+ ocrRemarks.toLowerCase();
+
+        System.out.println("Let's parse these remarks for date and location: "+remarks);
+
+        Properties props = new Properties();
+
+        //OK, let's check the comments and tags for retrievable metadata
+        try {
 
 
+          //first parse for location and locationID
+          try{
+            props=ShepherdProperties.getProperties("submitActionClass.properties", "",context);
+            Enumeration m_enum = props.propertyNames();
+            while (m_enum.hasMoreElements()) {
+              String aLocationSnippet = ((String) m_enum.nextElement()).trim();
+              System.out.println("     Looking for: "+aLocationSnippet);
+              if (remarks.indexOf(aLocationSnippet) != -1) {
+                locCode = props.getProperty(aLocationSnippet);
+                location+=(aLocationSnippet+" ");
+                System.out.println(".....Building an idea of location: "+location);
+              }
+            }
+
+          }
+          catch(Exception e){
+            e.printStackTrace();
+          }
+
+
+          //reset date to exclude OCR, which can currently confuse NLP
+          //remarks=ytRemarks+" "+enc.getRComments().trim().toLowerCase();
+
+
+
+          //reset remarks to avoid dates embedded in researcher comments
+          //              remarks=enc.getOccurrenceRemarks().trim().toLowerCase();
+          //if no one has set the date already, use NLP to try to figure it out
+          boolean setDate=true;
+          if(enc.getDateInMilliseconds()!=null){setDate=false;}
+          //next use natural language processing for date
+          if(setDate){
+            boolean NLPsuccess=false;
+            try{
+              System.out.println(">>>>>> looking for date with NLP");
+              //call Stanford NLP function to find and select a date from ytRemarks
+              String myDate= ServletUtilities.nlpDateParse(remarks);
+              System.out.println("Finished nlpPrseDate");;
+              //parse through the selected date to grab year, month and day separately.Remove cero from month and day with intValue.
+              if (myDate!=null) {
+                System.out.println(">>>>>> NLP found date: "+myDate);
+                //int numCharact= myDate.length();
+
+                /*if(numCharact>=4){
+
+                try{
+                year=(new Integer(myDate.substring(0, 4))).intValue();
+                NLPsuccess=true;
+
+                if(numCharact>=7){
+                try {
+                month=(new Integer(myDate.substring(5, 7))).intValue();
+                if(numCharact>=10){
+                try {
+                day=(new Integer(myDate.substring(8, 10))).intValue();
+              }
+              catch (Exception e) { day=-1; }
+            }
+            else{day=-1;}
+          }
+          catch (Exception e) { month=-1;}
+        }
+        else{month=-1;}
+
+      }
+      catch(Exception e){
+      e.printStackTrace();
+    }
   }
+  */
 
-  //                      Parser parser = new Parser();
-  //                      List groups = parser.parse(ytRemarks);
-  //                      int numGroups=groups.size();
-  //                      //just grab the first group
-  //                      if(numGroups>0){
-  //                          List<Date> dates = ((DateGroup)groups.get(0)).getDates();
-  //                          int numDates=dates.size();
-  //                          if(numDates>0){
-  //                            Date myDate=dates.get(0);
-  //                            LocalDateTime dt = LocalDateTime.fromDateFields(myDate);
-  //                            String detectedDate=dt.toString().replaceAll("T", "-");
-  //                            System.out.println(">>>>>> NLP found date: "+detectedDate);
-  //                            StringTokenizer str=new StringTokenizer(detectedDate,"-");
-  //                            int numTokens=str.countTokens();
-  //                            if(numTokens>=1){
-  //                              NLPsuccess=true;
-  //                              year=(new Integer(str.nextToken())).intValue();
-  //                            }
-  //                            if(numTokens>=2){
-  //                              try { month=(new Integer(str.nextToken())).intValue();
-  //                              } catch (Exception e) { month=-1;}
-  //                            }
-  //                            else{month=-1;}
-  //                            if(numTokens>=3){
-  //                              try {
-  //                                String myToken=str.nextToken();
-  //                                day=(new Integer(myToken.replaceFirst("^0+(?!$)", ""))).intValue(); } catch (Exception e) { day=-1; }
-  //                            }
-  //                            else{day=-1;}
-  //                        }
-  //                    }
+  //current datetime just for quality comparison
+  LocalDateTime dt = new LocalDateTime();
+
+  DateTimeFormatter parser1 = ISODateTimeFormat.dateOptionalTimeParser();
+  LocalDateTime reportedDateTime=new LocalDateTime(parser1.parseLocalDateTime(myDate));
+  //System.out.println("     reportedDateTime is: "+reportedDateTime.toString(parser1));
+  StringTokenizer str=new StringTokenizer(myDate,"-");
+  int numTokens=str.countTokens();
+  System.out.println("     StringTokenizer for date has "+numTokens+" tokens for String input "+str.toString());
+
+  if(numTokens>=1){
+    //try {
+    year=reportedDateTime.getYear();
+    if(year>(dt.getYear()+1)){
+      //badDate=true;
+      year=-1;
+      //throw new Exception("    An unknown exception occurred during date processing in EncounterForm. The user may have input an improper format: "+year+" > "+dt.getYear());
+    }
+
+    //} catch (Exception e) { year=-1;}
+  }
+  if(numTokens>=2){
+    try { month=reportedDateTime.getMonthOfYear(); } catch (Exception e) { month=-1;}
+  }
+  else{month=-1;}
+  //see if we can get a day, because we do want to support only yyy-MM too
+  if(str.countTokens()>=3){
+    try { day=reportedDateTime.getDayOfMonth(); } catch (Exception e) { day=0; }
+  }
+  else{day=-1;}
+
+
+}
+
+//                      Parser parser = new Parser();
+//                      List groups = parser.parse(ytRemarks);
+//                      int numGroups=groups.size();
+//                      //just grab the first group
+//                      if(numGroups>0){
+//                          List<Date> dates = ((DateGroup)groups.get(0)).getDates();
+//                          int numDates=dates.size();
+//                          if(numDates>0){
+//                            Date myDate=dates.get(0);
+//                            LocalDateTime dt = LocalDateTime.fromDateFields(myDate);
+//                            String detectedDate=dt.toString().replaceAll("T", "-");
+//                            System.out.println(">>>>>> NLP found date: "+detectedDate);
+//                            StringTokenizer str=new StringTokenizer(detectedDate,"-");
+//                            int numTokens=str.countTokens();
+//                            if(numTokens>=1){
+//                              NLPsuccess=true;
+//                              year=(new Integer(str.nextToken())).intValue();
+//                            }
+//                            if(numTokens>=2){
+//                              try { month=(new Integer(str.nextToken())).intValue();
+//                              } catch (Exception e) { month=-1;}
+//                            }
+//                            else{month=-1;}
+//                            if(numTokens>=3){
+//                              try {
+//                                String myToken=str.nextToken();
+//                                day=(new Integer(myToken.replaceFirst("^0+(?!$)", ""))).intValue(); } catch (Exception e) { day=-1; }
+//                            }
+//                            else{day=-1;}
+//                        }
+//                    }
 }
 catch(Exception e){
   System.out.println("Exception in NLP in IBEISIA.class");

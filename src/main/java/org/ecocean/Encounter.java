@@ -2344,12 +2344,12 @@ System.out.println(" (final)cluster [" + groupsMade + "] -> " + newEnc);
             //set the video ID as the EventID for distinct access later
             newEnc.setEventID("youtube:"+parentRoot.getParameters().optString("id"));
             if ((parentRoot.getMetadata() != null) && (parentRoot.getMetadata().getData() != null)) {
-                
+
                 if (parentRoot.getMetadata().getData().optJSONObject("basic") != null) {
                     newEnc.setSubmitterName(parentRoot.getMetadata().getData().getJSONObject("basic").optString("author_name", "[unknown]") + " (by way of YouTube)");
                     consolidatedRemarks+="<p>From YouTube video: <i>" + parentRoot.getMetadata().getData().getJSONObject("basic").optString("title", "[unknown]") + "</i></p>";
                     newEnc.addComments(consolidatedRemarks);
-                    
+
                     //add a dynamic property to make a quick link to the video
                 }
                 if (parentRoot.getMetadata().getData().optJSONObject("detailed") != null) {
@@ -2358,7 +2358,7 @@ System.out.println(" (final)cluster [" + groupsMade + "] -> " + newEnc);
                         desc += "<p><b>tags:</b> " + parentRoot.getMetadata().getData().getJSONObject("detailed").getJSONArray("tags").toString() + "</p>";
                     }
                     consolidatedRemarks+=desc;
-                    
+
                 }
             }
             newEnc.setOccurrenceRemarks(consolidatedRemarks);
@@ -2425,7 +2425,7 @@ System.out.println(" (final)cluster [" + groupsMade + "] -> " + newEnc);
     //down-n-dirty with no myShepherd passed!  :/
     public ArrayList<MediaAsset> findAllMediaByFeatureId(String[] featureIds) {
         Shepherd myShepherd = new Shepherd("context0");
-        myShepherd.setAction("Encounter.class.findAllMediaByFeatureID");  
+        myShepherd.setAction("Encounter.class.findAllMediaByFeatureID");
         myShepherd.beginDBTransaction();
         ArrayList<MediaAsset> all = findAllMediaByFeatureId(myShepherd, featureIds);
         myShepherd.rollbackDBTransaction();
@@ -2939,7 +2939,8 @@ throw new Exception();
 
     //ann is the Annotation that was created after IA detection.  mostly this is just to notify... someone
     //  note: this is for singly-made encounters; see also Occurrence.fromDetection()
-    public void detectedAnnotation(Shepherd myShepherd, HttpServletRequest request, Annotation ann) {
+    public void detectedAnnotation(Shepherd myShepherd, String context, String rootDir, Annotation ann) {
+      //@TODO Jon, I changed the signature of this so that it would avoid using request as an argument here. I don't know which, if either, of context or rootDir you might need here. -Mark F.
 System.out.println(">>>>> detectedAnnotation() on " + this);
     }
 

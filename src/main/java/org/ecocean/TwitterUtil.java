@@ -39,8 +39,7 @@ import twitter4j.Status;
 public class TwitterUtil {
   private static TwitterFactory tfactory = null;
 
-  public static Twitter init(HttpServletRequest request) {
-    String context = ServletUtilities.getContext(request);
+  public static Twitter init(String context) {
     tfactory = getTwitterFactory(context);
     System.out.println("INFO: initialized TwitterUtil.tfactory");
     return tfactory.getInstance();
@@ -296,7 +295,7 @@ public class TwitterUtil {
   }
 
 
-  public static void addDetectionAndIdentificationTweetToQueue(String screenName, String imageUrl, Twitter twitterInst, String whaleId, boolean detected, boolean identified, String info, HttpServletRequest request, String pathToQueueFile){
+  public static void addDetectionAndIdentificationTweetToQueue(String screenName, String imageUrl, Twitter twitterInst, String whaleId, boolean detected, boolean identified, String info, String rootDir, String pathToQueueFile){
     System.out.println("Entered addDetectionAndIdentificationTweetToQueue");
     String tweet = null, tweet2 = null;
     if(detected && identified){
@@ -315,7 +314,7 @@ public class TwitterUtil {
       addTweetToQueue(tweet2, twitterInst, pathToQueueFile);
       try{
         System.out.println("Entered try for removeEntryFromPendingIaByImageUrl");
-        removeEntryFromPendingIaByImageUrl(imageUrl, request);
+        removeEntryFromPendingIaByImageUrl(imageUrl, rootDir);
         System.out.println("Got past try for removeEntryFromPendingIaByImageUrl");
       } catch(Exception f){
         System.out.println("removeEntryFromPendingIaByImageId failed inside addDetectionAndIdentificationTweetToQueue method");
@@ -327,7 +326,7 @@ public class TwitterUtil {
     }
   }
 
-  public static void addTimeoutTweetToQueue(String screenName, Twitter twitterInst, String imageUrl,  HttpServletRequest request, String pathToQueueFile) {
+  public static void addTimeoutTweetToQueue(String screenName, Twitter twitterInst, String imageUrl, String rootDir, String pathToQueueFile) {
     String reply = "@" + screenName + ", analysis for image " + imageUrl + " couldn't be processed within 24 hrs.";
     String reply2 = "@" + screenName + ", if you'd like to make a manual submission, please go to http://www.flukebook.org/submit.jsp";
     try {
@@ -335,7 +334,7 @@ public class TwitterUtil {
       addTweetToQueue(reply2, twitterInst, pathToQueueFile);
       try{
         System.out.println("Entered try for removeEntryFromPendingIaByImageUrl");
-        removeEntryFromPendingIaByImageUrl(imageUrl, request);
+        removeEntryFromPendingIaByImageUrl(imageUrl, rootDir);
         System.out.println("Got past try for removeEntryFromPendingIaByImageUrl");
       } catch(Exception f){
         System.out.println("removeEntryFromPendingIaByImageId failed inside addDetectionAndIdentificationTweetToQueue method");
@@ -369,41 +368,29 @@ public class TwitterUtil {
     return new JSONArray(list);
   }
 
-  public static void removeEntryFromPendingIaByImageUrl(String imageUrl, HttpServletRequest request) throws Exception{
+  public static void removeEntryFromPendingIaByImageUrl(String imageUrl, String rootDir) throws Exception{
     try{
-      removeEntryFromPendingIaByGenericString("photoUrl", imageUrl, request);
+      removeEntryFromPendingIaByGenericString("photoUrl", imageUrl, rootDir);
     } catch(Exception e){
       e.printStackTrace();
       throw new Exception ("removeEntryFromPendingIaByImageUrl in TwitterUtil.java failed");
     }
   }
 
-  public static void removeEntryFromPendingIaByImageId(String imageId, HttpServletRequest request) throws Exception{
+  public static void removeEntryFromPendingIaByImageId(String imageId, String rootDir) throws Exception{
     try{
-      removeEntryFromPendingIaByGenericString("photoId", imageId, request);
+      removeEntryFromPendingIaByGenericString("photoId", imageId, rootDir);
     } catch(Exception e){
       e.printStackTrace();
       throw new Exception ("removeEntryFromPendingIaByImageId in TwitterUtil.java failed");
     }
   }
 
-  public static void removeEntryFromPendingIaByGenericString(String targetLabel, String id, HttpServletRequest request) throws Exception{ //TODO this is ugly and could be made DRYer -Mark F.
+  public static void removeEntryFromPendingIaByGenericString(String targetLabel, String id, String rootDir) throws Exception{ //TODO this is ugly and could be made DRYer -Mark F.
     System.out.println("Entered removeEntryFromPendingIaByGenericString");
     ArrayList<JSONObject> list = new ArrayList<>();
     String iaPendingResultsFile = "/pendingAssetsIA.json";
     JSONArray iaPendingResults = null;
-    String rootDir = null;
-    try{
-      rootDir = request.getSession().getServletContext().getRealPath("/");
-    } catch(Exception e){
-      try{
-        rootDir = "/var/lib/tomcat7/webapps/wildbook/"; //TODO again, a terrible way to do this -Mark F.
-        // e.printStackTrace();
-      } catch(Exception f){
-        System.out.println("Can't find rootdir in removeEntryFromPendingIaByGenericString in TwitterUtil.java");
-        f.printStackTrace();
-      }
-    }
     String dataDir = ServletUtilities.dataDir("context0", rootDir);
     try {
       String iaPendingResultsAsString = Util.readFromFile(dataDir + iaPendingResultsFile);
@@ -416,14 +403,6 @@ public class TwitterUtil {
     for(int i = 0; i < iaPendingResults.length(); i++){
       System.out.println("got into entry for loop of removeEntryFromPendingIaByGenericString");
       JSONObject entry = iaPendingResults.getJSONObject(i);
-      try{ //TODO you can remove this whole try catch statement after October, 2017 -Mark F
-        System.out.println(targetLabel + " is: ");
-        System.out.println(entry.getString(targetLabel));
-        System.out.println ("id is: ");
-        System.out.println(id);
-      } catch(Exception e){
-        e.printStackTrace();
-      }
       if(entry.getString(targetLabel).equals(id)){
         System.out.println(targetLabel + " of " + id + " was detected in iaPendingResultsFile; removing now!");
         continue;
@@ -464,40 +443,28 @@ public class TwitterUtil {
     }
   }
 
-  public static String findImageIdInIaPendingLogFromTaskId(String taskId, HttpServletRequest request) throws Exception{
+  public static String findImageIdInIaPendingLogFromTaskId(String taskId, String rootDir) throws Exception{
     String returnVal = null;
     try{
-      return findGenericStringItemInIaPendingLogFromTaskId("photoId", taskId, request);
+      return findGenericStringItemInIaPendingLogFromTaskId("photoId", taskId, rootDir);
     } catch(Exception e){
       e.printStackTrace();
       throw new Exception ("findImageIdInIaPendingLogFromTaskId in TwitterUtil.java failed");
     }
   }
 
-  public static String findScreenNameInIaPendingLogFromTaskId(String taskId, HttpServletRequest request) throws Exception{
+  public static String findScreenNameInIaPendingLogFromTaskId(String taskId, String rootDir) throws Exception{
     String returnVal = null;
     try{
-      return findGenericStringItemInIaPendingLogFromTaskId("tweeterScreenName", taskId, request);
+      return findGenericStringItemInIaPendingLogFromTaskId("tweeterScreenName", taskId, rootDir);
     } catch(Exception e){
       e.printStackTrace();
       throw new Exception ("findScreenNameInIaPendingLogFromTaskId in TwitterUtil.java failed");
     }
   }
 
-  public static String findGenericStringItemInIaPendingLogFromTaskId(String target, String taskId, HttpServletRequest request) throws Exception{
+  public static String findGenericStringItemInIaPendingLogFromTaskId(String target, String taskId, String rootDir) throws Exception{
     String returnVal = null;
-    String rootDir = null;
-    try{
-      rootDir = request.getSession().getServletContext().getRealPath("/");
-    } catch(Exception e){
-      try{
-        rootDir = "/var/lib/tomcat7/webapps/wildbook/"; //TODO this is terrible, but I couldn't think of a better way. -Mark
-        // e.printStackTrace();
-      } catch(Exception f){
-        System.out.println("Can't find rootdir in findGenericStringItemInIaPendingLogFromTaskId in TwitterUtil.java");
-        f.printStackTrace();
-      }
-    }
     String dataDir = ServletUtilities.dataDir("context0", rootDir);
     String iaPendingResultsFile = "/pendingAssetsIA.json";
     try {
@@ -520,10 +487,10 @@ public class TwitterUtil {
     }
   }
 
-  public static String findImageUrlInIaPendingLogFromTaskId(String taskId, HttpServletRequest request) throws Exception{
+  public static String findImageUrlInIaPendingLogFromTaskId(String taskId, String rootDir) throws Exception{
     String returnVal = null;
     try{
-      return findGenericStringItemInIaPendingLogFromTaskId("photoUrl", taskId, request);
+      return findGenericStringItemInIaPendingLogFromTaskId("photoUrl", taskId, rootDir);
     } catch(Exception e){
       e.printStackTrace();
       throw new Exception ("findImageUrlInIaPendingLogFromTaskId in TwitterUtil.java failed");

@@ -330,7 +330,7 @@ if(iaPendingResults != null){
 
     if(interval.toDuration().getStandardHours() >= 72){
 
-    	TwitterUtil.addTimeoutTweetToQueue(pendingResult.getString("tweeterScreenName"), twitterInst, pendingResult.getString("photoUrl"), request, pathToQueueFile);
+    	TwitterUtil.addTimeoutTweetToQueue(pendingResult.getString("tweeterScreenName"), twitterInst, pendingResult.getString("photoUrl"), rootDir, pathToQueueFile);
       //Note that sendTimeoutTweet calls removeEntryFromPendingIaByImageUrl.
     }
   }
