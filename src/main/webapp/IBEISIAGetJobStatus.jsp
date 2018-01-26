@@ -44,7 +44,7 @@
 
   } else {
 
-    runIt(jobID, context, rootDir);
+    runIt(jobID, context, rootDir, baseUrl);
     out.println("{\"success\": true}");
     System.out.println("((((all done with main thread))))");
   }
@@ -55,13 +55,13 @@
 
   <%!
 
-  private void runIt(final String jobID, final String context, final String rootDir) {
+  private void runIt(final String jobID, final String context, final String rootDir, final String baseUrl) {
     System.out.println("---<< jobID=" + jobID + ", trying spawn . . . . . . . . .. . .................................");
 
     Runnable r = new Runnable() {
       public void run() {
         try {
-          tryToGet(jobID, context, rootDir);
+          tryToGet(jobID, context, rootDir, baseUrl);
         } catch (Exception ex) {
           System.out.println("tryToGet(" + jobID + ") got exception " + ex);
         }
@@ -74,7 +74,7 @@
     return;
   }
 
-  private void tryToGet(String jobID, String context, String rootDir) throws JSONException {
+  private void tryToGet(String jobID, String context, String rootDir, String baseUrl) throws JSONException {
     System.out.println("<<<<<<<<<< tryToGet(" + jobID + ")----");
     JSONObject statusResponse = new JSONObject();
     //if (jobID != null) return;
@@ -103,7 +103,7 @@
 
     jlog.put("_action", "getJobStatus");
     jlog.put("_response", statusResponse);
-    
+
 
     IBEISIA.log(taskID, jobID, jlog, context);
 
