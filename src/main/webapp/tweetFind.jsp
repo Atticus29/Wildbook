@@ -53,7 +53,7 @@ try {
 
 JSONObject rtn = new JSONObject("{\"success\": false}");
 
-Twitter twitterInst = TwitterUtil.init(request);
+Twitter twitterInst = TwitterUtil.init(context);
 
 Shepherd myShepherd = new Shepherd(ServletUtilities.getContext(request));
 myShepherd.setAction("tweetFind.jsp");
@@ -273,7 +273,7 @@ if(iaPendingResults != null){
     currentJobId = IBEISIA.findJobIDFromTaskID(currentTaskId, context);
     // currentJobId = "jobid-0797";
     System.out.println("current JobId is: " + currentJobId);
-    currentImageURL = TwitterUtil.findImageUrlInIaPendingLogFromTaskId(pendingResult.getString("taskId"),request);
+    currentImageURL = TwitterUtil.findImageUrlInIaPendingLogFromTaskId(pendingResult.getString("taskId"),rootDir);
 
     try{
       String status = IBEISIA.getJobStatus(currentJobId, context).getJSONObject("response").getString("jobstatus");
