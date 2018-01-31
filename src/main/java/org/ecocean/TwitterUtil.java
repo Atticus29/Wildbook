@@ -250,7 +250,7 @@ public class TwitterUtil {
       for(int i=0; i<mas.size(); i++){
         System.out.println("Total number of media assets to looop through in saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis: " + Integer.toString(mas.size()));
         MediaAsset ent = mas.get(i);
-        myShepherd.beginDBTransaction();
+        // myShepherd.beginDBTransaction();
         try {
           JSONObject ej = new JSONObject();
           // MediaAssetMetadata entMd = ent.updateMetadata();
@@ -281,7 +281,7 @@ public class TwitterUtil {
           jent.put(ej);
           iaPendingResults.put(ej);
           // myShepherd.getPM().makePersistent(ej); //maybe?
-          myShepherd.commitDBTransaction();
+          // myShepherd.commitDBTransaction();
         } catch(Exception e){
           myShepherd.rollbackDBTransaction();
           System.out.println("something went wrong in the big series of commands in saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis");
