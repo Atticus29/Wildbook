@@ -678,10 +678,9 @@ System.out.println("anns -> " + anns);
         JSONArray taskList = new JSONArray();
 /* currently we are sending annotations one at a time (one per query list) but later we will have to support clumped sets...
    things to consider for that - we probably have to further subdivide by species ... other considerations?   */
-        for (Annotation ann : anns) {
-            JSONObject queryConfigDict = IBEISIA.queryConfigDict(myShepherd, ann.getSpecies(), opt);
-            JSONObject taskRes = _sendIdentificationTask(ann, context, baseUrl, queryConfigDict, null, -1,
-                                                         ((anns.size() == 1) ? taskId : null));  //we use passed taskId if only 1 ann but generate otherwise
+        for (Annotation annEnum : anns) {
+            JSONObject queryConfigDict = IBEISIA.queryConfigDict(myShepherd, annEnum.getSpecies(), null);
+            JSONObject taskRes = _sendIdentificationTask(annEnum, context, baseUrl, queryConfigDict, null, -1, ((anns.size() == 1) ? taskId : null));  //we use passed taskId if only 1 ann but generate otherwise
             taskList.put(taskRes);
         }
         res.put("tasks", taskList);
