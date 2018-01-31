@@ -665,6 +665,30 @@ System.out.println("anns -> " + anns);
     }
 
 
+    //this takes in a single annotation, cuz IBEISIA.IAIntake needed to pass an *uncommitted* shepherd.  its complicated. :)
+    public static JSONObject _doIdentify(Annotation ann, JSONObject res, Shepherd myShepherd, String context, String baseUrl) throws ServletException, IOException {
+        if (res == null) throw new RuntimeException("IAGateway._doIdentify() called without res passed in");
+        String taskId = res.optString("taskId", null);
+        if (taskId == null) throw new RuntimeException("IAGateway._doIdentify() has no taskId passed in");
+        if (baseUrl == null) return res;
+        ArrayList<Annotation> anns = new ArrayList<Annotation>();  //what we ultimately run on.  occurrences are irrelevant now right?
+        ArrayList<String> validIds = new ArrayList<String>();
+        anns.add(ann);
+
+        JSONArray taskList = new JSONArray();
+/* currently we are sending annotations one at a time (one per query list) but later we will have to support clumped sets...
+   things to consider for that - we probably have to further subdivide by species ... other considerations?   */
+        for (Annotation ann : anns) {
+            JSONObject queryConfigDict = IBEISIA.queryConfigDict(myShepherd, ann.getSpecies(), opt);
+            JSONObject taskRes = _sendIdentificationTask(ann, context, baseUrl, queryConfigDict, null, -1,
+                                                         ((anns.size() == 1) ? taskId : null));  //we use passed taskId if only 1 ann but generate otherwise
+            taskList.put(taskRes);
+        }
+        res.put("tasks", taskList);
+        res.put("success", true);
+        return res;
+    }
+
     private static JSONObject _sendIdentificationTask(Annotation ann, String context, String baseUrl, JSONObject queryConfigDict,
                                                JSONObject userConfidence, int limitTargetSize, String annTaskId) throws IOException {
         String species = ann.getSpecies();

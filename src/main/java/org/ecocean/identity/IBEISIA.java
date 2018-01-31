@@ -2790,16 +2790,18 @@ public static void waitForIAPriming() {
     }
 
     public static String IAIntake(Annotation ann, Shepherd myShepherd, String context, String baseUrl) throws ServletException, IOException {
+/*
       JSONObject jin = new JSONObject();
       JSONObject ja = new JSONObject();
       JSONArray jaids = new JSONArray();
       jaids.put(ann.getId());
       ja.put("annotationIds", jaids);
       jin.put("identify", ja);
+*/
       JSONObject res = new JSONObject();
       String taskId = Util.generateUUID();
       res.put("taskId", taskId);
-      org.ecocean.servlet.IAGateway._doIdentify(jin, res, myShepherd, context, baseUrl);
+      org.ecocean.servlet.IAGateway._doIdentify(ann, res, myShepherd, context, baseUrl);
       System.out.println("IAIntake(identify:" + ann + ") [taskId=" + taskId + "] -> " + res);
       return taskId;
     }
