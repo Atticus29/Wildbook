@@ -1349,6 +1349,8 @@ public static void waitForTrainingJobs(ArrayList<String> taskIds, String context
             //TODO how to know *if* we should start identification
             // if(jann.optDouble("confidence", -1.0) >= getDetectionCutoffValue() && jann.optString("species", "unkown").equals("whale_fluke")){ //These criteria have actually already been satisfied above -Mark F.
             System.out.println("Detection found a whale fluke; sending to identification");
+            myShepherd.commitDBTransaction();
+            myShepherd.beginDBTransaction();
             ident.put(ann.getId(), IAIntake(ann, myShepherd, context, baseUrl));
             // }
           } catch (Exception ex) {
@@ -2790,18 +2792,16 @@ public static void waitForIAPriming() {
     }
 
     public static String IAIntake(Annotation ann, Shepherd myShepherd, String context, String baseUrl) throws ServletException, IOException {
-/*
       JSONObject jin = new JSONObject();
       JSONObject ja = new JSONObject();
       JSONArray jaids = new JSONArray();
       jaids.put(ann.getId());
       ja.put("annotationIds", jaids);
       jin.put("identify", ja);
-*/
       JSONObject res = new JSONObject();
       String taskId = Util.generateUUID();
       res.put("taskId", taskId);
-      org.ecocean.servlet.IAGateway._doIdentify(ann, res, myShepherd, context, baseUrl);
+      org.ecocean.servlet.IAGateway._doIdentify(jin, res, myShepherd, context, baseUrl);
       System.out.println("IAIntake(identify:" + ann + ") [taskId=" + taskId + "] -> " + res);
       return taskId;
     }
