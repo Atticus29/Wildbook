@@ -200,6 +200,7 @@ public class IBEISIA {
       map.get("image_uuid_list").add(toFancyUUID(ann.getMediaAsset().getUUID()));
       map.get("annot_uuid_list").add(toFancyUUID(ann.getUUID()));
       map.get("annot_species_list").add(ann.getSpecies());
+System.out.println("will this break????");
       String name = ann.findIndividualId(myShepherd);
       map.get("annot_name_list").add((name == null) ? "____" : name);
       markSent(ann);
@@ -1114,10 +1115,12 @@ public static void waitForTrainingJobs(ArrayList<String> taskIds, String context
     if (occ != null) myShepherd.getPM().makePersistent(occ);
     System.out.println("* createAnnotationFromIAResult() CREATED " + ann + " on Encounter " + enc.getCatalogNumber());
 
+/*
 System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
     for (Feature ft : ann.getFeatures()) {
       myShepherd.getPM().makePersistent(ft);
     }
+*/
 
     return ann;
   }
@@ -2676,6 +2679,7 @@ public static JSONObject queryConfigDict(Shepherd myShepherd, String species, JS
 private static String annotGetIndiv(Annotation ann, Shepherd myShepherd) {
   String id = cacheAnnotIndiv.get(ann.getId());
   if (id != null) return id;
+System.out.println("will this work???????????");
   id = ann.findIndividualId(myShepherd);
   cacheAnnotIndiv.put(ann.getId(), id);
   return id;
@@ -2796,16 +2800,18 @@ public static void waitForIAPriming() {
     }
 
     public static String IAIntake(Annotation ann, Shepherd myShepherd, String context, String baseUrl) throws ServletException, IOException {
+/*
       JSONObject jin = new JSONObject();
       JSONObject ja = new JSONObject();
       JSONArray jaids = new JSONArray();
       jaids.put(ann.getId());
       ja.put("annotationIds", jaids);
       jin.put("identify", ja);
+*/
       JSONObject res = new JSONObject();
       String taskId = Util.generateUUID();
       res.put("taskId", taskId);
-      org.ecocean.servlet.IAGateway._doIdentify(jin, res, myShepherd, context, baseUrl);
+      org.ecocean.servlet.IAGateway._doIdentify(ann, res, myShepherd, context, baseUrl);
       System.out.println("IAIntake(identify:" + ann + ") [taskId=" + taskId + "] -> " + res);
       return taskId;
     }
