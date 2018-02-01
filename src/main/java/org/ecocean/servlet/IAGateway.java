@@ -680,12 +680,57 @@ System.out.println("anns -> " + anns);
    things to consider for that - we probably have to further subdivide by species ... other considerations?   */
         for (Annotation annEnum : anns) {
             JSONObject queryConfigDict = IBEISIA.queryConfigDict(myShepherd, annEnum.getSpecies(), null);
-            JSONObject taskRes = _sendIdentificationTask(annEnum, context, baseUrl, queryConfigDict, null, -1, ((anns.size() == 1) ? taskId : null));  //we use passed taskId if only 1 ann but generate otherwise
+            JSONObject taskRes = _sendIdentificationTaskWithShepherd(myShepherd, annEnum, context, baseUrl, queryConfigDict, null, -1, ((anns.size() == 1) ? taskId : null));  //we use passed taskId if only 1 ann but generate otherwise
             taskList.put(taskRes);
         }
         res.put("tasks", taskList);
         res.put("success", true);
         return res;
+    }
+
+    private static JSONObject _sendIdentificationTaskWithShepherd(Shepherd myShepherd, Annotation ann, String context, String baseUrl, JSONObject queryConfigDict,
+                                               JSONObject userConfidence, int limitTargetSize, String annTaskId) throws IOException {
+        String species = ann.getSpecies();
+        if ((species == null) || (species.equals(""))) throw new IOException("species on Annotation " + ann + " invalid: " + species);
+        boolean success = true;
+        if (annTaskId == null) annTaskId = Util.generateUUID();
+        JSONObject taskRes = new JSONObject();
+        taskRes.put("taskId", annTaskId);
+        JSONArray jids = new JSONArray();
+        jids.put(ann.getId());  //for now there is only one
+        taskRes.put("annotationIds", jids);
+System.out.println("+ starting ident task " + annTaskId);
+        myShepherd.setAction("IAGateway._sendIdentificationTask");
+        try {
+            //TODO we might want to cache this examplars list (per species) yes?
+
+            ///note: this can all go away if/when we decide not to need limitTargetSize
+            ArrayList<Annotation> exemplars = null;
+            if (limitTargetSize > -1) {
+                exemplars = Annotation.getExemplars(species, myShepherd);
+                if ((exemplars == null) || (exemplars.size() < 10)) throw new IOException("suspiciously empty exemplar set for species " + species);
+                if (exemplars.size() > limitTargetSize) {
+                    System.out.println("WARNING: limited identification exemplar list size from " + exemplars.size() + " to " + limitTargetSize);
+                    exemplars = new ArrayList(exemplars.subList(0, limitTargetSize));
+                }
+                taskRes.put("exemplarsSize", exemplars.size());
+            }
+            ArrayList<Annotation> qanns = new ArrayList<Annotation>();
+            qanns.add(ann);
+            IBEISIA.waitForIAPriming();
+            JSONObject sent = IBEISIA.beginIdentifyAnnotations(qanns, exemplars, queryConfigDict, userConfidence, myShepherd, species, annTaskId, baseUrl);
+            ann.setIdentificationStatus(IBEISIA.STATUS_PROCESSING);
+            taskRes.put("beginIdentify", sent);
+            String jobId = null;
+            if ((sent.optJSONObject("status") != null) && sent.getJSONObject("status").optBoolean("success", false))
+                jobId = sent.optString("response", null);
+            taskRes.put("jobId", jobId);
+            IBEISIA.log(annTaskId, ann.getId(), jobId, new JSONObject("{\"_action\": \"initIdentify\"}"), context);
+        } catch (Exception ex) {
+            success = false;
+            throw new IOException(ex.toString());
+        }
+        return taskRes;
     }
 
     private static JSONObject _sendIdentificationTask(Annotation ann, String context, String baseUrl, JSONObject queryConfigDict,
