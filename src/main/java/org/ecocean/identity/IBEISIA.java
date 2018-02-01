@@ -1114,10 +1114,10 @@ public static void waitForTrainingJobs(ArrayList<String> taskIds, String context
     if (occ != null) myShepherd.getPM().makePersistent(occ);
     System.out.println("* createAnnotationFromIAResult() CREATED " + ann + " on Encounter " + enc.getCatalogNumber());
 
-System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
-    for (Feature ft : ann.getFeatures()) {
-      myShepherd.getPM().makePersistent(ft);
-    }
+// System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
+//     for (Feature ft : ann.getFeatures()) {
+//       myShepherd.getPM().makePersistent(ft);
+//     }
 
     return ann;
   }
