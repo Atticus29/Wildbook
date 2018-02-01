@@ -1113,6 +1113,12 @@ public static void waitForTrainingJobs(ArrayList<String> taskIds, String context
     myShepherd.getPM().makePersistent(enc);
     if (occ != null) myShepherd.getPM().makePersistent(occ);
     System.out.println("* createAnnotationFromIAResult() CREATED " + ann + " on Encounter " + enc.getCatalogNumber());
+
+System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
+    for (Feature ft : ann.getFeatures()) {
+      myShepherd.getPM().makePersistent(ft);
+    }
+
     return ann;
   }
 
@@ -1349,8 +1355,6 @@ public static void waitForTrainingJobs(ArrayList<String> taskIds, String context
             //TODO how to know *if* we should start identification
             // if(jann.optDouble("confidence", -1.0) >= getDetectionCutoffValue() && jann.optString("species", "unkown").equals("whale_fluke")){ //These criteria have actually already been satisfied above -Mark F.
             System.out.println("Detection found a whale fluke; sending to identification");
-            myShepherd.commitDBTransaction();
-            myShepherd.beginDBTransaction();
             ident.put(ann.getId(), IAIntake(ann, myShepherd, context, baseUrl));
             // }
           } catch (Exception ex) {
