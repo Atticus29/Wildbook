@@ -156,8 +156,8 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
 
   try{
     //@TODO add this back in
-    // ArrayList<String> locations = ParseDateLocation.parseLocation(tweetText, context);
-    // out.println(locations);
+    ArrayList<String> locations = ParseDateLocation.parseLocation(tweetText, context);
+    out.println(locations);
   } catch(Exception e){
     e.printStackTrace();
     continue;
@@ -165,6 +165,7 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
 
   try{
     ArrayList<String> dates = ParseDateLocation.parseDateToArrayList(tweetText,context);
+    out.println(dates);
     //TODO parseDateToArrayList may need to be updated (and overloaded?)?
   } catch(Exception e){
     e.printStackTrace();
@@ -192,22 +193,18 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
     continue;
   }
 
-  //sendPhotoSpecificCourtesyTweet will detect a photo in your tweet object and tweet the user an acknowledgement about this. If multiple images are sent in the same tweet, this response will only happen once. @TODO make this send photo URLs instead of IDs
+  //sendPhotoSpecificCourtesyTweet will detect a photo in your tweet object and tweet the user an acknowledgement about this. If multiple images are sent in the same tweet, this response will happen once per image.
   TwitterUtil.addPhotoSpecificCourtesyTweetToQueue(emedia, tweeterScreenName, twitterInst, pathToQueueFile);
 
   ArrayList<String> photoIds = TwitterUtil.getPhotoIds(emedia, tweeterScreenName, twitterInst);
   ArrayList<String> photoUrls = TwitterUtil.getPhotoUrls(emedia, tweeterScreenName, twitterInst);
-  // System.out.println(photoUrls);
-
-
-  //LEFT OFF HERE
   tj = TwitterUtil.makeParentTweetMediaAssetAndSave(myShepherd, tas, tweet, tj);
 
   // System.out.println("twitter obj:");
   // System.out.println(tj.toString());
 
 
-  //retrieve ma now that it has been saved
+  //retrieve ma now that it has been saved...wait. Has it been saved?? -M. Fisher 2.2.2018
   ma = tas.find(p, myShepherd);
   if (ma == null){
     out.println("Something went wrong ma has not been saved or retrieved correctly");
@@ -216,8 +213,8 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
   List<MediaAsset> mas = TwitterAssetStore.entitiesAsMediaAssetsGsonObj(ma, tweetID);
   // out.println(mas); //working as expected here
 
-  // dates = addPhotoDatesToPreviouslyParsedDates(dates, mas); //TODO write this/ think about when we want this to happen. We will ultimately add the dates and locations to encounter objects, so perhaps this should only occur downstream of successful detection? Another question is how to tack all of the previously-captured date candidates (or just the best one from ParseDateLocation.parseDate()?) onto each photo while keeping the photo-specific captured date strings attached to only their parent photo...
-  out.println("About to call saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis");
+  // dates = addPhotoDatesToPreviouslyParsedDates(dates, mas); //TODO write this/ think about when we want this to happen. We will ultimately add the dates and locations to encounter objects, so perhaps this should only occur downstream of successful detection? Another question is how to tack all of the previously-captured date candidates (or just the best one from ParseDateLocation.parseDate()?) onto each photo while keeping the photo-specific captured date strings attached to only their parent photo... does twitter give us access to this meta-data from its photos?
+  // out.println("About to call saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis");
   iaPendingResults = TwitterUtil.saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis(mas, tweetID, myShepherd, tj, request, tarr, iaPendingResults, photoIds, photoUrls);
   // out.println(iaPendingResults);
 	tarr.put(tj);
@@ -255,17 +252,13 @@ rtn.put("data", tarr);
 if(iaPendingResults != null){
 	// TODO: check if IA has finished processing the pending results
 
-
-
-  //TODO: check if there are any entries that are older than 24 hours, tweet user, and remove
-
   JSONObject pendingResult = null;
   String currentJobId = null;
   String currentImageURL = null;
   String currentTaskId = null;
-  Boolean curlStatus = null;
-  String currentIPAddress = "54.68.97.153"; //@TODO put this somewhere more permanent
-  String getJobStatusBaseURL = "http://" + currentIPAddress + "/IBEISIAGetJobStatus.jsp?jobid=";
+  // Boolean curlStatus = null;
+  // String currentIPAddress = "54.68.97.153"; //@TODO put this somewhere more permanent
+  // String getJobStatusBaseURL = "http://" + currentIPAddress + "/IBEISIAGetJobStatus.jsp?jobid=";
   for(int i = 0; i<iaPendingResults.length(); i++){
     pendingResult = iaPendingResults.getJSONObject(i);
     currentTaskId = pendingResult.getString("taskId");
@@ -291,7 +284,7 @@ if(iaPendingResults != null){
         IBEISIA.processCallback(currentTaskId, jobResult, request);
 
         //@TODO move code block below into IBEISIA.java?? Or move some of that stuff here? It's weird that half of it is there and half is here
-        //@TODO find out where the jobId and taskId for an identification are given out, and make sure that's added to pendingResults
+
         // if(TwitterUtil.isSuccessfulDetection(jobResult)){
         //   //Do nothing. Wait for it to return an identification result.
         // } else {
@@ -308,35 +301,27 @@ if(iaPendingResults != null){
         //   //@TODO add an encounter to the markedIndividualID
         // }
       } else if (status.equals("unknown")){
-        //Ignore and let it try until 72 hours pass?
+        //Ignore and let it try until 72 hours pass
       }
     } catch(Exception e){
       //@TODO this is the case where IBEIS is not responding. Do nothing = keep it on the list for next time (unless it's old, which is handled below)
       e.printStackTrace();
     }
 
-    //@TODO change the curl call below to IBEISIA.getJobStatus(String jobid, String context), then, if status is error tweet about it and drop from iaPendingResults. If ok, use IBEISIA.getJobResult(String jobid, String context)
+    //@TODO if status is error tweet about it and drop from iaPendingResults. If ok, use IBEISIA.getJobResult(String jobid, String context)
     //these can possibly throw exceptions (like IA has gone away) so best to catch those too.  i guess that was case 0 on the whiteboard
 
     //@TODO add check for results and confidences having the same number of elements
 
-    // String[] cmd = {"curl", getJobStatusBaseURL + currentJobId};
-    // Process p = Runtime.getRuntime().exec(cmd);
-
     DateTime resultCreation = new DateTime(pendingResult.getString("creationDate"));
     DateTime timeNow = new DateTime();
     Interval interval = new Interval(resultCreation, timeNow);
-
-
     if(interval.toDuration().getStandardHours() >= 72){
-
     	TwitterUtil.addTimeoutTweetToQueue(pendingResult.getString("tweeterScreenName"), twitterInst, pendingResult.getString("photoUrl"), rootDir, pathToQueueFile);
       //Note that sendTimeoutTweet calls removeEntryFromPendingIaByImageUrl.
     }
   }
-
 } else {
-
 	iaPendingResults = new JSONArray();
 }
 // END PENDING IA RETRIEVAL
@@ -345,8 +330,7 @@ if(iaPendingResults != null){
 System.out.println("ABOUT TO COMMIT");
 myShepherd.commitDBTransaction();
 
-//@TODO change this number to that from the limit call to the API
-//@ATTN this is currently running 1 tweet per minute (assuming the cron job is per minute). It's a precaution if you can't ever see the API limit status call decrementing and use that as your count of how many tweets are remaining
+//@TODO change this number to that from the limit call to the API...assuming this ever tells the truth! This is currently running 1 tweet per minute (assuming the cron job is per minute). It's a very conservative precaution if you can't ever see the API limit status call decrementing and use that as your count of how many tweets are remaining
 TwitterUtil.sendThisManyTweetsFromTheQueue(1, dataDir + tweetQueueFile, twitterInst);
 Map<String,RateLimitStatus> rateLimitStatusMap = twitterInst.getRateLimitStatus();
 System.out.println(rateLimitStatusMap);
