@@ -1359,7 +1359,7 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
             // if(jann.optDouble("confidence", -1.0) >= getDetectionCutoffValue() && jann.optString("species", "unkown").equals("whale_fluke")){ //These criteria have actually already been satisfied above -Mark F.
             System.out.println("Detection found a whale fluke; sending to identification");
             String newTaskID = IAIntake(ann, myShepherd, context, baseUrl);
-            TwitterUtil.updatePendingResultsWithNewIdentificationTaskID(oldTaskID, newTaskID, rootDir);
+            TwitterUtil.updatePendingResultsWithNewIdentificationTaskID(taskID, newTaskID, rootDir);
             ident.put(ann.getId(), newTaskID);
             // }
           } catch (Exception ex) {
