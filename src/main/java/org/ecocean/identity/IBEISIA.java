@@ -206,6 +206,7 @@ System.out.println("will this break????");
       markSent(ann);
       ct++;
     }
+System.out.println("MAP#################################################################################"); System.out.println(map);
     myShepherd.commitDBTransaction();
     myShepherd.closeDBTransaction();
 
