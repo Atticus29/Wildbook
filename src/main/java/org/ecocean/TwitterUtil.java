@@ -653,4 +653,25 @@ public class TwitterUtil {
       throw new Exception("pathToQueueFile was null in removeTweetFromQueue method");
     }
   }
+
+  public static void updatePendingResultsWithNewIdentificationTaskID(String oldTaskId, String newTaskId, String rootDir){
+    JSONArray returnVal = null;
+    String dataDir = ServletUtilities.dataDir("context0", rootDir);
+    String iaPendingResultsFile = "/pendingAssetsIA.json";
+    JSONArray newJSONArray = new JSONArray();
+    try {
+    	String iaPendingResultsAsString = Util.readFromFile(dataDir + iaPendingResultsFile);
+    	JSONArray iaPendingResults = new JSONArray(iaPendingResultsAsString);
+      for(int i =0; i<iaPendingResults.length(); i++){
+        JSONObject entry = iaPendingResults.getJSONObject(i);
+        if (entry.getString("taskId").equals(oldTaskId)){
+          entry.put("taskId", newTaskId);
+        }
+        newJSONArray.put(entry);
+      }
+      Util.writeToFile(newJSONArray.toString(), dataDir + iaPendingResultsFile);
+    } catch(Exception e){
+    	e.printStackTrace();
+    }
+  }
 }

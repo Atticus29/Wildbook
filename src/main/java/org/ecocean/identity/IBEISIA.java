@@ -1358,7 +1358,9 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
             //TODO how to know *if* we should start identification
             // if(jann.optDouble("confidence", -1.0) >= getDetectionCutoffValue() && jann.optString("species", "unkown").equals("whale_fluke")){ //These criteria have actually already been satisfied above -Mark F.
             System.out.println("Detection found a whale fluke; sending to identification");
-            ident.put(ann.getId(), IAIntake(ann, myShepherd, context, baseUrl));
+            String newTaskID = IAIntake(ann, myShepherd, context, baseUrl);
+            TwitterUtil.updatePendingResultsWithNewIdentificationTaskID(oldTaskID, newTaskID, rootDir);
+            ident.put(ann.getId(), newTaskID);
             // }
           } catch (Exception ex) {
             System.out.println("WARNING: IAIntake threw exception " + ex);
