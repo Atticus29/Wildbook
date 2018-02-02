@@ -231,7 +231,7 @@ System.out.println("======================== postStream -> " + jtext);
                 System.out.println("caught exception on key " + key + ": " + uee.toString());
             }
         }
-//////System.out.println("------- getPostDataString=(\n" + result.toString() + "\n)--------\n");
+System.out.println("------- getPostDataString=(\n" + result.toString() + "\n)--------\n");
         return result.toString();
     }
 
