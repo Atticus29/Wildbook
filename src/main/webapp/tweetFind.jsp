@@ -156,7 +156,7 @@ for(int i = 0 ; i<tweetStatuses.size(); i++){  //int i = 0 ; i<qr.getTweets().si
 
   try{
     //@TODO add this back in
-    ArrayList<String> locations = ParseDateLocation.parseLocation(tweetText, context);
+    // ArrayList<String> locations = ParseDateLocation.parseLocation(tweetText, context);
     out.println(locations);
   } catch(Exception e){
     e.printStackTrace();
