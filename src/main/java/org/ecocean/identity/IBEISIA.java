@@ -1140,7 +1140,10 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
     Feature ft = ma.generateFeatureFromBbox(iaResult.optDouble("width", 0), iaResult.optDouble("height", 0),
     iaResult.optDouble("xtl", 0), iaResult.optDouble("ytl", 0), fparams);
     System.out.println("convertAnnotation() generated ft = " + ft + "; params = " + ft.getParameters());
-    return new Annotation(convertSpeciesToString(iaResult.optString("class", null)), ft);
+    Annotation ann = new Annotation(convertSpeciesToString(iaResult.optString("class", null)), ft);  //TODO "class" or "species" ??
+    String iaUUID = fromFancyUUID(iaResult.optJSONObject("uuid"));
+    if (iaUUID != null) ann.setId(iaUUID);
+    return ann;
   }
 
   public static String convertSpeciesToString(String iaClassLabel) {
