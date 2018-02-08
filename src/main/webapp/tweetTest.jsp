@@ -31,8 +31,9 @@
   String testFileName = "/twitterTimeStampTestFile.txt";
   String testPendingResultsFile = "/testPendingResultsFile.json";
   long sinceId = 890302524275662848L;
+  String context = ServletUtilities.getContext(request);
 
-  Twitter twitterInst = TwitterUtil.init(request);
+  Twitter twitterInst = TwitterUtil.init(context);
 
   // Test strings
   String dateTest = "Saw a whale on monday June 13, 2017";

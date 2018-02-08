@@ -37,7 +37,7 @@ String twitterTestTimeStampFile = "/twitterTestTimeStampFile.txt";
 Long timeStamp = 890302524275662848L;
 
 // Twitter Instance
-Twitter twitterInst = TwitterUtil.init(request);
+Twitter twitterInst = TwitterUtil.init(context);
 
 
 //Check on status posting limits
