@@ -261,6 +261,7 @@ public class TwitterUtil {
           ej.put("maId", ent.getId());
           ej.put("taskId", taskId);
           ej.put("creationDate", new LocalDateTime());
+
           String tweeterScreenName = tj.getJSONObject("tweet").getJSONObject("user").getString("screenName");
           System.out.println("tweeterScreenName in saveEntitiesAsMediaAssetsToSheperdDatabaseAndSendEachToImageAnalysis is: " + tweeterScreenName);
           ej.put("tweeterScreenName", tweeterScreenName);
@@ -295,7 +296,8 @@ public class TwitterUtil {
   }
 
 
-  public static void addDetectionAndIdentificationTweetToQueue(String screenName, String imageUrl, Twitter twitterInst, String whaleId, boolean detected, boolean identified, String info, String rootDir, String pathToQueueFile){
+  public static void addDetectionAndIdentificationTweetToQueue(String screenName, String imageUrl, Twitter twitterInst, String whaleId, boolean detected, boolean identified, String info, String rootDir, String pathToQueueFile){ //@TODO update the calls to this
+    //Note: right now, a successful detection and unsuccessful identification and a successful detection + identification but no markedIndividual match are treated with a false for the identified boolean in this method
     System.out.println("Entered addDetectionAndIdentificationTweetToQueue");
     String tweet = null, tweet2 = null;
     if(detected && identified){
@@ -303,7 +305,7 @@ public class TwitterUtil {
       tweet2 = "@" + screenName + ", here's some info on " + whaleId + ": " + info; //TODO flesh out either by pulling info from db now that whaleId is available, or by passing some info as an additional argument in this method
     } else if(detected && !identified){
       tweet =  "@" + screenName + ", we detected a whale in " + imageUrl + " but we were not able to identify it.";
-      tweet2 = "@" + screenName + ", if you'd like to make a manual submission, please go to http://www.flukebook.org/submit.jsp";
+      tweet2 = "@" + screenName + ", we added your whale to our database here: " + info;
     } else {
       tweet =  "@" + screenName + ", we were not able to identify a whale in " + imageUrl + ".";
       tweet2 = "@" + screenName + ", if you'd like to make a manual submission, please go to http://www.flukebook.org/submit.jsp";
@@ -526,7 +528,7 @@ public class TwitterUtil {
     }
   }
 
-  public static ArrayList<String> getArrayOfUUIDsFromJSONIdentificaitonResult(JSONObject JSONResult) throws Exception{ //@TODO test this for a case where there is more than one result
+  public static ArrayList<String> getArrayOfUUIDsFromJSONIdentificationResult(JSONObject JSONResult) throws Exception{ //@TODO test this for a case where there is more than one result
     ArrayList<String> finalUUIDs = new ArrayList<String>();
     JSONArray review_pair_list = JSONResult.getJSONObject("response").getJSONObject("json_result").getJSONObject("inference_dict").getJSONObject("annot_pair_dict").getJSONArray("review_pair_list");
     for(int i = 0; i < review_pair_list.length(); i++){
@@ -566,7 +568,7 @@ public class TwitterUtil {
       returnVal = "";
     }
     //@TODO check whether max confidence beats our cutoff! If not, throw exception.
-    ArrayList<String> correspondingUUIDs = getArrayOfUUIDsFromJSONIdentificaitonResult(JSONResult);
+    ArrayList<String> correspondingUUIDs = getArrayOfUUIDsFromJSONIdentificationResult(JSONResult);
     returnVal = correspondingUUIDs.get(maxIndex);
     if(returnVal != null){
       return returnVal;
@@ -654,7 +656,7 @@ public class TwitterUtil {
     }
   }
 
-  public static void updatePendingResultsWithNewIdentificationTaskID(String oldTaskId, String newTaskId, String rootDir){
+  public static void updatePendingResultsWithNewIdentificationTaskID(String oldTaskId, String newTaskId, String rootDir, String encounterCatalogNumber){
     JSONArray returnVal = null;
     String dataDir = ServletUtilities.dataDir("context0", rootDir);
     String iaPendingResultsFile = "/pendingAssetsIA.json";
@@ -666,6 +668,7 @@ public class TwitterUtil {
         JSONObject entry = iaPendingResults.getJSONObject(i);
         if (entry.getString("taskId").equals(oldTaskId)){
           entry.put("taskId", newTaskId);
+          entry.put("encounterCatalogNumber", encounterCatalogNumber);
         }
         newJSONArray.put(entry);
       }

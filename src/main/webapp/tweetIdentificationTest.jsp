@@ -78,7 +78,7 @@
   }
 
   try{
-    ArrayList<String> correspondingUUIDs = TwitterUtil.getArrayOfUUIDsFromJSONIdentificaitonResult(identificationJSON);
+    ArrayList<String> correspondingUUIDs = TwitterUtil.getArrayOfUUIDsFromJSONIdentificationResult(identificationJSON);
     out.println(correspondingUUIDs);
   } catch(Exception e){
     e.printStackTrace();

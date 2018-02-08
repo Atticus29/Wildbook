@@ -126,7 +126,6 @@
         rlog.put("_response", resultResponse);
         IBEISIA.log(taskID, jobID, rlog, context);
         all.put("jobResult", rlog);
-        //@TODO MARK change signature of processCallback to take two strings instead of request (context and "/")
         JSONObject proc = IBEISIA.processCallback(taskID, rlog, context, rootDir, baseUrl);
         System.out.println("Got into processCallback from IBEISIAGetJobStatus ATTN");
         System.out.println("processCallback returned --> " + proc);

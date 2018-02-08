@@ -123,6 +123,14 @@ public class Shepherd {
    * @return an Integer number that represents the unique number of this new encounter in the datatbase
    * @ see encounter
    */
+  public String storeNewEncounter(Encounter enc){
+    if(enc.getCatalogNumber() == null){
+      enc.setCatalogNumber(Util.generateUUID());
+      System.out.println("Created new UUID for encounter in storeNewEncounter call:" + enc.getCatalogNumber());
+    }
+     return storeNewEncounter(enc, enc.getCatalogNumber());
+  }
+
   public String storeNewEncounter(Encounter enc, String uniqueID) {
     enc.setEncounterNumber(uniqueID);
     beginDBTransaction();

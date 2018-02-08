@@ -2,6 +2,7 @@
 
 import="org.ecocean.*,
 java.util.ArrayList,
+java.net.URISyntaxException,
 java.io.FileNotFoundException,
 java.io.IOException,
 java.util.Map,
@@ -281,25 +282,61 @@ if(iaPendingResults != null){
     		IBEISIA.log(currentTaskId, currentJobId, rlog, context);
     		// all.put("jobResult", rlog);
     		JSONObject proc = IBEISIA.processCallback(currentTaskId, rlog, request);
-        IBEISIA.processCallback(currentTaskId, jobResult, request);
+        out.println(proc);
+        // IBEISIA.processCallback(currentTaskId, jobResult, request);
 
         //@TODO move code block below into IBEISIA.java?? Or move some of that stuff here? It's weird that half of it is there and half is here
 
-        // if(TwitterUtil.isSuccessfulDetection(jobResult)){
-        //   //Do nothing. Wait for it to return an identification result.
-        // } else {
-        //   //@TODO we can rule out successful detection, unsuccessful anything else will fail below. Can we assume that this will only run if there is successful identification?
-        //   String bestUUIDMatch = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(jobResult);
-        //   if(bestUUIDMatch.equals("")){
-        //     TwitterUtil.addDetectionAndIdentificationTweetToQueue(tweeterScreenName, currentImageURL, twitterInst, null, true, false, null, request);
-        //     //@TODO add an encounter for a novel animal and flag for review by a human
-        //   }
-        //   String markedIndividualID = getMarkedIndividualIDFromEncounterUUID(bestUUIDMatch,request);
-        //   // @TODO mature ^ and move to TwitterUtil.java
-        //   String info = "http://" + currentIPAddress + "/individuals.jsp/?number=" + markedIndividualID;
-        //   TwitterUtil.addDetectionAndIdentificationTweetToQueue(tweeterScreenName, currentImageURL, twitterInst, markedIndividualID , true, true, info, request);
-        //   //@TODO add an encounter to the markedIndividualID
-        // }
+        if(TwitterUtil.isSuccessfulDetection(jobResult)){
+          //Do nothing. Wait for it to return an identification result.
+        } else {
+          //@TODO we can rule out successful detection, unsuccessful anything else will fail below. Can we assume that this will only run if there is successful identification?
+
+          String flukebookBaseUrl = null;
+          try{
+            flukebookBaseUrl = CommonConfiguration.getServerURL(request, request.getContextPath());
+          } catch(URISyntaxException e){}
+
+          String bestUUIDMatch = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(jobResult);
+          Encounter currentEnc = null;
+          try{
+            currentEnc = myShepherd.getEncounter(pendingResult.getString("encounterCatalogNumber"));
+          } catch(Exception e){
+            System.out.println("couldn't fetch encounter from current pendingResult");
+            e.printStackTrace();
+            // continue;
+          }
+          String info = null;
+
+          if(bestUUIDMatch.equals("")){ // || bestUUIDMatch == null
+            //There is no identification match
+            //TODO Mark make sure that a non-whale doesn't also end up here
+            info = flukebookBaseUrl + "/encounters/encounter.jsp/?number=" + currentEnc.getCatalogNumber();
+            TwitterUtil.addDetectionAndIdentificationTweetToQueue(tweeterScreenName, currentImageURL, twitterInst, null, true, false, info, rootDir, pathToQueueFile);
+            //The encounter has already been persisted in IBEISIA.java...we hope.
+          } else{
+            //This is the case where we have a good identification match
+
+            // String markedIndividualID = getMarkedIndividualIDFromEncounterUUID(bestUUIDMatch,request);
+            // @TODO mature getMarkedIndividualIDFromEncounterUUID if the below encounter-persisting stuff doesn't work
+            Encounter bestMatchEnc = myShepherd.getEncounter(bestUUIDMatch);
+            currentEnc.setMatchedBy("wildbook IA via flukebot tweetbot");
+            if(bestMatchEnc.hasMarkedIndividual()){
+              //This is the case where we have a good identification match that matches an encounter with a markedIndividual
+              MarkedIndividual markedIndividual = myShepherd.getMarkedIndividual(bestMatchEnc.getIndividualID());
+              markedIndividual.addEncounter(currentEnc, context);
+              // myShepherd.getPM().makePersistent(markedIndividual); @TODO add this in if markedIndividual not being persisted (sheperd commit happens below)
+              currentEnc.setIndividualID(markedIndividual.getIndividualID());
+
+              info = flukebookBaseUrl + "/individuals.jsp/?number=" + markedIndividual.getIndividualID();
+              TwitterUtil.addDetectionAndIdentificationTweetToQueue(tweeterScreenName, currentImageURL, twitterInst, markedIndividual.getNickName() , true, true, info, rootDir, pathToQueueFile);
+            } else {
+              //Successful detection and identification but no marked individual
+              info = flukebookBaseUrl + "/encounters/encounter.jsp/?number=" + currentEnc.getCatalogNumber();
+              TwitterUtil.addDetectionAndIdentificationTweetToQueue(tweeterScreenName, currentImageURL, twitterInst, null , true, false, info,  rootDir, pathToQueueFile);
+            }
+          }
+        }
       } else if (status.equals("unknown")){
         //Ignore and let it try until 72 hours pass
       }

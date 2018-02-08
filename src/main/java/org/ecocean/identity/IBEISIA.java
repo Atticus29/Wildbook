@@ -1361,9 +1361,21 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
           try {
             //TODO how to know *if* we should start identification
             // if(jann.optDouble("confidence", -1.0) >= getDetectionCutoffValue() && jann.optString("species", "unkown").equals("whale_fluke")){ //These criteria have actually already been satisfied above -Mark F.
-            System.out.println("Detection found a whale fluke; sending to identification");
+            System.out.println("Detection found a whale fluke; storing encounter and then sending to identification");
+
+            Encounter detectionEnc = new Encounter(ann);
+            detectionEnc.setState(Encounter.STATE_AUTO_SOURCED);
+            if(myShepherd.getUser("wildbookai")!= null){
+              detectionEnc.setSubmitterID("wildbookai");
+            }
+            detectionEnc.setSubmitterName("@" + screenName);
+            //@TODO add comments, maybe tweet ID (what if two images?)
+            myShepherd.storeNewEncounter(detectionEnc);
+            String detectionEncCatalogNumber = detectionEnc.getCatalogNumber();
+
+
             String newTaskID = IAIntake(ann, myShepherd, context, baseUrl);
-            TwitterUtil.updatePendingResultsWithNewIdentificationTaskID(taskID, newTaskID, rootDir);
+            TwitterUtil.updatePendingResultsWithNewIdentificationTaskID(taskID, newTaskID, rootDir, detectionEncCatalogNumber); //@TODO Mark update this method for new signature
             ident.put(ann.getId(), newTaskID);
             // }
           } catch (Exception ex) {
