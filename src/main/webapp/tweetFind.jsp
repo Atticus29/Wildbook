@@ -323,7 +323,8 @@
                 IBEISIA.log(currentTaskId, currentJobId, rlog, context);
                 all.put("jobResult", rlog);
                 proc = IBEISIA.processCallback(currentTaskId, rlog, context, rootDir, baseUrl);
-                out.println(proc);
+                // out.println(proc);
+                out.println(rlog);
                 System.out.println("Got into processCallback from IBEISIAGetJobStatus ATTN");
                 System.out.println("processCallback returned --> " + proc);
 
