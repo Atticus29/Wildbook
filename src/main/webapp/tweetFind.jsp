@@ -302,6 +302,7 @@
             all.put("jobStatus", jlog);
             System.out.println(">>>>------[ currentJobId = " + currentJobId + " -> currentTaskId = " + currentTaskId + " ]----------------------------------------------------");
             JSONObject proc = null;
+            JSONObject resultResponse = null;
             try {
                 //FAKEOUT//"ok".equals(status.getJSONObject("response").getString("exec_status"))) {
                 System.out.println("HEYYYYYYY i am trying to getJobResult(" + currentJobId + ")");
@@ -310,7 +311,7 @@
                 ///// here is our fakeout
                 String fakeUrl = "https://www.sito.org/cgi-bin/results/" + currentJobId + "/" + annId;
                 System.out.println("fakeUrl: " + fakeUrl);
-                JSONObject resultResponse = RestClient.get(new URL(fakeUrl));
+                resultResponse = RestClient.get(new URL(fakeUrl));
                 /////FAKEOUT//////
 
                 //// next line is the real thing (skipped now)
@@ -350,7 +351,7 @@
 
             //@TODO move code block below into IBEISIA.java?? Or move some of that stuff here? It's weird that half of it is there and half is here
 
-            if(proc != null && TwitterUtil.isSuccessfulDetection(proc)){ // use resultResponse? proc? rlog?
+            if(resultResponse != null && TwitterUtil.isSuccessfulDetection(resultResponse)){ // use resultResponse? proc? rlog?
               //Do nothing. Wait for it to return an identification result.
             } else {
               //@TODO we can rule out successful detection, unsuccessful anything else will fail below. Can we assume that this will only run if there is successful identification?
@@ -360,7 +361,7 @@
                 flukebookBaseUrl = CommonConfiguration.getServerURL(request, request.getContextPath());
               } catch(URISyntaxException e){}
 
-                String bestUUIDMatch = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(proc); //jobResult? resultResponse? rlog?
+                String bestUUIDMatch = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(resultResponse); //jobResult? resultResponse? rlog?
                 Encounter currentEnc = null;
                 try{
                   currentEnc = myShepherd.getEncounter(pendingResult.getString("encounterCatalogNumber"));
