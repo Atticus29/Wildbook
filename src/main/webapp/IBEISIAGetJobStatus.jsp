@@ -105,6 +105,15 @@
     jlog.put("_response", statusResponse);
 
 
+/////FAKEOUT//////
+Shepherd myShepherd=new Shepherd(context);
+ArrayList<IdentityServiceLog> logs = IdentityServiceLog.loadByTaskID(taskID, "IBEISIA", myShepherd);
+String[] ids = IdentityServiceLog.findObjectIDs(logs);
+if (ids.length < 1) throw new RuntimeException("could not find ids from logs");
+String annId = ids[0];
+System.out.println("***** GOT annId=" + annId);
+/////FAKEOUT//////
+
     IBEISIA.log(taskID, jobID, jlog, context);
 
     JSONObject all = new JSONObject();
@@ -117,9 +126,19 @@
       statusResponse.has("response") && statusResponse.getJSONObject("response").has("status") &&
       "ok".equals(statusResponse.getJSONObject("response").getString("status")) &&
       "completed".equals(statusResponse.getJSONObject("response").getString("jobstatus")) &&
-      "ok".equals(statusResponse.getJSONObject("response").getString("exec_status"))) {
+      "exception".equals(statusResponse.getJSONObject("response").getString("exec_status"))) {
+      //FAKEOUT//"ok".equals(statusResponse.getJSONObject("response").getString("exec_status"))) {
         System.out.println("HEYYYYYYY i am trying to getJobResult(" + jobID + ")");
-        JSONObject resultResponse = IBEISIA.getJobResult(jobID, context);
+
+/////FAKEOUT//////
+///// here is our fakeout
+	String fakeUrl = "https://www.sito.org/cgi-bin/results/" + jobID + "/" + annId;
+	System.out.println("fakeUrl: " + fakeUrl);
+	JSONObject resultResponse = RestClient.get(new URL(fakeUrl));
+/////FAKEOUT//////
+
+//// next line is the real thing (skipped now)
+        ///JSONObject resultResponse = IBEISIA.getJobResult(jobID, context);
         JSONObject rlog = new JSONObject();
         rlog.put("jobID", jobID);
         rlog.put("_action", "getJobResult");
