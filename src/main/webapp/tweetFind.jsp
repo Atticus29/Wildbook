@@ -259,12 +259,18 @@
       String currentJobId = null;
       String currentImageURL = null;
       String currentTaskId = null;
+      String encounterCatalogNumber = null;
       // Boolean curlStatus = null;
       // String currentIPAddress = "54.68.97.153"; //@TODO put this somewhere more permanent
       // String getJobStatusBaseURL = "http://" + currentIPAddress + "/IBEISIAGetJobStatus.jsp?jobid=";
       for(int i = 0; i<iaPendingResults.length(); i++){
         pendingResult = iaPendingResults.getJSONObject(i);
         currentTaskId = pendingResult.getString("taskId");
+        try{
+          encounterCatalogNumber = pendingResult.getString("encounterCatalogNumber");
+        } catch(Exception e){
+          System.out.println("No encounterCatalogNumber for taskId: " + currentTaskId);
+        }
         System.out.println("current taskId is: " + currentTaskId);
         currentJobId = IBEISIA.findJobIDFromTaskID(currentTaskId, context);
         // currentJobId = "jobid-0797";
@@ -304,10 +310,13 @@
               JSONObject jlog = new JSONObject();
               jlog.put("jobID", currentJobId);
               String taskID = IBEISIA.findTaskIDFromJobID(currentJobId, context);
-              if (currentTaskId == null) {
+              if(encounterCatalogNumber != null){
+                TwitterUtil.updatePendingResultsWithNewIdentificationTaskID(currentTaskId, taskID, rootDir, encounterCatalogNumber); //@TODO not sure?
+              }
+              if (taskID == null) {
                 jlog.put("error", "could not determine task ID from job " + currentJobId);
               } else {
-                jlog.put("taskId", currentTaskId);
+                jlog.put("taskId", taskID);
               }
 
               jlog.put("_action", "getJobStatus");
@@ -315,11 +324,11 @@
 
               /////FAKEOUT//////
 
-              IBEISIA.log(currentTaskId, currentJobId, jlog, context);
+              IBEISIA.log(taskID, currentJobId, jlog, context);
 
               JSONObject all = new JSONObject();
               all.put("jobStatus", jlog);
-              System.out.println(">>>>------[ currentJobId = " + currentJobId + " -> currentTaskId = " + currentTaskId + " ]----------------------------------------------------");
+              System.out.println(">>>>------[ currentJobId = " + currentJobId + " -> currentTaskId = " + taskID + " ]----------------------------------------------------");
               JSONObject resultResponse = null;
               try {
                 //FAKEOUT//"ok".equals(status.getJSONObject("response").getString("exec_status"))) {
@@ -338,9 +347,9 @@
                 rlog.put("jobID", currentJobId);
                 rlog.put("_action", "getJobResult");
                 rlog.put("_response", resultResponse);
-                IBEISIA.log(currentTaskId, currentJobId, rlog, context);
+                IBEISIA.log(taskID, currentJobId, rlog, context);
                 all.put("jobResult", rlog);
-                proc = IBEISIA.processCallback(currentTaskId, rlog, context, rootDir, baseUrl);
+                proc = IBEISIA.processCallback(taskID, rlog, context, rootDir, baseUrl);
                 // out.println(proc);
                 out.println(rlog);
                 System.out.println("Got into processCallback from IBEISIAGetJobStatus ATTN");
