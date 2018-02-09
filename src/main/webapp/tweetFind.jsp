@@ -275,35 +275,53 @@
           String status = IBEISIA.getJobStatus(currentJobId, context).getJSONObject("response").getString("jobstatus");
           System.out.println("Job status ==>" + status);
           if (status.equals("completed")){
+            //@TODO takea look at IBEISIAGetJobStatus parsing to see whether everything is useable
+            JSONObject jobResult = IBEISIA.getJobResult(currentJobId, context);
+            JSONObject rlog = new JSONObject();
+            rlog.put("jobID", currentJobId);
+            rlog.put("_action", "getJobResult");
+            rlog.put("_response", jobResult);
+            IBEISIA.log(currentTaskId, currentJobId, rlog, context);
+            // all.put("jobResult", rlog);
+            JSONObject proc = IBEISIA.processCallback(currentTaskId, rlog, request);
+            out.println(proc);
+            IBEISIA.processCallback(currentTaskId, jobResult, request);
 
-            /////FAKEOUT//////
-            ArrayList<IdentityServiceLog> logs = IdentityServiceLog.loadByTaskID(currentTaskId, "IBEISIA", myShepherd);
-            String[] ids = IdentityServiceLog.findObjectIDs(logs);
-            if (ids.length < 1) throw new RuntimeException("could not find ids from logs");
-            String annId = ids[0];
-            System.out.println("***** GOT annId=" + annId);
+            //@TODO move code block below into IBEISIA.java?? Or move some of that stuff here? It's weird that half of it is there and half is here
 
-            JSONObject jlog = new JSONObject();
-            jlog.put("jobID", currentJobId);
-
-            if (currentTaskId == null) {
-              jlog.put("error", "could not determine task ID from job " + currentJobId);
+            if(jobResult != null && TwitterUtil.isSuccessfulDetection(jobResult)){ // use jobResult? proc? rlog?
+              //Do nothing. Wait for it to return an identification result.
             } else {
-              jlog.put("currentTaskId", currentTaskId);
-            }
+              //@TODO we can rule out successful detection, unsuccessful anything else will fail below. Can we assume that this will only run if there is successful identification?
 
-            jlog.put("_action", "getJobStatus");
-            jlog.put("_response", status);
-            /////FAKEOUT//////
+              /////FAKEOUT//////
+              ArrayList<IdentityServiceLog> logs = IdentityServiceLog.loadByTaskID(currentTaskId, "IBEISIA", myShepherd);
+              String[] ids = IdentityServiceLog.findObjectIDs(logs);
+              if (ids.length < 1) throw new RuntimeException("could not find ids from logs");
+              String annId = ids[0];
+              System.out.println("***** GOT annId=" + annId);
 
-            IBEISIA.log(currentTaskId, currentJobId, jlog, context);
+              JSONObject jlog = new JSONObject();
+              jlog.put("jobID", currentJobId);
+              String taskID = IBEISIA.findTaskIDFromJobID(currentJobId, context);
+              if (currentTaskId == null) {
+                jlog.put("error", "could not determine task ID from job " + currentJobId);
+              } else {
+                jlog.put("taskId", currentTaskId);
+              }
 
-            JSONObject all = new JSONObject();
-            all.put("jobStatus", jlog);
-            System.out.println(">>>>------[ currentJobId = " + currentJobId + " -> currentTaskId = " + currentTaskId + " ]----------------------------------------------------");
-            JSONObject proc = null;
-            JSONObject resultResponse = null;
-            try {
+              jlog.put("_action", "getJobStatus");
+              jlog.put("_response", status);
+
+              /////FAKEOUT//////
+
+              IBEISIA.log(currentTaskId, currentJobId, jlog, context);
+
+              JSONObject all = new JSONObject();
+              all.put("jobStatus", jlog);
+              System.out.println(">>>>------[ currentJobId = " + currentJobId + " -> currentTaskId = " + currentTaskId + " ]----------------------------------------------------");
+              JSONObject resultResponse = null;
+              try {
                 //FAKEOUT//"ok".equals(status.getJSONObject("response").getString("exec_status"))) {
                 System.out.println("HEYYYYYYY i am trying to getJobResult(" + currentJobId + ")");
 
@@ -316,7 +334,7 @@
 
                 //// next line is the real thing (skipped now)
                 ///JSONObject resultResponse = IBEISIA.getJobResult(jobID, context);
-                JSONObject rlog = new JSONObject();
+                rlog = new JSONObject();
                 rlog.put("jobID", currentJobId);
                 rlog.put("_action", "getJobResult");
                 rlog.put("_response", resultResponse);
@@ -328,41 +346,22 @@
                 System.out.println("Got into processCallback from IBEISIAGetJobStatus ATTN");
                 System.out.println("processCallback returned --> " + proc);
 
-            } catch (Exception ex) {
-              System.out.println("whoops got exception: " + ex.toString());
-              ex.printStackTrace();
-            }
-            finally{
-              //myShepherd.rollbackDBTransaction();
-              //myShepherd.closeDBTransaction();
-            }
+              } catch (Exception ex) {
+                System.out.println("whoops got exception: " + ex.toString());
+                ex.printStackTrace();
+              }
+              finally{
+                //myShepherd.rollbackDBTransaction();
+                //myShepherd.closeDBTransaction();
+              }
 
-
-            //@TODO takea look at IBEISIAGetJobStatus parsing to see whether everything is useable
-            // JSONObject jobResult = IBEISIA.getJobResult(currentJobId, context);
-            // JSONObject rlog = new JSONObject();
-            // rlog.put("jobID", currentJobId);
-            // rlog.put("_action", "getJobResult");
-            // rlog.put("_response", jobResult);
-            // IBEISIA.log(currentTaskId, currentJobId, rlog, context);
-            // // all.put("jobResult", rlog);
-            // JSONObject proc = IBEISIA.processCallback(currentTaskId, rlog, request);
-            // out.println(proc);
-            // IBEISIA.processCallback(currentTaskId, jobResult, request);
-
-            //@TODO move code block below into IBEISIA.java?? Or move some of that stuff here? It's weird that half of it is there and half is here
-
-            if(resultResponse != null && TwitterUtil.isSuccessfulDetection(resultResponse)){ // use resultResponse? proc? rlog?
-              //Do nothing. Wait for it to return an identification result.
-            } else {
-              //@TODO we can rule out successful detection, unsuccessful anything else will fail below. Can we assume that this will only run if there is successful identification?
 
               String flukebookBaseUrl = null;
               try{
                 flukebookBaseUrl = CommonConfiguration.getServerURL(request, request.getContextPath());
               } catch(URISyntaxException e){}
 
-                String bestUUIDMatch = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(resultResponse); //jobResult? resultResponse? rlog?
+                String bestUUIDMatch = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(resultResponse); //jobResult? resultResponse? rlog? //@TODO add error handling
                 Encounter currentEnc = null;
                 try{
                   currentEnc = myShepherd.getEncounter(pendingResult.getString("encounterCatalogNumber"));

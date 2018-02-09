@@ -582,7 +582,8 @@ public class TwitterUtil {
       String species = jsonResult.getJSONObject("response").getJSONObject("json_result").getJSONArray("results_list").getJSONArray(0).getJSONObject(0).getString("species");
       return species != null;
     } catch(Exception e){
-      e.printStackTrace();
+      // e.printStackTrace();
+      System.out.println("Not a detection");
       return false;
     }
   }
