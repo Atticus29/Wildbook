@@ -460,7 +460,7 @@ public class TwitterUtil {
     try{
       return findGenericStringItemInIaPendingLogFromTaskId("tweeterScreenName", taskId, rootDir);
     } catch(Exception e){
-      e.printStackTrace();
+      // e.printStackTrace();
       throw new Exception ("findScreenNameInIaPendingLogFromTaskId in TwitterUtil.java failed");
     }
   }
@@ -480,7 +480,8 @@ public class TwitterUtil {
         }
       }
     } catch(Exception e){
-    	e.printStackTrace();
+      System.out.println("findGenericStringItemInIaPendingLogFromTaskId failed for taskId: " + taskID + " when looking for: " + target);
+    	// e.printStackTrace();
     }
     if (returnVal != null){
       return returnVal;
