@@ -330,6 +330,7 @@ public static JSONObject sendDetect(ArrayList<MediaAsset> mas, String baseUrl, S
   }
   map.put("image_uuid_list", malist);
 
+    map.put("model_tag", "whalefluke_v2");
   return RestClient.post(url, new JSONObject(map));
 }
 
