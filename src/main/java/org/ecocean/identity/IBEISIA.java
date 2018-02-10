@@ -1182,9 +1182,13 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
   }
 
   public static JSONObject processCallback(String taskID, JSONObject resp, String context, String rootDir, String baseUrl) {
+    return processCallback(taskID, resp, context, rootDir, null, null, null, null);
+  }
+
+  public static JSONObject processCallback(String taskID, JSONObject resp, String context, String rootDir, String baseUrl, String screenName, String imageId, Twitter twitterInst) {
     System.out.println("CALLBACK GOT: (taskID " + taskID + ") " + resp);
-    String screenName = null;
-    String imageUrl = null;
+    // String screenName = null;
+    String imageUrl = imageId;
     JSONObject rtn = new JSONObject("{\"success\": false}");
     rtn.put("taskId", taskID);
     if (taskID == null) return rtn;
@@ -1199,18 +1203,18 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
     System.out.println("**** type ---------------> [" + type + "]");
     if ("detect".equals(type)) {
       rtn.put("success", true);
+      // try{
+      //   screenName = TwitterUtil.findScreenNameInIaPendingLogFromTaskId(taskID, rootDir);
+      // } catch(Exception e){
+      //   e.printStackTrace();
+      // }
+      // try{
+      //   imageUrl = TwitterUtil.findImageUrlInIaPendingLogFromTaskId(taskID, rootDir);
+      // } catch(Exception e){
+      //   e.printStackTrace();
+      // }
       try{
-        screenName = TwitterUtil.findScreenNameInIaPendingLogFromTaskId(taskID, rootDir);
-      } catch(Exception e){
-        e.printStackTrace();
-      }
-      try{
-        imageUrl = TwitterUtil.findImageUrlInIaPendingLogFromTaskId(taskID, rootDir);
-      } catch(Exception e){
-        e.printStackTrace();
-      }
-      try{
-        Twitter twitterInst = TwitterUtil.init(context);
+        // Twitter twitterInst = TwitterUtil.init(context);
         rtn.put("processResult", processCallbackDetect(taskID, logs, resp, myShepherd, screenName, imageUrl, twitterInst, baseUrl, rootDir, context));
       } catch(Exception e){
         rtn.put("processResult", processCallbackDetect(taskID, logs, resp, myShepherd, baseUrl, rootDir, context));
@@ -1220,7 +1224,13 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
     } else if ("identify".equals(type)) {
       rtn.put("success", true);
       System.out.println("About to call processCallbackIdentify"); //TODO eventually remove this line
-      rtn.put("processResult", processCallbackIdentify(taskID, logs, resp, context));
+      try{
+        rtn.put("processResult", processCallbackIdentify(taskID, logs, resp, screenName, imageId, twitterInst, context));
+      } catch(Exception e){
+        System.out.println("likely that the twitter stuff didn't exist; trying a simpler signature for processCallbackIdentify from within processCallback");
+        rtn.put("processResult", processCallbackIdentify(taskID, logs, resp, context));
+      }
+
     } else {
       rtn.put("error", "unknown task action type " + type);
     }

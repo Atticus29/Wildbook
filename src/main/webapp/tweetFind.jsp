@@ -281,7 +281,7 @@ if(iaPendingResults != null){
     		rlog.put("_response", jobResult);
     		IBEISIA.log(currentTaskId, currentJobId, rlog, context);
     		// all.put("jobResult", rlog);
-    		JSONObject proc = IBEISIA.processCallback(currentTaskId, rlog, request);
+    		JSONObject proc = IBEISIA.processCallback(currentTaskId, rlog, context, rootDir, baseUrl, tweeterScreenName, currentImageURL, twitterInst);
         out.println(proc);
         // IBEISIA.processCallback(currentTaskId, jobResult, request);
 
