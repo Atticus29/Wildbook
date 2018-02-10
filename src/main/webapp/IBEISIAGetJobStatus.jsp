@@ -129,6 +129,7 @@
         JSONObject proc = IBEISIA.processCallback(taskID, rlog, context, rootDir, baseUrl);
         System.out.println("Got into processCallback from IBEISIAGetJobStatus ATTN");
         System.out.println("processCallback returned --> " + proc);
+        System.out.println("processCallback resultResponse -->" + resultResponse);
       }
     } catch (Exception ex) {
       System.out.println("whoops got exception: " + ex.toString());
@@ -140,7 +141,7 @@
     }
 
     all.put("_timestamp", System.currentTimeMillis());
-    System.out.println("-------- >>> " + all.toString() + "\n##################################################################");
+    System.out.println("all (job result and timestamp)-------- >>> " + all.toString() + "\n##################################################################");
     return;
 
   }

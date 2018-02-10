@@ -1386,7 +1386,8 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
 
 
             String newTaskID = IAIntake(ann, myShepherd, context, baseUrl);
-            TwitterUtil.updatePendingResultsWithNewIdentificationTaskID(taskID, newTaskID, rootDir, detectionEncCatalogNumber); //@TODO Mark update this method for new signature
+            System.out.println("newTaskID is: " + newTaskID);
+            TwitterUtil.updatePendingResultsWithNewIdentificationTaskID(taskID, newTaskID, rootDir, detectionEncCatalogNumber);
             ident.put(ann.getId(), newTaskID);
             // }
           } catch (Exception ex) {

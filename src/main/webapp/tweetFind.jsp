@@ -265,7 +265,6 @@ if(iaPendingResults != null){
     currentTaskId = pendingResult.getString("taskId");
     System.out.println("current taskId is: " + currentTaskId);
     currentJobId = IBEISIA.findJobIDFromTaskID(currentTaskId, context);
-    // currentJobId = "jobid-0797";
     System.out.println("current JobId is: " + currentJobId);
     currentImageURL = TwitterUtil.findImageUrlInIaPendingLogFromTaskId(pendingResult.getString("taskId"),rootDir);
 
@@ -342,6 +341,7 @@ if(iaPendingResults != null){
       }
     } catch(Exception e){
       //@TODO this is the case where IBEIS is not responding. Do nothing = keep it on the list for next time (unless it's old, which is handled below)
+      System.out.println("something went wrong while getting the status or results of a job in tweetFind.jsp");
       e.printStackTrace();
     }
 
