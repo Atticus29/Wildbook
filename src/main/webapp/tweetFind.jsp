@@ -50,6 +50,7 @@ out.println("tweetFind.jsp currently being executed");
 
 try {
     baseUrl = CommonConfiguration.getServerURL(request, request.getContextPath());
+    System.out.println("baseUrl at beginning of tweetFind.jsp is " + baseUrl);
 } catch (java.net.URISyntaxException ex) {}
 
 JSONObject rtn = new JSONObject("{\"success\": false}");
@@ -270,7 +271,7 @@ if(iaPendingResults != null){
 
     try{
       String status = IBEISIA.getJobStatus(currentJobId, context).getJSONObject("response").getString("jobstatus");
-      System.out.println("Job status ==>" + status);
+      System.out.println("tweetFind.jsp Job status ==>" + status);
       if (status.equals("completed")){
         //@TODO takea look at IBEISIAGetJobStatus parsing to see whether everything is useable
         JSONObject jobResult = IBEISIA.getJobResult(currentJobId, context);
