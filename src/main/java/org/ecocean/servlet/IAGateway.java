@@ -680,9 +680,7 @@ System.out.println("anns -> " + anns);
 /* currently we are sending annotations one at a time (one per query list) but later we will have to support clumped sets...
    things to consider for that - we probably have to further subdivide by species ... other considerations?   */
         for (Annotation annEnum : anns) {
-            System.out.println("Mark got into for loop of _doIdentify");
             String taskIdIfOnlyOneAnnotation = (anns.size() == 1) ? taskId : null;
-            System.out.println("Mark taskIdIfOnlyOneAnnotation is: " + taskIdIfOnlyOneAnnotation);
             JSONObject queryConfigDict = IBEISIA.queryConfigDict(myShepherd, annEnum.getSpecies(), null);
             JSONObject taskRes = _sendIdentificationTaskWithShepherd(myShepherd, annEnum, context, baseUrl, queryConfigDict, null, -1, ((anns.size() == 1) ? taskId : null));  //we use passed taskId if only 1 ann but generate otherwise
             taskList.put(taskRes);

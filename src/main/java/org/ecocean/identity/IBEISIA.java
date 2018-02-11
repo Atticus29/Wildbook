@@ -1188,7 +1188,6 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
 
   public static JSONObject processCallback(String taskID, JSONObject resp, String context, String rootDir, String baseUrl, String screenName, String imageId, Twitter twitterInst) {
     System.out.println("CALLBACK GOT: (taskID " + taskID + ") " + resp);
-    System.out.println("Mark baseUrl in processCallback is: " + baseUrl);
     // String screenName = null;
     String imageUrl = imageId;
     JSONObject rtn = new JSONObject("{\"success\": false}");

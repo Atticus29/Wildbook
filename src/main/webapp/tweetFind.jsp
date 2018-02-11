@@ -281,7 +281,6 @@ if(iaPendingResults != null){
     		rlog.put("_response", jobResult);
     		IBEISIA.log(currentTaskId, currentJobId, rlog, context);
     		// all.put("jobResult", rlog);
-        System.out.println("Mark baseUrl in tweetFind right before processCallback call is: " + baseUrl);
     		JSONObject proc = IBEISIA.processCallback(currentTaskId, rlog, context, rootDir, baseUrl, tweeterScreenName, currentImageURL, twitterInst);
         out.println(proc);
         // IBEISIA.processCallback(currentTaskId, jobResult, request);
