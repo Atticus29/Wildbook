@@ -667,6 +667,7 @@ System.out.println("anns -> " + anns);
 
     //this takes in a single annotation, cuz IBEISIA.IAIntake needed to pass an *uncommitted* shepherd.  its complicated. :)
     public static JSONObject _doIdentify(Annotation ann, JSONObject res, Shepherd myShepherd, String context, String baseUrl) throws ServletException, IOException {
+        System.out.println("Mark baseUrl is: " + baseUrl);
         if (res == null) throw new RuntimeException("IAGateway._doIdentify() called without res passed in");
         String taskId = res.optString("taskId", null);
         if (taskId == null) throw new RuntimeException("IAGateway._doIdentify() has no taskId passed in");
