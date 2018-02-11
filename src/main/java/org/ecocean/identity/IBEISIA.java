@@ -1183,7 +1183,7 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
   }
 
   public static JSONObject processCallback(String taskID, JSONObject resp, String context, String rootDir, String baseUrl) {
-    return processCallback(taskID, resp, context, rootDir, null, null, null, null);
+    return processCallback(taskID, resp, context, rootDir, baseUrl, null, null, null);
   }
 
   public static JSONObject processCallback(String taskID, JSONObject resp, String context, String rootDir, String baseUrl, String screenName, String imageId, Twitter twitterInst) {
