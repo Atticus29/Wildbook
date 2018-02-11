@@ -667,7 +667,6 @@ System.out.println("anns -> " + anns);
 
     //this takes in a single annotation, cuz IBEISIA.IAIntake needed to pass an *uncommitted* shepherd.  its complicated. :)
     public static JSONObject _doIdentify(Annotation ann, JSONObject res, Shepherd myShepherd, String context, String baseUrl) throws ServletException, IOException {
-        System.out.println("Mark res going into _doIdentify is: " + res.toString());
         if (res == null) throw new RuntimeException("IAGateway._doIdentify() called without res passed in");
         String taskId = res.optString("taskId", null);
         if (taskId == null) throw new RuntimeException("IAGateway._doIdentify() has no taskId passed in");
@@ -675,6 +674,7 @@ System.out.println("anns -> " + anns);
         ArrayList<Annotation> anns = new ArrayList<Annotation>();  //what we ultimately run on.  occurrences are irrelevant now right?
         ArrayList<String> validIds = new ArrayList<String>();
         anns.add(ann);
+        System.out.println("Mark anns is: " + anns.toString());
 
         JSONArray taskList = new JSONArray();
 /* currently we are sending annotations one at a time (one per query list) but later we will have to support clumped sets...
