@@ -1380,7 +1380,7 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
               detectionEnc.setSubmitterID("wildbookai");
             }
             detectionEnc.setSubmitterName("@" + screenName);
-            //@TODO add comments, maybe tweet ID (what if two images?)
+            //@TODO add comments, maybe tweet ID (what if two images?), add date and location from nlp stuff
             myShepherd.storeNewEncounter(detectionEnc);
             String detectionEncCatalogNumber = detectionEnc.getCatalogNumber();
 

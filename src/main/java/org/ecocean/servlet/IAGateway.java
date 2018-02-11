@@ -667,6 +667,7 @@ System.out.println("anns -> " + anns);
 
     //this takes in a single annotation, cuz IBEISIA.IAIntake needed to pass an *uncommitted* shepherd.  its complicated. :)
     public static JSONObject _doIdentify(Annotation ann, JSONObject res, Shepherd myShepherd, String context, String baseUrl) throws ServletException, IOException {
+        System.out.println("Mark got into this flavor of _doIdentify");
         if (res == null) throw new RuntimeException("IAGateway._doIdentify() called without res passed in");
         String taskId = res.optString("taskId", null);
         if (taskId == null) throw new RuntimeException("IAGateway._doIdentify() has no taskId passed in");
@@ -688,8 +689,7 @@ System.out.println("anns -> " + anns);
         return res;
     }
 
-    private static JSONObject _sendIdentificationTaskWithShepherd(Shepherd myShepherd, Annotation ann, String context, String baseUrl, JSONObject queryConfigDict,
-                                               JSONObject userConfidence, int limitTargetSize, String annTaskId) throws IOException {
+    private static JSONObject _sendIdentificationTaskWithShepherd(Shepherd myShepherd, Annotation ann, String context, String baseUrl, JSONObject queryConfigDict, JSONObject userConfidence, int limitTargetSize, String annTaskId) throws IOException {
         String species = ann.getSpecies();
         if ((species == null) || (species.equals(""))) throw new IOException("species on Annotation " + ann + " invalid: " + species);
         boolean success = true;
@@ -725,6 +725,7 @@ System.out.println("+ starting ident task " + annTaskId);
             if ((sent.optJSONObject("status") != null) && sent.getJSONObject("status").optBoolean("success", false))
                 jobId = sent.optString("response", null);
             taskRes.put("jobId", jobId);
+            System.out.println("Mark annotationTaskID about to be logged is: " + annTaskId);
             IBEISIA.log(annTaskId, ann.getId(), jobId, new JSONObject("{\"_action\": \"initIdentify\"}"), context);
         } catch (Exception ex) {
             success = false;
