@@ -961,15 +961,19 @@ public static String findJobIDFromTaskID(String taskID, String context) {
     return null;
   }
 
-  String jobID = logs.get(logs.size() - 1).getServiceJobID();
-  if ("-1".equals(jobID)) {
-    myShepherd.rollbackDBTransaction();
-    myShepherd.closeDBTransaction();
-    return null;
-  }
+    //this returns the first non-null, non-"-1" value we get
+    for (IdentityServiceLog l : logs) {
+        String jobId = l.getServiceJobID();
+        if ((jobId != null) && (!jobId.equals("-1"))) {
+            myShepherd.rollbackDBTransaction();
+            myShepherd.closeDBTransaction();
+            return jobId;
+        }
+    }
+
   myShepherd.rollbackDBTransaction();
   myShepherd.closeDBTransaction();
-  return jobID;
+  return null;  //no such luck
 }
 
 
