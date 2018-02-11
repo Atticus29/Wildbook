@@ -1281,6 +1281,7 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
 
   private static JSONObject processCallbackDetect(String taskID, ArrayList<IdentityServiceLog> logs, JSONObject resp, Shepherd myShepherd, String screenName, String imageUrl, Twitter twitterInst, String baseUrl, String rootDir, String context) {
     System.out.println("Entered processCallbackDetect");
+    System.out.println("Mark baseUrl in processCallbackDetect is " + baseUrl);
     JSONObject rtn = new JSONObject("{\"success\": false}");
     String[] ids = IdentityServiceLog.findObjectIDs(logs);
     System.out.println("***** ids = " + ids);
