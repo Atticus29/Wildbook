@@ -291,6 +291,7 @@ if(iaPendingResults != null){
           //Do nothing. Wait for it to return an identification result.
         } else {
           //@TODO we can rule out successful detection, unsuccessful anything else will fail below. Can we assume that this will only run if there is successful identification?
+          System.out.println("Mark jobResult is: " + jobResult.toString());
 
           String flukebookBaseUrl = null;
           try{
@@ -298,9 +299,11 @@ if(iaPendingResults != null){
           } catch(URISyntaxException e){}
 
           String bestUUIDMatch = TwitterUtil.getUUIDOfBestMatchFromIdentificationJSONResults(jobResult);
+          System.out.println("Mark bestUUIDMatch is: " + bestUUIDMatch);
           Encounter currentEnc = null;
           try{
             currentEnc = myShepherd.getEncounter(pendingResult.getString("encounterCatalogNumber"));
+            System.out.println("Mark fetched encounter " + pendingResult.getString("encounterCatalogNumber"));
           } catch(Exception e){
             System.out.println("couldn't fetch encounter from current pendingResult");
             e.printStackTrace();
@@ -310,6 +313,7 @@ if(iaPendingResults != null){
 
           if(bestUUIDMatch.equals("")){ // || bestUUIDMatch == null
             //There is no identification match
+            System.out.println("Mark there is no identification match");
             //TODO Mark make sure that a non-whale doesn't also end up here
             info = flukebookBaseUrl + "/encounters/encounter.jsp/?number=" + currentEnc.getCatalogNumber();
             TwitterUtil.addDetectionAndIdentificationTweetToQueue(tweeterScreenName, currentImageURL, twitterInst, null, true, false, info, rootDir, pathToQueueFile);
@@ -317,22 +321,28 @@ if(iaPendingResults != null){
           } else{
             //This is the case where we have a good identification match
 
+            System.out.println("Mark there is a good identification match");
             // String markedIndividualID = getMarkedIndividualIDFromEncounterUUID(bestUUIDMatch,request);
             // @TODO mature getMarkedIndividualIDFromEncounterUUID if the below encounter-persisting stuff doesn't work
             Encounter bestMatchEnc = myShepherd.getEncounter(bestUUIDMatch);
+            System.out.println("Mark getting the bestMatchEnc worked");
             currentEnc.setMatchedBy("wildbook IA via flukebot tweetbot");
             if(bestMatchEnc.hasMarkedIndividual()){
               //This is the case where we have a good identification match that matches an encounter with a markedIndividual
+
+              System.out.println("Mark there is a good identification match and it matches a known individual");
               MarkedIndividual markedIndividual = myShepherd.getMarkedIndividual(bestMatchEnc.getIndividualID());
               markedIndividual.addEncounter(currentEnc, context);
               // myShepherd.getPM().makePersistent(markedIndividual); @TODO add this in if markedIndividual not being persisted (sheperd commit happens below)
               currentEnc.setIndividualID(markedIndividual.getIndividualID());
 
               info = flukebookBaseUrl + "/individuals.jsp/?number=" + markedIndividual.getIndividualID();
+              System.out.println("Mark info is: " + info);
               TwitterUtil.addDetectionAndIdentificationTweetToQueue(tweeterScreenName, currentImageURL, twitterInst, markedIndividual.getNickName() , true, true, info, rootDir, pathToQueueFile);
             } else {
               //Successful detection and identification but no marked individual
               info = flukebookBaseUrl + "/encounters/encounter.jsp/?number=" + currentEnc.getCatalogNumber();
+              System.out.println("Mark Successful detection and identification but no marked individual info is: " + info);
               TwitterUtil.addDetectionAndIdentificationTweetToQueue(tweeterScreenName, currentImageURL, twitterInst, null , true, false, info,  rootDir, pathToQueueFile);
             }
           }
