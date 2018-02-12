@@ -368,6 +368,7 @@ public class Shepherd {
     try {
       tempEnc = ((Encounter) (pm.getObjectById(pm.newObjectIdInstance(Encounter.class, num.trim()), true)));
     } catch (Exception nsoe) {
+      System.out.println("attempt to getEncounter for object: " + num + " failed. Returning null.");
       return null;
     }
     return tempEnc;
