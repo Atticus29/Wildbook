@@ -326,7 +326,13 @@ if(iaPendingResults != null){
             // @TODO mature getMarkedIndividualIDFromEncounterUUID if the below encounter-persisting stuff doesn't work
             Encounter bestMatchEnc = myShepherd.getEncounter(bestUUIDMatch);
             System.out.println("Mark getting the bestMatchEnc worked");
-            currentEnc.setMatchedBy("wildbook IA via flukebot tweetbot");
+            System.out.println("Mark does the bestMatchEnc have a markedIndividual?: " + boolean.toString(bestMatchEnc.hasMarkedIndividual()));
+            try{
+              currentEnc.setMatchedBy("wildbook IA via flukebot tweetbot");
+            } catch(Exception e){
+              System.out.println("Mark setMatchedBy didn't work delete this");
+            }
+            // currentEnc.setMatchedBy("wildbook IA via flukebot tweetbot");
             if(bestMatchEnc.hasMarkedIndividual()){
               //This is the case where we have a good identification match that matches an encounter with a markedIndividual
 
@@ -341,6 +347,7 @@ if(iaPendingResults != null){
               TwitterUtil.addDetectionAndIdentificationTweetToQueue(tweeterScreenName, currentImageURL, twitterInst, markedIndividual.getNickName() , true, true, info, rootDir, pathToQueueFile);
             } else {
               //Successful detection and identification but no marked individual
+              System.out.println();
               info = flukebookBaseUrl + "/encounters/encounter.jsp/?number=" + currentEnc.getCatalogNumber();
               System.out.println("Mark Successful detection and identification but no marked individual info is: " + info);
               TwitterUtil.addDetectionAndIdentificationTweetToQueue(tweeterScreenName, currentImageURL, twitterInst, null , true, false, info,  rootDir, pathToQueueFile);
