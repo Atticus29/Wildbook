@@ -1348,8 +1348,17 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
           //System.out.println("============================================================== JANNS " + janns.toString(2));
           boolean skipEncounters = asset.hasLabel("_frame");
           System.out.println("+++++++++++ >>>> skipEncounters ???? " + skipEncounters);
-          System.out.println("Mark janns is: " + janns.toString());
-          System.out.println("Mark janns length is: " + Integer.toString(janns.length()));
+          // System.out.println("janns is: " + janns.toString());
+          // System.out.println("janns length is: " + Integer.toString(janns.length()));
+          if(janns.length() == 0){
+            //No results! Go ahead and call that a failed detection
+            System.out.println("Detection didn't find a whale fluke");
+            System.out.println("ImageUrl in processCallbackDetect is: " + imageUrl);
+            String dataDir = ServletUtilities.dataDir("context0", rootDir);
+            String tweetQueueFile = "/tweetQueue.txt";
+            TwitterUtil.addDetectionAndIdentificationTweetToQueue(screenName, imageUrl, twitterInst, null, false, false, "", rootDir, dataDir + tweetQueueFile);
+            continue;
+          }
           //@TODO Mark branch if janns.length() is 0 with another System.out.println("Detection didn't find a whale fluke"); and subsequent tweet?
           for (int a = 0 ; a < janns.length() ; a++) {
             System.out.println("Entered janns for loop in processCallbackDetect");
