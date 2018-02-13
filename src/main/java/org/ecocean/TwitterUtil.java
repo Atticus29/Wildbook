@@ -515,11 +515,19 @@ public class TwitterUtil {
 
   public static ArrayList<Double> getArrayOfConfidencesFromJSONIdentificaitonResult(JSONObject JSONResult) throws Exception{
     ArrayList<Double> finalConfidences = new ArrayList<Double>();
-    JSONArray confidences = JSONResult.getJSONObject("response").getJSONObject("json_result").getJSONObject("inference_dict").getJSONObject("annot_pair_dict").getJSONArray("confidence_list");
-    for(int i = 0; i<confidences.length(); i++){
-      String currentConfidenceString = confidences.getString(i);
-      Double confidence = Double.parseDouble(currentConfidenceString);
-      finalConfidences.add(confidence);
+    JSONArray confidences = null;
+    try{
+      confidences = JSONResult.getJSONObject("response").getJSONObject("json_result").getJSONObject("inference_dict").getJSONObject("annot_pair_dict").getJSONArray("confidence_list");
+    } catch(Exception e){
+      // e.printStackTrace();
+      System.out.println("Getting the confidence list in getArrayOfConfidencesFromJSONIdentificaitonResult failed. Possible that the result passed to it was weird: " + JSONResult.toString());
+    }
+    if(confidences != null){
+      for(int i = 0; i<confidences.length(); i++){
+        String currentConfidenceString = confidences.getString(i);
+        Double confidence = Double.parseDouble(currentConfidenceString);
+        finalConfidences.add(confidence);
+      }
     }
     if(finalConfidences.size() > 0){
       return finalConfidences;
@@ -582,7 +590,7 @@ public class TwitterUtil {
       String species = jsonResult.getJSONObject("response").getJSONObject("json_result").getJSONArray("results_list").getJSONArray(0).getJSONObject(0).getString("species");
       return species != null;
     } catch(Exception e){
-      e.printStackTrace();
+      // e.printStackTrace();
       return false;
     }
   }
