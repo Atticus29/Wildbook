@@ -324,8 +324,7 @@ if(iaPendingResults != null){
             System.out.println("Mark there is a good identification match");
             // String markedIndividualID = getMarkedIndividualIDFromEncounterUUID(bestUUIDMatch,request);
             // @TODO mature getMarkedIndividualIDFromEncounterUUID if the below encounter-persisting stuff doesn't work
-            // Encounter bestMatchEnc = myShepherd.getEncounter(bestUUIDMatch);
-            Encounter bestMatchEnc = myShepherd.getEncounter("fcafe4f5-11f6-4932-a869-a06133b944e8");
+            Encounter bestMatchEnc = myShepherd.getEncounter(bestUUIDMatch);
             System.out.println("Mark is bestMatchEnc null?" + Boolean.toString(bestMatchEnc == null));
             System.out.println("Mark getting the bestMatchEnc worked");
             System.out.println("Mark does the bestMatchEnc have a markedIndividual?: " + Boolean.toString(bestMatchEnc.hasMarkedIndividual()));

@@ -1286,6 +1286,7 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
   private static JSONObject processCallbackDetect(String taskID, ArrayList<IdentityServiceLog> logs, JSONObject resp, Shepherd myShepherd, String screenName, String imageUrl, Twitter twitterInst, String baseUrl, String rootDir, String context) {
     System.out.println("Entered processCallbackDetect");
     System.out.println("Mark baseUrl in processCallbackDetect is " + baseUrl);
+    //@TODO Mark branch if length is 0 with another System.out.println("Detection didn't find a whale fluke"); and subsequent tweet?
     JSONObject rtn = new JSONObject("{\"success\": false}");
     String[] ids = IdentityServiceLog.findObjectIDs(logs);
     System.out.println("***** ids = " + ids);
@@ -1322,8 +1323,11 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
         JSONObject amap = new JSONObject();
         JSONObject ident = new JSONObject();
         List<Annotation> allAnns = new ArrayList<Annotation>();
+        System.out.println("Mark rlist is: " + rlist.toString());
+        System.out.println("Mark rlist length is: " + Integer.toString(rlist.length()));
         for (int i = 0 ; i < rlist.length() ; i++) {
           System.out.println("processCallbackDetect got into the response list");
+          System.out.println("rlist is: " + rlist.toString());
           JSONArray janns = rlist.optJSONArray(i);
           if (janns == null) continue;
           JSONObject jiuuid = ilist.optJSONObject(i);
