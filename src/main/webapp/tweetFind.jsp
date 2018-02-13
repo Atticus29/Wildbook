@@ -334,8 +334,9 @@
                   System.out.println("Mark there is a good identification match");
                   // String markedIndividualID = getMarkedIndividualIDFromEncounterUUID(bestUUIDMatch,request);
                   // @TODO mature getMarkedIndividualIDFromEncounterUUID if the below encounter-persisting stuff doesn't work
-                  Encounter bestMatchEnc = myShepherd.getEncounter(bestUUIDMatch);
+                    Encounter bestMatchEnc = Encounter.findByAnnotationId(bestUUIDMatch, myShepherd);  //bestUUIDMatch is an annot id
                   System.out.println("Mark is bestMatchEnc null?" + Boolean.toString(bestMatchEnc == null));
+                    if (bestMatchEnc == null) throw new RuntimeException("bestMatchEnc failed to on Annotation id=" + bestUUIDMatch);
                   System.out.println("Mark getting the bestMatchEnc worked");
                   System.out.println("Mark does the bestMatchEnc have a markedIndividual?: " + Boolean.toString(bestMatchEnc.hasMarkedIndividual()));
                   System.out.println("Mark individual ID is: " + bestMatchEnc.getIndividualID());
