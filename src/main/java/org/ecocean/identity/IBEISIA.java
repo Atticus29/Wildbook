@@ -1193,7 +1193,7 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
   }
 
   public static JSONObject processCallback(String taskID, JSONObject resp, String context, String rootDir, String baseUrl, String screenName, String imageId, Twitter twitterInst) {
-    System.out.println("CALLBACK GOT: (taskID " + taskID + ") " + resp
+    System.out.println("CALLBACK GOT: (taskID " + taskID + ") " + resp);
     System.out.println("Mark screenName in processCallback is: " + screenName);
     // String screenName = null;
     String imageUrl = imageId;
