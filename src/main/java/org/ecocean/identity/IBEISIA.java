@@ -1183,15 +1183,18 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
     if(baseUrl == null){
       throw new Exception("baseUrl in processCallback method is null");
     }
+    System.out.print("Mark 2");
     return processCallback(taskID, resp, context, rootDir, baseUrl);
   }
 
   public static JSONObject processCallback(String taskID, JSONObject resp, String context, String rootDir, String baseUrl) {
+    System.out.print("Mark 1");
     return processCallback(taskID, resp, context, rootDir, baseUrl, null, null, null);
   }
 
   public static JSONObject processCallback(String taskID, JSONObject resp, String context, String rootDir, String baseUrl, String screenName, String imageId, Twitter twitterInst) {
-    System.out.println("CALLBACK GOT: (taskID " + taskID + ") " + resp);
+    System.out.println("CALLBACK GOT: (taskID " + taskID + ") " + resp
+    System.out.println("Mark screenName in processCallback is: " + screenName);
     // String screenName = null;
     String imageUrl = imageId;
     JSONObject rtn = new JSONObject("{\"success\": false}");
