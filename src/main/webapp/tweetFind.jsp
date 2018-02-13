@@ -176,6 +176,7 @@
 
       try{
         tweeterScreenName = tweet.getUser().getScreenName();
+        System.out.println("Mark tweeterScreenName is: " + tweeterScreenName);
         if(tweeterScreenName == null){
           continue;
         }
@@ -281,8 +282,10 @@
             rlog.put("_response", jobResult);
             IBEISIA.log(currentTaskId, currentJobId, rlog, context);
             // all.put("jobResult", rlog);
+            out.println("tweeterScreenName is: " + tweeterScreenName);
+            System.out.println("tweeterScreenName is: " + tweeterScreenName);
             JSONObject proc = IBEISIA.processCallback(currentTaskId, rlog, context, rootDir, baseUrl, tweeterScreenName, currentImageURL, twitterInst);
-            out.println(proc);
+            // out.println(proc);
             // IBEISIA.processCallback(currentTaskId, jobResult, request);
 
             //@TODO move code block below into IBEISIA.java?? Or move some of that stuff here? It's weird that half of it is there and half is here
