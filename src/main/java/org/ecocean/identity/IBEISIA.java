@@ -1249,6 +1249,7 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
   */
 
   private static JSONObject processCallbackDetect(String taskID, ArrayList<IdentityServiceLog> logs, JSONObject resp, Shepherd myShepherd, HttpServletRequest request) throws Exception{
+    System.out.println("Mark Something is calling a non-twitter version of processCallbackDetect");
     String baseUrl = null;
     try{
       baseUrl = CommonConfiguration.getServerURL(request, request.getContextPath()); //@ATTN there's another signature where this is passed as an argument -Mark F.
@@ -1264,6 +1265,7 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
   }
 
   private static JSONObject processCallbackDetect(String taskID, ArrayList<IdentityServiceLog> logs, JSONObject resp, Shepherd myShepherd, String baseUrl, String rootDir, String context) {
+    System.out.println("Mark Something is calling a non-twitter version of processCallbackDetect");
     return processCallbackDetect(taskID, logs, resp, myShepherd, null, null, null, baseUrl, rootDir, context);
   }
 
@@ -1286,6 +1288,7 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
   private static JSONObject processCallbackDetect(String taskID, ArrayList<IdentityServiceLog> logs, JSONObject resp, Shepherd myShepherd, String screenName, String imageUrl, Twitter twitterInst, String baseUrl, String rootDir, String context) {
     System.out.println("Entered processCallbackDetect");
     System.out.println("Mark baseUrl in processCallbackDetect is " + baseUrl);
+    System.out.println("Mark screenName at the beginning of processCallbackDetect is: " + screenName);
     JSONObject rtn = new JSONObject("{\"success\": false}");
     String[] ids = IdentityServiceLog.findObjectIDs(logs);
     System.out.println("***** ids = " + ids);
@@ -1323,8 +1326,8 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
         JSONObject amap = new JSONObject();
         JSONObject ident = new JSONObject();
         List<Annotation> allAnns = new ArrayList<Annotation>();
-        System.out.println("Mark rlist is: " + rlist.toString());
-        System.out.println("Mark rlist length is: " + Integer.toString(rlist.length()));
+        // System.out.println("rlist is: " + rlist.toString());
+        // System.out.println("rlist length is: " + Integer.toString(rlist.length()));
         for (int i = 0 ; i < rlist.length() ; i++) {
           System.out.println("processCallbackDetect got into the response list");
           JSONArray janns = rlist.optJSONArray(i);
@@ -1352,7 +1355,7 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
           // System.out.println("janns length is: " + Integer.toString(janns.length()));
           if(janns.length() == 0){
             //No results! Go ahead and call that a failed detection
-            System.out.println("Detection didn't find a whale fluke");
+            System.out.println("Detection didn't find a whale fluke because there were no results at all!");
             System.out.println("ImageUrl in processCallbackDetect is: " + imageUrl);
             String dataDir = ServletUtilities.dataDir("context0", rootDir);
             String tweetQueueFile = "/tweetQueue.txt";
