@@ -308,7 +308,7 @@ public class TwitterUtil {
       tweet2 = "@" + screenName + ", we added your whale to our database here: " + info;
     } else {
       tweet =  "@" + screenName + ", we were not able to identify a whale in " + imageUrl + ".";
-      tweet2 = "@" + screenName + ", if you'd like to make a manual submission for the image" + imageUrl + ", please go to http://www.flukebook.org/submit.jsp";
+      tweet2 = "@" + screenName + ", if you'd like to make a manual submission for the image " + imageUrl + ", please go to http://www.flukebook.org/submit.jsp";
     }
 
     try {
