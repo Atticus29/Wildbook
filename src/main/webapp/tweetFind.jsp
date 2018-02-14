@@ -269,6 +269,7 @@
         currentJobId = IBEISIA.findJobIDFromTaskID(currentTaskId, context);
         System.out.println("current JobId is: " + currentJobId);
         currentImageURL = TwitterUtil.findImageUrlInIaPendingLogFromTaskId(pendingResult.getString("taskId"),rootDir);
+        tweeterScreenName = pendingResult.getString("tweeterScreenName");
 
         try{
           String status = IBEISIA.getJobStatus(currentJobId, context).getJSONObject("response").getString("jobstatus");
