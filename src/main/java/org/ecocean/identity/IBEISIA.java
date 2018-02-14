@@ -1171,26 +1171,26 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
     return null;
   }
 
-  // public static JSONObject processCallback(String taskID, JSONObject resp, HttpServletRequest request) throws Exception{
-  //   String rootDir = request.getSession().getServletContext().getRealPath("/");
-  //   String context = ServletUtilities.getContext(request);
-  //   String baseUrl = null;
-  //   try{
-  //     baseUrl = CommonConfiguration.getServerURL(request, request.getContextPath());
-  //   } catch(java.net.URISyntaxException e){
-  //     e.printStackTrace();
-  //   }
-  //   if(baseUrl == null){
-  //     throw new Exception("baseUrl in processCallback method is null");
-  //   }
-  //   System.out.print("Mark 2");
-  //   return processCallback(taskID, resp, context, rootDir, baseUrl);
-  // }
+  public static JSONObject processCallback(String taskID, JSONObject resp, HttpServletRequest request) throws Exception{
+    String rootDir = request.getSession().getServletContext().getRealPath("/");
+    String context = ServletUtilities.getContext(request);
+    String baseUrl = null;
+    try{
+      baseUrl = CommonConfiguration.getServerURL(request, request.getContextPath());
+    } catch(java.net.URISyntaxException e){
+      e.printStackTrace();
+    }
+    if(baseUrl == null){
+      throw new Exception("baseUrl in processCallback method is null");
+    }
+    System.out.print("Mark 2");
+    return processCallback(taskID, resp, context, rootDir, baseUrl);
+  }
 
-  // public static JSONObject processCallback(String taskID, JSONObject resp, String context, String rootDir, String baseUrl) {
-  //   System.out.print("Mark 1");
-  //   return processCallback(taskID, resp, context, rootDir, baseUrl, null, null, null);
-  // }
+  public static JSONObject processCallback(String taskID, JSONObject resp, String context, String rootDir, String baseUrl) {
+    System.out.print("Mark 1");
+    return processCallback(taskID, resp, context, rootDir, baseUrl, null, null, null);
+  }
 
   public static JSONObject processCallback(String taskID, JSONObject resp, String context, String rootDir, String baseUrl, String screenName, String imageId, Twitter twitterInst) {
     System.out.println("CALLBACK GOT: (taskID " + taskID + ") " + resp);

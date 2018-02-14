@@ -326,7 +326,7 @@
                   //There is no identification match
                   System.out.println("Mark there is no identification match");
                   //TODO Mark make sure that a non-whale doesn't also end up here
-                  info = flukebookBaseUrl + "/encounters/encounter.jsp/?number=" + currentEnc.getCatalogNumber();
+                  info = flukebookBaseUrl + "/encounters/encounter.jsp?number=" + currentEnc.getCatalogNumber();
                   TwitterUtil.addDetectionAndIdentificationTweetToQueue(tweeterScreenName, currentImageURL, twitterInst, null, true, false, info, rootDir, pathToQueueFile);
                   //The encounter has already been persisted in IBEISIA.java...we hope.
                 } else{
@@ -356,13 +356,13 @@
                     // myShepherd.getPM().makePersistent(markedIndividual); @TODO add this in if markedIndividual not being persisted (sheperd commit happens below)
                     currentEnc.setIndividualID(markedIndividual.getIndividualID());
 
-                    info = flukebookBaseUrl + "/individuals.jsp/?number=" + markedIndividual.getIndividualID();
+                    info = flukebookBaseUrl + "/individuals.jsp?number=" + markedIndividual.getIndividualID();
                     System.out.println("Mark info is: " + info);
                     TwitterUtil.addDetectionAndIdentificationTweetToQueue(tweeterScreenName, currentImageURL, twitterInst, markedIndividual.getNickName() , true, true, info, rootDir, pathToQueueFile);
                   } else {
                     //Successful detection and identification but no marked individual
                     System.out.println();
-                    info = flukebookBaseUrl + "/encounters/encounter.jsp/?number=" + currentEnc.getCatalogNumber();
+                    info = flukebookBaseUrl + "/encounters/encounter.jsp?number=" + currentEnc.getCatalogNumber();
                     System.out.println("Mark Successful detection and identification but no marked individual info is: " + info);
                     TwitterUtil.addDetectionAndIdentificationTweetToQueue(tweeterScreenName, currentImageURL, twitterInst, null , true, false, info,  rootDir, pathToQueueFile);
                   }
