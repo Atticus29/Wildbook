@@ -1598,7 +1598,7 @@ private static void exitIdentificationLoop(JSONObject infDict, Shepherd myShephe
 
 //scores < these will require human review (otherwise they carry on automatically)
 public static double getDetectionCutoffValue() {
-  return 0.25;
+  return 0.75;
 }
 public static double getIdentificationCutoffValue() {
   return 0.8;
