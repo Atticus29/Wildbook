@@ -1187,10 +1187,10 @@ System.out.println("XXXXXXXXXXXX getFeatures -> " + ann.getFeatures());
     return processCallback(taskID, resp, context, rootDir, baseUrl);
   }
 
-  public static JSONObject processCallback(String taskID, JSONObject resp, String context, String rootDir, String baseUrl) {
-    System.out.print("Mark 1");
-    return processCallback(taskID, resp, context, rootDir, baseUrl, null, null, null);
-  }
+  // public static JSONObject processCallback(String taskID, JSONObject resp, String context, String rootDir, String baseUrl) {
+  //   System.out.print("Mark 1");
+  //   return processCallback(taskID, resp, context, rootDir, baseUrl, null, null, null);
+  // }
 
   public static JSONObject processCallback(String taskID, JSONObject resp, String context, String rootDir, String baseUrl, String screenName, String imageId, Twitter twitterInst) {
     System.out.println("CALLBACK GOT: (taskID " + taskID + ") " + resp);
