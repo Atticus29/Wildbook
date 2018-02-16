@@ -15,7 +15,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Iterator;
+import java.util.List;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.crypto.Mac;
@@ -226,7 +228,21 @@ System.out.println("======================== postStream -> " + jtext);
             try {
                 result.append(URLEncoder.encode(key, "UTF-8"));
                 result.append("=");
-                result.append(URLEncoder.encode(obj.get(key).toString(), "UTF-8"));
+
+                //abondon all hope ye who enter here
+                // some real madness with a difference between J7 and J8 ... in short, this is not "automatic" in J8
+                //  for J7, this simply works for all cases:   result.append(URLEncoder.encode(obj.get(key).toString(), "UTF-8"));
+                Object val = obj.get(key);
+                if (val instanceof List) {  //maybe could also just be Collection?
+                    JSONArray jarr = new JSONArray((List)val);
+                    result.append(URLEncoder.encode(jarr.toString(), "UTF-8"));
+                } else if (val.getClass().isArray()) {
+                    JSONArray jarr = new JSONArray(val);  //this seems to work?  *gulp*
+                    result.append(URLEncoder.encode(jarr.toString(), "UTF-8"));
+                } else {
+                    result.append(URLEncoder.encode(val.toString(), "UTF-8"));  //bon chance, toString() !!
+                }
+
             } catch (UnsupportedEncodingException uee) {
                 System.out.println("caught exception on key " + key + ": " + uee.toString());
             }
