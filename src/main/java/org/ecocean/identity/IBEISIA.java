@@ -308,6 +308,7 @@ System.out.println("===================================== qlist & tlist ========
 System.out.println(qlist + " callback=" + baseUrl + "/IBEISIAGetJobStatus.jsp");
 System.out.println("tlist.size()=" + tlist.size());
 System.out.println(map);
+System.out.println(" ////////////////" + hashMapToJSONObject2(map) + " ////////////////////////////");
 myShepherd.rollbackDBTransaction();
 myShepherd.closeDBTransaction();
 return RestClient.post(url, hashMapToJSONObject2(map));
