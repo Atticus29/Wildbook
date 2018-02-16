@@ -1601,7 +1601,7 @@ public static double getDetectionCutoffValue() {
   return 0.75;
 }
 public static double getIdentificationCutoffValue() {
-  return 0.8;
+  return 0.1;
 }
 //tests review_pair_list and confidence_list for element at i and determines if we need review
 private static boolean needIdentificationReview(JSONArray rlist, JSONArray clist, int i, String context) {
