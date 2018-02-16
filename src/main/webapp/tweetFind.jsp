@@ -314,7 +314,7 @@
                 Encounter currentEnc = null;
                 try{
                   currentEnc = myShepherd.getEncounter(pendingResult.getString("encounterCatalogNumber"));
-                  System.out.println("Mark fetched encounter " + pendingResult.getString("encounterCatalogNumber"));
+                  System.out.println("Mark fetched current encounter " + pendingResult.getString("encounterCatalogNumber"));
                 } catch(Exception e){
                   System.out.println("couldn't fetch encounter from current pendingResult");
                   e.printStackTrace();
@@ -358,7 +358,7 @@
 
                     info = flukebookBaseUrl + "/individuals.jsp?number=" + markedIndividual.getIndividualID();
                     System.out.println("Mark info is: " + info);
-                    TwitterUtil.addDetectionAndIdentificationTweetToQueue(tweeterScreenName, currentImageURL, twitterInst, markedIndividual.getNickName() , true, true, info, rootDir, pathToQueueFile);
+                    TwitterUtil.addDetectionAndIdentificationTweetToQueue(tweeterScreenName, currentImageURL, twitterInst, markedIndividual.getIndividualID() , true, true, info, rootDir, pathToQueueFile);
                   } else {
                     //Successful detection and identification but no marked individual
                     System.out.println();
